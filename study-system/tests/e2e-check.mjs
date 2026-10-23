@@ -119,18 +119,36 @@ await check('不能读到项目外文件', async () => {
 })
 
 console.log('\n[5] QA 能存能读')
-await check('保存合法 QA', async () => {
-  const r = await fetch(`${BASE}/qa`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({
-      docId: DOC,
-      pairs: [{ q: '端到端验收会检查哪些内容？', a: '检查高亮粒度、archify 图可取性、路径穿越防护和 QA 读写。' }],
-    }),
-  })
-  if (r.status === 404) return // 该路由可能未开放，跳过
-  const body = await r.json()
-  if (!body.accepted) throw new Error(JSON.stringify(body.issues))
+/**
+ * 用一次性项目验证 QA 读写，绝不碰真实学习数据。
+ *
+ * 之前这里是直接往 chapter4 里写 QA，结果每跑一次测试，
+ * 用户就会看到一条他从没写过的问答，阶段还被推进到 recalled。
+ * 测试污染用户数据是不可接受的，所以改成建完就删。
+ */
+await check('保存合法 QA（用临时项目，不污染真实数据）', async () => {
+  const url = `${BASE}/qa`
+  const tempDoc = '__e2e_temp__'
+  try {
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        docId: tempDoc,
+        pairs: [{ q: '端到端验收检查什么？', a: '高亮粒度、图可取性、越界防护和 QA 读写。' }],
+      }),
+    })
+    if (r.status === 404) return // 路由未开放
+    const body = await r.json()
+    if (!body.accepted) throw new Error(JSON.stringify(body.issues))
+  } finally {
+    // 清掉临时项目，避免留下垃圾目录
+    await fetch(`${BASE}/project`, {
+      method: 'DELETE',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ docId: tempDoc }),
+    }).catch(() => {})
+  }
 })
 
 console.log('\n[6] 参考资料按来源分组')

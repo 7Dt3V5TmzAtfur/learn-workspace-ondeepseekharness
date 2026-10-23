@@ -1,0 +1,327 @@
+{
+  "schemaVersion": "learn-from-materials/unit-record-v2",
+  "unit": {
+    "id": "u01",
+    "label": "单元 1",
+    "title": "界定问题",
+    "source": "method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页",
+    "core": {
+      "id": "display-u01-core",
+      "text": "选择行动前先明确范围。"
+    },
+    "frameworks": [
+      {
+        "id": "display-u01-framework-0",
+        "text": "问题地图"
+      }
+    ],
+    "takeaways": [
+      {
+        "id": "display-u01-takeaway-0",
+        "text": "指出边界与相关方。"
+      },
+      {
+        "id": "display-u01-takeaway-1",
+        "text": "明确约束和成功标准。"
+      }
+    ],
+    "conclusions": [
+      {
+        "title": "先明确边界再行动",
+        "source": "method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页",
+        "summary": {
+          "id": "display-u01-conclusion-0-summary",
+          "text": "问题地图帮助识别哪些信息与问题相关。"
+        },
+        "points": [
+          {
+            "id": "display-u01-conclusion-0-point-0",
+            "text": "记录问题包含哪些内容。"
+          },
+          {
+            "id": "display-u01-conclusion-0-point-1",
+            "text": "选择可观察的成功标准。"
+          }
+        ]
+      }
+    ]
+  },
+  "sources": [
+    {
+      "sourceId": "src-451aaf991057-pdf_page-00001",
+      "status": "covered",
+      "reason": "Synthetic demo block assigned to this unit; fixture only."
+    }
+  ],
+  "claims": [
+    {
+      "id": "claim-001",
+      "kind": "method",
+      "text": "选择行动前先明确范围。",
+      "source": "method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页",
+      "sourceIds": [
+        "src-451aaf991057-pdf_page-00001"
+      ],
+      "contentIds": [
+        "display-u01-core"
+      ],
+      "evidence": [
+        {
+          "kind": "text",
+          "sourceId": "src-451aaf991057-pdf_page-00001",
+          "quote": "Before choosing an action, record the problem boundary, stakeholders, constraints and an\n\nobservable success criterion. When the scope is unclear, draw a problem map first;\n\notherwise it is difficult to decide which information is relevant."
+        }
+      ]
+    },
+    {
+      "id": "claim-002",
+      "kind": "method",
+      "text": "问题地图",
+      "source": "method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页",
+      "sourceIds": [
+        "src-451aaf991057-pdf_page-00001"
+      ],
+      "contentIds": [
+        "display-u01-framework-0"
+      ],
+      "evidence": [
+        {
+          "kind": "text",
+          "sourceId": "src-451aaf991057-pdf_page-00001",
+          "quote": "Before choosing an action, record the problem boundary, stakeholders, constraints and an\n\nobservable success criterion. When the scope is unclear, draw a problem map first;\n\notherwise it is difficult to decide which information is relevant."
+        }
+      ]
+    },
+    {
+      "id": "claim-003",
+      "kind": "method",
+      "text": "指出边界与相关方。",
+      "source": "method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页",
+      "sourceIds": [
+        "src-451aaf991057-pdf_page-00001"
+      ],
+      "contentIds": [
+        "display-u01-takeaway-0"
+      ],
+      "evidence": [
+        {
+          "kind": "text",
+          "sourceId": "src-451aaf991057-pdf_page-00001",
+          "quote": "Before choosing an action, record the problem boundary, stakeholders, constraints and an\n\nobservable success criterion. When the scope is unclear, draw a problem map first;\n\notherwise it is difficult to decide which information is relevant."
+        }
+      ]
+    },
+    {
+      "id": "claim-004",
+      "kind": "method",
+      "text": "明确约束和成功标准。",
+      "source": "method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页",
+      "sourceIds": [
+        "src-451aaf991057-pdf_page-00001"
+      ],
+      "contentIds": [
+        "display-u01-takeaway-1"
+      ],
+      "evidence": [
+        {
+          "kind": "text",
+          "sourceId": "src-451aaf991057-pdf_page-00001",
+          "quote": "Before choosing an action, record the problem boundary, stakeholders, constraints and an\n\nobservable success criterion. When the scope is unclear, draw a problem map first;\n\notherwise it is difficult to decide which information is relevant."
+        }
+      ]
+    },
+    {
+      "id": "claim-005",
+      "kind": "method",
+      "text": "问题地图帮助识别哪些信息与问题相关。",
+      "source": "method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页",
+      "sourceIds": [
+        "src-451aaf991057-pdf_page-00001"
+      ],
+      "contentIds": [
+        "display-u01-conclusion-0-summary"
+      ],
+      "evidence": [
+        {
+          "kind": "text",
+          "sourceId": "src-451aaf991057-pdf_page-00001",
+          "quote": "Before choosing an action, record the problem boundary, stakeholders, constraints and an\n\nobservable success criterion. When the scope is unclear, draw a problem map first;\n\notherwise it is difficult to decide which information is relevant."
+        }
+      ]
+    },
+    {
+      "id": "claim-006",
+      "kind": "method",
+      "text": "记录问题包含哪些内容。",
+      "source": "method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页",
+      "sourceIds": [
+        "src-451aaf991057-pdf_page-00001"
+      ],
+      "contentIds": [
+        "display-u01-conclusion-0-point-0"
+      ],
+      "evidence": [
+        {
+          "kind": "text",
+          "sourceId": "src-451aaf991057-pdf_page-00001",
+          "quote": "Before choosing an action, record the problem boundary, stakeholders, constraints and an\n\nobservable success criterion. When the scope is unclear, draw a problem map first;\n\notherwise it is difficult to decide which information is relevant."
+        }
+      ]
+    },
+    {
+      "id": "claim-007",
+      "kind": "method",
+      "text": "选择可观察的成功标准。",
+      "source": "method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页",
+      "sourceIds": [
+        "src-451aaf991057-pdf_page-00001"
+      ],
+      "contentIds": [
+        "display-u01-conclusion-0-point-1"
+      ],
+      "evidence": [
+        {
+          "kind": "text",
+          "sourceId": "src-451aaf991057-pdf_page-00001",
+          "quote": "Before choosing an action, record the problem boundary, stakeholders, constraints and an\n\nobservable success criterion. When the scope is unclear, draw a problem map first;\n\notherwise it is difficult to decide which information is relevant."
+        }
+      ]
+    }
+  ],
+  "frameworks": [
+    {
+      "id": "f-map",
+      "name": "问题地图",
+      "oneLine": "明确边界、相关方、约束和成功标准。",
+      "when": "进入陌生或尚不明确的问题时",
+      "firstUnitId": "u01",
+      "sourceOrder": 1,
+      "source": "method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页"
+    }
+  ],
+  "glossary": [
+    {
+      "id": "boundary",
+      "term": "问题边界",
+      "category": "领域术语",
+      "definition": "当前要解决的问题的范围。",
+      "context": "问题地图在行动前明确边界。",
+      "related": [
+        "约束",
+        "成功标准"
+      ],
+      "units": [
+        "u01"
+      ],
+      "firstUnitId": "u01",
+      "sourceOrder": 1,
+      "source": "method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页"
+    }
+  ],
+  "decisionRules": [
+    {
+      "id": "r-map",
+      "when": "问题范围不清楚",
+      "do": "先画问题地图",
+      "because": "边界有助于识别相关信息",
+      "source": "method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页"
+    }
+  ],
+  "focusAreas": [
+    {
+      "id": "a-map",
+      "title": "识别有用的问题边界",
+      "unitId": "u01",
+      "abilities": [
+        "解释",
+        "应用"
+      ],
+      "source": "method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页"
+    }
+  ],
+  "sections": {
+    "mentalModels": [
+      "问题地图由边界、相关方、约束和可观察成功标准组成；不是固定顺序的所有方法前置关卡。 method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页"
+    ],
+    "antiPatterns": [
+      "范围未清就选择行动会使相关信息难以识别。 method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页"
+    ],
+    "workedExamples": [
+      "原页是方法说明，没有实际业务案例或实证结果。 method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页"
+    ],
+    "connections": [
+      "边界帮助确定相关信息；与证据链的结合是有标注的分析性联系。 method-lab-synthetic.pdf · 标题路径：Method Lab > 1. Problem map · PDF第1页"
+    ]
+  },
+  "ruleReview": {
+    "unitId": "u01",
+    "status": "reviewed",
+    "reviewedSourceIds": [
+      "src-451aaf991057-pdf_page-00001"
+    ],
+    "note": "读回第1页：范围、相关方、约束、可观察成功标准四个要素均保留；问题地图的触发条件是范围不清，不把它扩张为所有工具的强制前置步骤。页眉、版权与页脚不当作研究证据。"
+  },
+  "ruleCandidates": [
+    {
+      "id": "candidate-r-map",
+      "unitId": "u01",
+      "sourceIds": [
+        "src-451aaf991057-pdf_page-00001"
+      ],
+      "quote": "When the scope is unclear, draw a problem map first",
+      "when": "问题范围不清楚",
+      "do": "先画问题地图",
+      "because": "边界有助于识别相关信息",
+      "prerequisites": [],
+      "exceptions": [],
+      "stopCondition": "",
+      "status": "retained",
+      "targetRuleId": "r-map",
+      "reason": "核对自编源材料中的条件、行动与理由后保留。"
+    }
+  ],
+  "frameworkCandidates": [
+    {
+      "id": "fc-f-map",
+      "name": "问题地图",
+      "claimIds": [
+        "claim-002"
+      ],
+      "status": "retained",
+      "targetFrameworkId": "f-map",
+      "reason": "读回第1页：范围、相关方、约束、可观察成功标准四个要素均保留；问题地图的触发条件是范围不清，不把它扩张为所有工具的强制前置步骤。页眉、版权与页脚不当作研究证据。"
+    }
+  ],
+  "relationSearch": {
+    "status": "searched",
+    "sourceIds": [
+      "src-451aaf991057-pdf_page-00001"
+    ],
+    "note": "读回第1页：范围、相关方、约束、可观察成功标准四个要素均保留；问题地图的触发条件是范围不清，不把它扩张为所有工具的强制前置步骤。页眉、版权与页脚不当作研究证据。"
+  },
+  "relationCandidates": [
+    {
+      "id": "rc-page-map-rule",
+      "unitIds": [
+        "u01"
+      ],
+      "sourceIds": [
+        "src-451aaf991057-pdf_page-00001"
+      ],
+      "evidence": [
+        {
+          "kind": "text",
+          "sourceId": "src-451aaf991057-pdf_page-00001",
+          "quote": "Before choosing an action, record the problem boundary, stakeholders, constraints and an\n\nobservable success criterion. When the scope is unclear, draw a problem map first;\n\notherwise it is difficult to decide which information is relevant."
+        }
+      ],
+      "from": "f-map",
+      "to": "r-map",
+      "type": "applies",
+      "condition": "范围不清楚时",
+      "handoff": "地图的边界与成功标准用于识别相关信息。",
+      "evidenceKind": "material",
+      "note": "第1页明确给出条件与画图动作，不推成普遍先后顺序。"
+    }
+  ]
+}

@@ -258,7 +258,10 @@ export function apply(ctx, config = {}) {
               source: 'agent',
             })
           case 'study_status': {
-            if (args.docId) return svc.project(args.docId)
+            // 注意：这里必须用 status() 而不是 project()。
+            // project() 是给界面渲染用的，带 182 段原文 + 三份 HTML（实测 222 KB），
+            // 而 study_status 是每轮都可能调的工具，只需要进度与校验摘要。
+            if (args.docId) return svc.status(args.docId)
             return { projects: await svc.list() }
           }
           case 'study_drill':
@@ -569,6 +572,14 @@ export function apply(ctx, config = {}) {
           if (req.method === 'GET' && route.startsWith('/qa/')) {
             const docId = decodeURIComponent(route.slice('/qa/'.length))
             return send(res, 200, { items: await svcOf(url).qa(docId) })
+          }
+          // 删除整个学习项目：主要给自动化测试收尾用，
+          // 让"建临时项目 → 验证 → 删掉"成为一个不留痕迹的原子动作。
+          if (req.method === 'DELETE' && route === '/project') {
+            const body = await readBody(req)
+            if (!body.docId) return send(res, 400, { error: '缺少 docId' })
+            await svcOf(url).store.remove(body.docId)
+            return send(res, 200, { removed: body.docId })
           }
           if (req.method === 'GET' && route.startsWith('/render/')) {
             const docId = decodeURIComponent(route.slice('/render/'.length))

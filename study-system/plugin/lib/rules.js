@@ -5,6 +5,8 @@
  * 目标分级用没用规定动词。语义质量（写得对不对、好不好）由技能+模型负责。
  */
 
+import { renderMarkdown } from './markdown.js'
+
 /** 渐构七类段落角色标签（tools/渐构+文案拆解标注.md）。 */
 export const ROLE_LABELS = Object.freeze({
   d: { en: 'Definition', zh: '定义', means: '对概念、论点、过程或事物的清晰定义' },
@@ -219,6 +221,11 @@ export function validateAnnotation(items, context) {
       highlightedChars,
       totalChars,
       ratio: Number(ratio.toFixed(4)),
+      // 分档占比：让模型和界面都能看出"是不是某一档用超了"，
+      // 只有总 ratio 的话，超预算时不知道是哪一档的问题。
+      tierRatio: Object.fromEntries(
+        Object.keys(ATTENTION_TIERS).map((k) => [k, Number((tierCharsMap[k] / totalChars).toFixed(4))]),
+      ),
       tierChars: tierCharsMap,
       labelCounts: Object.fromEntries(Object.keys(ROLE_LABELS).map((k) => [k, labels.filter((l) => l === k).length])),
     },
@@ -401,28 +408,85 @@ const escHtml = (s) =>
   String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
 
 /**
- * 在段落文字里把 quote 包成三色 <strong>，返回转义安全的 HTML。
+ * 占位符：用私用区字符包住序号，保证 Markdown 解析器不会吃掉它。
  *
- * 这是"三色加粗原文"的唯一实现点：
- * - 命中：`<strong class="sc-hl-core">原文片段</strong>`
- * - 未命中：原样输出（校验阶段已经拦过，这里只是兜底）
+ * 为什么不用 <strong> 直接插入：如果先插标签再交给 Markdown 解析，
+ * 解析器会把标签当普通字符转义掉；反过来先解析再插标签，则无法
+ * 在跨语法边界的文本上定位 quote。
  *
- * 为什么不用 innerHTML 拼字符串再替换：原文可能有 <、& 等字符，
- * 必须先转义再插入标签，否则会出现 XSS 或标签错乱。这里采用
- * "按命中位置切片 + 逐片转义"的方式，天然安全。
+ * 用 U+E000 私用区字符的理由：它不会被任何 Markdown 语法识别
+ * （不是 * _ ` | # [ ] 这些），且几乎不可能出现在正文里。
  */
-function highlightQuote(text, quote, tierClass) {
-  if (!quote) return escHtml(text)
-  const idx = text.indexOf(quote)
-  if (idx < 0) return escHtml(text)
-  const before = text.slice(0, idx)
-  const hit = text.slice(idx, idx + quote.length)
-  const after = text.slice(idx + quote.length)
-  return `${escHtml(before)}<strong class="${tierClass}">${escHtml(hit)}</strong>${escHtml(after)}`
+const PH_OPEN = '\uE000'
+const PH_CLOSE = '\uE001'
+const PH_OPEN_HARD = '\uE002'
+const PH_CLOSE_HARD = '\uE003'
+const PH_OPEN_REF = '\uE004'
+const PH_CLOSE_REF = '\uE005'
+
+const TIER_MARK = {
+  'sc-hl-core': [PH_OPEN, PH_CLOSE],
+  'sc-hl-hard': [PH_OPEN_HARD, PH_CLOSE_HARD],
+  'sc-hl-ref': [PH_OPEN_REF, PH_CLOSE_REF],
+}
+
+/**
+ * 给一段 Markdown 文本打上高亮占位符。
+ *
+ * quote 可能落在 `**…**` 内部（如 `**作用对象**` 里只标「作用」）。
+ * 占位符包在语法字符**内部**时，Markdown 解析后仍能正确配对，
+ * 但会产出 `<strong class="sc-hl-x"><strong>…</strong></strong>` 这种嵌套。
+ * 因此解析完还有一步 reserve()：先剥掉内层无属性的 <strong>，再插真正的标签。
+ *
+ * @param {string} text  一段原始 Markdown
+ * @param {string} quote 要标出的原文片段
+ * @param {string} tierClass  sc-hl-core / sc-hl-hard / sc-hl-ref
+ * @returns {string} 已解析成 HTML、且高亮已落位的片段
+ */
+function markQuote(text, quote, tierClass) {
+  const marks = TIER_MARK[tierClass]
+  const src = String(text ?? '')
+
+  // 块级语法（表格 / 列表 / 标题 / 代码围栏）必须走块级解析，
+  // 否则 renderMarkdown 的 inline 模式会把这些标记直接删掉，
+  // 表格就会退化成一行竖线文本。
+  const isBlock = /(^|\n)\s*(\||[-*+]\s|\d+\.\s|#{1,6}\s|```|>)/.test(src)
+
+  const render = (s) => (isBlock ? renderMarkdown(s) : renderMarkdown(s, { inline: true }))
+
+  if (!marks) return render(src)
+  const [open, close] = marks
+  if (!quote) return render(src)
+
+  const idx = src.indexOf(quote)
+  if (idx < 0) return render(src)
+
+  // 用占位符夹住命中片段，其余原样
+  const marked = `${src.slice(0, idx)}${open}${src.slice(idx, idx + quote.length)}${close}${src.slice(idx + quote.length)}`
+
+  // 整段过 Markdown（保留 ** | ` 等语法）
+  let html = render(marked)
+
+  // 占位符可能被解析进 <strong> 里，导致 <strong class=hl><strong>文字</strong></strong>
+  // 先去掉紧邻的嵌套层，避免无意义的双重加粗
+  html = html
+    .replace(new RegExp(`<strong>\\s*${open}`, 'g'), open)
+    .replace(new RegExp(`${close}\\s*</strong>`, 'g'), close)
+
+  // 占位符换回真正的标签
+  return html
+    .split(open)
+    .join(`<strong class="${tierClass}">`)
+    .split(close)
+    .join('</strong>')
 }
 
 /**
  * 把原文 + 标注渲染成 HTML：整篇按 ¶N 分段，段内在原文位置做三色加粗。
+ *
+ * 关键：正文必须按 **整段** 交给 Markdown 解析，不能逐行——
+ * 表格（`| a | b |` 多行）和列表（连续 `- ` 行）都是跨行语法，
+ * 逐行解析会把它们拆成一个个 <p>，在界面上变成竖排竖线。
  *
  * @param {Array<{id:string,text:string}>} segments
  * @param {{items:Array}} annotation
@@ -447,16 +511,9 @@ export function renderAnnotatedHtml(segments, annotation) {
           `<span class="sc-tag-en">${escHtml(en)}</span></span>`
       }
 
-      // 正文：如果是标题行就渲染成标题，否则做三色高亮
+      // 正文：整段过一次 Markdown，高亮用占位符法落位
       const quote = a?.quote ? String(a.quote).trim() : ''
-      const body = String(seg.text)
-        .split('\n')
-        .map((line) => {
-          if (!line.trim()) return ''
-          if (line.startsWith('#')) return `<div class="sc-h">${highlightQuote(line, quote, tierClass)}</div>`
-          return `<p>${highlightQuote(line, quote, tierClass)}</p>`
-        })
-        .join('')
+      const body = markQuote(String(seg.text), quote, a ? tierClass : '')
 
       // 备注单独一行，不参与高亮
       const note = a?.note ? `<div class="sc-seg-note">${escHtml(a.note)}</div>` : ''

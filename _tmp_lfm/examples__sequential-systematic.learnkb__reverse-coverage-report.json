@@ -1,0 +1,76 @@
+{
+  "schemaVersion": "learn-from-materials/reverse-coverage-report-v1",
+  "totalSourceBlocks": 3,
+  "mappedSourceBlocks": 3,
+  "unmappedSourceBlocks": 0,
+  "unmappedRatio": 0.0,
+  "unmappedSourceIds": [],
+  "intentionallyOmittedSourceBlocks": 0,
+  "intentionallyOmittedRatio": 0.0,
+  "intentionallyOmittedSourceIds": [],
+  "sampleSize": 3,
+  "sample": [
+    {
+      "sourceId": "src-451aaf991057-pdf_page-00002",
+      "filename": "method-lab-synthetic.pdf",
+      "locatorType": "pdf_page",
+      "covered": true,
+      "mappedUnits": [
+        "u02"
+      ],
+      "mappedClaims": [
+        "claim-008",
+        "claim-009",
+        "claim-010",
+        "claim-011",
+        "claim-012",
+        "claim-013",
+        "claim-014"
+      ],
+      "status": "covered"
+    },
+    {
+      "sourceId": "src-451aaf991057-pdf_page-00001",
+      "filename": "method-lab-synthetic.pdf",
+      "locatorType": "pdf_page",
+      "covered": true,
+      "mappedUnits": [
+        "u01"
+      ],
+      "mappedClaims": [
+        "claim-001",
+        "claim-002",
+        "claim-003",
+        "claim-004",
+        "claim-005",
+        "claim-006",
+        "claim-007"
+      ],
+      "status": "covered"
+    },
+    {
+      "sourceId": "src-451aaf991057-pdf_page-00003",
+      "filename": "method-lab-synthetic.pdf",
+      "locatorType": "pdf_page",
+      "covered": true,
+      "mappedUnits": [
+        "u03"
+      ],
+      "mappedClaims": [
+        "claim-015",
+        "claim-016",
+        "claim-017",
+        "claim-018",
+        "claim-019",
+        "claim-020",
+        "claim-021",
+        "claim-022",
+        "claim-023",
+        "claim-024",
+        "claim-025"
+      ],
+      "status": "covered"
+    }
+  ],
+  "passed": true
+}

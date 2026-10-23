@@ -538,12 +538,57 @@ await test('生成思考题不等于完成考核', async () => {
   await svc.saveQuiz(DOC_ID, '# 思考题\n\n1. 说说三类负荷。\n')
   const proj = await loadProject(svc)
   assert.equal(proj.progress.drilled, false, 'quiz.md 存在不应被视为已考核')
-  assert.equal(proj.next.action, 'study-feynman', '下一步仍应是费曼考核')
+  // 阶段顺序是 … → mapped → recalled → drilled。此刻还没做 QA 自测，
+  // 所以下一步应先去做读后自测，而不是直接跳到费曼考核。
+  assert.equal(proj.next.action, 'study-recall', '下一步应先做读后自测')
 })
 
 await test('空复述被拒，不能空手过关', async () => {
   const svc = new StudyService(workspace)
   await assert.rejects(() => svc.recordDrill(DOC_ID, { answer: '   ' }), /缺少你的复述/)
+})
+
+/* ---- 读后自测（recalled）阶段：新加的阶段必须真的接进状态机 ---- */
+
+await test('没做 QA 时 next 指向 study-recall，不能直接跳到考核', async () => {
+  const svc = new StudyService(workspace)
+  const st = await svc.status(DOC_ID)
+  assert.equal(st.progress.recalled, false, 'qa.json 为空时不该算完成自测')
+  assert.equal(st.next.action, 'study-recall', `实际 next=${st.next.action}`)
+})
+
+await test('保存 QA 后 recalled 点亮，next 才指向 study-feynman', async () => {
+  const svc = new StudyService(workspace)
+  const res = await svc.saveQa(DOC_ID, [
+    { q: '三类认知负荷分别是什么？', a: '内在、外在、相关。', segmentIds: [] },
+  ])
+  assert.equal(res.accepted, true, JSON.stringify(res.issues))
+  // saveQa 必须也返回 next，否则界面和 Agent 都不知道下一步
+  assert.ok(res.next, 'saveQa 应返回 next')
+  assert.equal(res.next.action, 'study-feynman', `实际 next=${res.next.action}`)
+  const st = await svc.status(DOC_ID)
+  assert.equal(st.progress.recalled, true, 'recalled 应已点亮')
+  assert.equal(st.counts.qa, 1)
+})
+
+await test('QA 超 100 字被拒（原则要求每条不超过 100 字）', async () => {
+  const svc = new StudyService(workspace)
+  const long = '啊'.repeat(101)
+  const res = await svc.saveQa(DOC_ID, [{ q: long, a: '短答案' }])
+  assert.equal(res.accepted, false, '超长问题应被拒')
+  assert.ok(
+    res.issues.some((i) => i.code === 'qa-question-too-long'),
+    JSON.stringify(res.issues),
+  )
+})
+
+await test('status() 不含正文，避免每轮烧掉几十 KB 上下文', async () => {
+  const svc = new StudyService(workspace)
+  const st = await svc.status(DOC_ID)
+  const size = JSON.stringify(st).length
+  assert.ok(size < 8 * 1024, `status() 应小于 8KB，实际 ${(size / 1024).toFixed(1)}KB`)
+  assert.equal(st.segments, undefined, 'status 不该带 segments 全量')
+  assert.equal(st.annotatedHtml, undefined, 'status 不该带渲染好的正文')
 })
 
 await test('记录真实复述后才推进到 drilled', async () => {

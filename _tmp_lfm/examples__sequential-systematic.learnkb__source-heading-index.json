@@ -1,0 +1,41 @@
+{
+  "schemaVersion": "learn-from-materials/source-heading-index-v1",
+  "entries": [
+    {
+      "filename": "method-lab-synthetic.pdf",
+      "path": "Method Lab",
+      "pdfStart": 1,
+      "pdfEnd": 3,
+      "evidencePage": 1,
+      "verification": "text",
+      "evidenceText": "Method Lab"
+    },
+    {
+      "filename": "method-lab-synthetic.pdf",
+      "path": "Method Lab > 1. Problem map",
+      "pdfStart": 1,
+      "pdfEnd": 1,
+      "evidencePage": 1,
+      "verification": "text",
+      "evidenceText": "1. Problem map"
+    },
+    {
+      "filename": "method-lab-synthetic.pdf",
+      "path": "Method Lab > 2. Evidence chain",
+      "pdfStart": 2,
+      "pdfEnd": 2,
+      "evidencePage": 2,
+      "verification": "text",
+      "evidenceText": "2. Evidence chain"
+    },
+    {
+      "filename": "method-lab-synthetic.pdf",
+      "path": "Method Lab > 3. Action loop",
+      "pdfStart": 3,
+      "pdfEnd": 3,
+      "evidencePage": 3,
+      "verification": "text",
+      "evidenceText": "3. Action loop"
+    }
+  ]
+}

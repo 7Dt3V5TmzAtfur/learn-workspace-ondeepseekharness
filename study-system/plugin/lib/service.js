@@ -19,7 +19,7 @@ import {
   RELATION_TYPES,
 } from './rules.js'
 
-const STAGE_ORDER = ['ingested', 'planned', 'annotated', 'mapped', 'drilled']
+const STAGE_ORDER = ['ingested', 'planned', 'annotated', 'mapped', 'recalled', 'drilled']
 
 function nextStepOf(progress) {
   if (!progress.ingested) return { stage: 'empty', action: 'study_ingest', message: '先导入一份资料' }
@@ -32,8 +32,15 @@ function nextStepOf(progress) {
   if (!progress.mapped) {
     return { stage: 'annotated', action: 'study-map', message: '梳理知识点逻辑关系，生成衔接图' }
   }
+  if (!progress.recalled) {
+    return {
+      stage: 'mapped',
+      action: 'study-recall',
+      message: '读后自测：生成 6-12 条问答（每条 ≤100 字），再定一个明天能做完的最小行动',
+    }
+  }
   if (!progress.drilled) {
-    return { stage: 'mapped', action: 'study-feynman', message: '读后考核：合上讲义做费曼复述与练习' }
+    return { stage: 'recalled', action: 'study-feynman', message: '读后考核：合上讲义做费曼复述与练习' }
   }
   return { stage: 'done', action: null, message: '全流程完成：可以做迁移应用或教给别人' }
 }
@@ -506,12 +513,88 @@ export class StudyService {
       items: normalized,
       savedAt: new Date().toISOString(),
     })
-    return { docId, accepted: true, issues, count: normalized.length }
+    return {
+      docId,
+      accepted: true,
+      issues,
+      count: normalized.length,
+      // 与其它阶段保持一致：存完就把"下一步"一起告诉调用方，
+      // 否则界面和 Agent 都不知道 QA 存进去以后该干什么。
+      next: nextStepOf(await this.store.progressOf(docId)),
+    }
   }
 
   async qa(docId) {
     const art = await this.store.artifact(docId, 'qa.json').catch(() => null)
     return art?.items ?? []
+  }
+
+  /**
+   * 精简状态：只给"做决定需要知道的事"，不含正文。
+   *
+   * 为什么需要单开一个方法：`project()` 是为了给界面渲染的，它带 182 段原文、
+   * 三份渲染好的 HTML、mermaid 源码，实测响应 222 KB。
+   * 而 `study_status` 是模型每轮都会调的工具，它只需要知道
+   * 「做到哪一步了、下一步干什么、有哪些校验问题」。
+   * 让模型读 222 KB 换一句话的结论，是纯粹的上下文浪费。
+   */
+  async status(docId) {
+    const meta = await this.store.meta(docId)
+    const progress = await this.store.progressOf(docId)
+    const preflight = await this.store.artifact(docId, 'preflight.json').catch(() => null)
+    const annotations = await this.store.artifact(docId, 'annotations.json').catch(() => null)
+    const relations = await this.store.artifact(docId, 'relations.json').catch(() => null)
+    const qa = await this.store.artifact(docId, 'qa.json').catch(() => null)
+    const terms = await this.store.jsonl(docId, 'terms.jsonl').catch(() => [])
+    const drills = await this.store.jsonl(docId, 'drills.jsonl').catch(() => [])
+
+    // 每个阶段只带"有没有问题"，不带全量 issue 文本（可能几十条，逐条读没意义）
+    const brief = (check) => {
+      if (!check) return null
+      const errs = (check.issues ?? []).filter((i) => i.level === 'error')
+      const warns = (check.issues ?? []).filter((i) => i.level === 'warn')
+      return {
+        ok: check.ok ?? errs.length === 0,
+        errors: errs.length,
+        warns: warns.length,
+        // 只给前 3 条错误，够定位就行
+        top: errs.slice(0, 3).map((i) => i.code ?? i.message),
+      }
+    }
+
+    return {
+      docId,
+      title: meta?.title ?? docId,
+      sourcePath: meta?.sourcePath ?? null,
+      stage: nextStepOf(progress).stage,
+      next: nextStepOf(progress),
+      progress,
+      checks: {
+        preflight: brief(preflight?.check),
+        annotation: brief(annotations?.check),
+        relations: brief(relations?.check),
+      },
+      counts: {
+        segments: progress.segmentCount,
+        annotations: progress.annotatedCount,
+        nodes: relations?.nodes?.length ?? 0,
+        edges: relations?.edges?.length ?? 0,
+        figures: (await this.store.artifact(docId, 'figures.json').catch(() => null))?.figures?.length ?? 0,
+        qa: qa?.items?.length ?? 0,
+        terms: terms.length,
+        drills: drills.length,
+      },
+      // 高亮预算实测值：模型应该据此判断要不要缩短 quote
+      highlight: annotations?.stats
+        ? {
+            ratio: annotations.stats.ratio,
+            coreRatio: annotations.stats.tierRatio?.core ?? null,
+            hardRatio: annotations.stats.tierRatio?.hard ?? null,
+            refRatio: annotations.stats.tierRatio?.ref ?? null,
+          }
+        : null,
+      hint: '需要看原文段落用 study_read；这个接口只回报进度与校验，不含正文。',
+    }
   }
 
   /**

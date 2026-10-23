@@ -1,0 +1,85 @@
+{
+  "sources": [
+    {
+      "filename": "method-lab-synthetic.pdf",
+      "status": "covered",
+      "reason": "逐页核查自编的三页材料并映射至三个内容单元。",
+      "unitIds": [
+        "u01",
+        "u02",
+        "u03"
+      ],
+      "ranges": [
+        {
+          "kind": "pdf_page",
+          "start": 1,
+          "end": 3
+        }
+      ]
+    }
+  ],
+  "finalCheck": {
+    "readToEnd": true,
+    "noEarlyStop": true,
+    "sourceLocatorsChecked": true
+  },
+  "schemaVersion": "1.1",
+  "learningDepth": "systematic",
+  "sourceBlocks": [
+    {
+      "sourceId": "src-451aaf991057-pdf_page-00001",
+      "status": "covered",
+      "reason": "Synthetic demo block assigned to this unit; fixture only.",
+      "mappedUnits": [
+        "u01"
+      ],
+      "mappedClaims": [
+        "claim-001",
+        "claim-002",
+        "claim-003",
+        "claim-004",
+        "claim-005",
+        "claim-006",
+        "claim-007"
+      ]
+    },
+    {
+      "sourceId": "src-451aaf991057-pdf_page-00002",
+      "status": "covered",
+      "reason": "Synthetic demo block assigned to this unit; fixture only.",
+      "mappedUnits": [
+        "u02"
+      ],
+      "mappedClaims": [
+        "claim-008",
+        "claim-009",
+        "claim-010",
+        "claim-011",
+        "claim-012",
+        "claim-013",
+        "claim-014"
+      ]
+    },
+    {
+      "sourceId": "src-451aaf991057-pdf_page-00003",
+      "status": "covered",
+      "reason": "Synthetic demo block assigned to this unit; fixture only.",
+      "mappedUnits": [
+        "u03"
+      ],
+      "mappedClaims": [
+        "claim-015",
+        "claim-016",
+        "claim-017",
+        "claim-018",
+        "claim-019",
+        "claim-020",
+        "claim-021",
+        "claim-022",
+        "claim-023",
+        "claim-024",
+        "claim-025"
+      ]
+    }
+  ]
+}

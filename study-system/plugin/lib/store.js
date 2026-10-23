@@ -254,14 +254,18 @@ export class StudyStore {
     // 读前建构阶段就会生成 quiz.md（思考题），所以它不能代表"已考核"。
     // 真正的考核完成以学习者自己提交过复述/答题记录为准。
     const drillRecords = await readJsonl(join(dir, 'drills.jsonl')).catch(() => [])
+    // 读后自测（QA）：只有真的提交过问答才算完成，空文件不算
+    const qa = await readJson(join(dir, 'qa.json'))
     return {
       ingested: has('source.md'),
       planned: Boolean(preflight?.summary),
       annotated: Boolean(annotation?.items?.length),
-      drilled: drillRecords.length > 0,
       mapped: has('relations.json'),
+      recalled: Boolean(qa?.items?.length),
+      drilled: drillRecords.length > 0,
       annotatedCount: annotation?.items?.length ?? 0,
       drillCount: drillRecords.length,
+      qaCount: qa?.items?.length ?? 0,
       segmentCount: (await this.segments(docId)).length,
     }
   }
