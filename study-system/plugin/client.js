@@ -273,11 +273,30 @@ body[data-ds-dark-theme] .sc-root{
 /* 知识点块 */
 .sc-kp{border-left:2px solid var(--sc-core-line);padding:2px 0 2px 10px;margin:10px 0}
 .sc-kp:last-child{margin-bottom:0}
-.sc-kp-h{font-weight:600;margin-bottom:3px;line-height:1.6}
+.sc-kp-h{font-weight:600;margin-bottom:3px;line-height:1.6;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
 .sc-kp-b{margin:0}
 .sc-kp-b>p{margin:0 0 4px}
 .sc-kp-b>p:last-child{margin-bottom:0}
 .sc-kp-note{color:var(--dsw-alias-label-secondary);font-size:var(--sc-fs-sm);margin-top:var(--sc-sp-1);line-height:1.7}
+/* 知识点 → 原文的回指链接。
+   没有回指时显示灰色"原文位置待定位"，不给假链接：
+   点了跳不到东西比没有链接更让人恼火。 */
+.sc-kp-jump{margin-left:auto;font-size:var(--sc-fs-xs);font-weight:400;text-decoration:none;
+  color:var(--dsw-alias-brand-primary);white-space:nowrap;padding:1px 6px;border-radius:var(--sc-r-sm)}
+.sc-kp-jump:hover{background:var(--dsw-alias-bg-layer-2);text-decoration:underline}
+.sc-kp-jump:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:1px}
+.sc-kp-nojump{margin-left:auto;font-size:var(--sc-fs-xs);font-weight:400;
+  color:var(--dsw-alias-label-secondary);opacity:.7;white-space:nowrap}
+/* 从读前跳到读中时，目标段落闪一下。
+   不闪的话用户滚到了也不知道该看哪一行 —— 182 段的页面里滚过去就找不到了。 */
+.sc-seg-flash{animation:sc-flash 1.6s ease-out}
+@keyframes sc-flash{
+  0%{background:color-mix(in oklab, var(--dsw-alias-brand-primary) 18%, transparent)}
+  70%{background:color-mix(in oklab, var(--dsw-alias-brand-primary) 8%, transparent)}
+  100%{background:transparent}
+}
+@media (prefers-reduced-motion:reduce){.sc-seg-flash{animation:none;
+  outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}}
 /* 折叠区：读前六段式默认只给骨架，重点难点与知识点正文折起来。
    打开页面要读的字从 5845 降到 2796（-52%），想核对细节的人再点开。
    summary 做成一眼可点的样子，不能像普通小标题那样看不出能点。 */
@@ -468,11 +487,27 @@ body[data-ds-dark-theme] .sc-root{
       return out
     }
 
-    function PreflightPane({ project, onJump }) {
+    function PreflightPane({ project, onJump, onGotoSegment }) {
       const plan = project.preflight
       const [cur, setCur] = useState('①')
 
       const blocks = useMemo(() => splitPreflight(project.preflightHtml), [project.preflightHtml])
+
+      /**
+       * 知识点右侧的「看原文 ¶N」是宿主渲染的 <a data-seg>，
+       * 用事件委托接住 —— 这样不用为每个知识点单独写 React 组件，
+       * 也让宿主那份 HTML 保持纯静态。
+       */
+      const onBodyClick = useCallback(
+        (e) => {
+          const a = e.target?.closest?.('a.sc-kp-jump')
+          if (!a) return
+          e.preventDefault()
+          const seg = a.getAttribute('data-seg')
+          if (seg && onGotoSegment) onGotoSegment(seg)
+        },
+        [onGotoSegment],
+      )
 
       if (!plan) {
         return h(
@@ -675,7 +710,7 @@ body[data-ds-dark-theme] .sc-root{
      * 早期版本按段落套 class 整段变色，导致"每段都是一块颜色"、
      * 注意力机制完全失效；现在高亮是短语级的。
      */
-    function ReadingPane({ project, onAsk, onLocate, workspace }) {
+    function ReadingPane({ project, onAsk, onLocate, workspace, jumpTo, onJumped }) {
       const [sel, setSel] = useState(null)
       const [selText, setSelText] = useState('')
       const [onlyAnnotated, setOnlyAnnotated] = useState(false)
@@ -722,6 +757,43 @@ body[data-ds-dark-theme] .sc-root{
           alive = false
         }
       }, [project.id])
+
+      /**
+       * 从读前页点知识点的「看原文 ¶N」跳过来。
+       *
+       * 要做的三件事：
+       *   1. 等这一帧渲染完再滚，否则元素还没挂上
+       *   2. 滚到那一段并给个短暂高亮，否则用户滚到了也不知道看哪
+       *   3. 把这一段所在单元标为 active，让目录里也能对上
+       */
+      useEffect(() => {
+        if (!jumpTo) return
+        const id = jumpTo
+        const t = setTimeout(() => {
+          // 宿主渲染段落时用的是 data-id（见 rules.js renderAnnotatedHtml），
+          // 这里顺手兼容 data-seg-id，免得两边对不上就跳不过去
+          const el =
+            document.querySelector(`[data-id="${id}"]`) ??
+            document.querySelector(`[data-seg-id="${id}"]`)
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            el.classList.add('sc-seg-flash')
+            setTimeout(() => el.classList.remove('sc-seg-flash'), 1600)
+          }
+          if (unitList) {
+            const hit = unitList.units.find((u) => u.sourceRange?.from === id) ??
+              unitList.units.find((u) => {
+                const a = parseInt(String(u.sourceRange?.from ?? '').replace(/\D/g, ''), 10)
+                const b = parseInt(String(u.sourceRange?.to ?? '').replace(/\D/g, ''), 10)
+                const n = parseInt(String(id).replace(/\D/g, ''), 10)
+                return Number.isFinite(a) && Number.isFinite(b) && n >= a && n <= b
+              })
+            if (hit) setActiveUnit(hit.id)
+          }
+          onJumped?.()
+        }, 60)
+        return () => clearTimeout(t)
+      }, [jumpTo]) // eslint-disable-line react-hooks/exhaustive-deps
 
       // 进面板时，把核心档（必须能复述的骨架）先盖上。
       // 只盖 core 不盖 hard：攻坚档多是提问句，盖住反而看不出在问什么；
@@ -1666,6 +1738,13 @@ body[data-ds-dark-theme] .sc-root{
       const [docId, setDocId] = useState(null)
       const [project, setProject] = useState(null)
       const [tab, setTab] = useState('read')
+      // 点了知识点的「看原文」后要跳到读中页的那一段。
+      // 用状态传递而不是 window 事件：读中页可能还没挂载，需要一个能落地的值。
+      const [jumpTo, setJumpTo] = useState(null)
+      const gotoSegment = useCallback((segId) => {
+        setJumpTo(segId)
+        setTab('read')
+      }, [])
       const [error, setError] = useState(null)
       const [busy, setBusy] = useState(false)
       const [showDiag, setShowDiag] = useState(false)
@@ -1921,11 +2000,11 @@ body[data-ds-dark-theme] .sc-root{
                   ),
                   h(
                     'div',
-                    { className: 'sc-pane' },
+                    { className: 'sc-pane', onClick: onBodyClick },
                     tab === 'read'
-                      ? h(ReadingPane, { project, onAsk: ask, workspace: wsPath })
+                      ? h(ReadingPane, { project, onAsk: ask, workspace: wsPath, jumpTo, onJumped: () => setJumpTo(null) })
                       : tab === 'plan'
-                        ? h(PreflightPane, { project, onJump: setTab })
+                        ? h(PreflightPane, { project, onJump: setTab, onGotoSegment: gotoSegment })
                         : tab === 'graph'
                           ? h(GraphPane, { project })
                           : tab === 'recall'

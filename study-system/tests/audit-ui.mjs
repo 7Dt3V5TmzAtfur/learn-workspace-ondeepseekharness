@@ -411,6 +411,41 @@ check(
   '没有 units.json 的项目应返回 null 而不是 500',
 )
 
+/* ---------------------------------------------- 11. 知识点回指原文 */
+
+console.log('\n11. 知识点能跳回原文（参考项目「claim 与原文双向映射」的启发）')
+
+check(
+  '知识点旁有「看原文」链接',
+  /sc-kp-jump/.test(clientSrc) && /sc-kp-jump/.test(serviceSrc),
+  '18 个知识点都不带段号时，用户点开一个知识点无路可走',
+)
+check(
+  '链接带 data-seg 指向具体段落',
+  /data-seg="\$\{escAttr\(ids\[0\]\)\}"/.test(serviceSrc),
+  '不带段号的跳转等于假链接',
+)
+check(
+  '没有回指时明说待定位，不给假链接',
+  /sc-kp-nojump/.test(serviceSrc) && /原文位置待定位/.test(serviceSrc),
+  '点了跳不到东西比没有链接更让人恼火',
+)
+check(
+  '点链接会切到读中页并滚到那一段',
+  /gotoSegment/.test(clientSrc) && /scrollIntoView/.test(clientSrc),
+  '只切页签不定位，用户在 182 段里找不到',
+)
+check(
+  '目标段落会闪一下',
+  /sc-seg-flash/.test(clientSrc),
+  '滚过去就找不到了，必须视觉上标一下',
+)
+check(
+  '闪动遵循 prefers-reduced-motion',
+  /prefers-reduced-motion:reduce\)\{\.sc-seg-flash/.test(clientSrc),
+  '前庭敏感用户会不适',
+)
+
 /* ---------------------------------------------- 汇总 */
 
 console.log(`\n${'─'.repeat(62)}`)

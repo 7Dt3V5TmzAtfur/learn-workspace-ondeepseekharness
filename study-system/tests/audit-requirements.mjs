@@ -284,6 +284,41 @@ add(
   '有边既没出处也没标推断，等于把猜测当事实',
 )
 
+add(
+  'D9',
+  '每个知识点都能回指到原文段落',
+  (() => {
+    const kps = (pre?.parts ?? []).flatMap((p) => p.knowledgePoints ?? [])
+    if (!kps.length) return false
+    // 允许极少数确实定位不到的，但不能大面积缺失 ——
+    // 之前是 18 个知识点 0 个段号，用户点开一个知识点无路可走
+    const withSeg = kps.filter((k) => (k.segmentIds ?? []).length > 0)
+    return withSeg.length / kps.length >= 0.9
+  })(),
+  '知识点不带段落号，用户无法从知识点跳回原文那一句',
+)
+
+add(
+  'D10',
+  '知识点的段落号都真实存在',
+  (() => {
+    const kps = (pre?.parts ?? []).flatMap((p) => p.knowledgePoints ?? [])
+    return kps.every((k) => (k.segmentIds ?? []).every((id) => textsMap.has(id)))
+  })(),
+  '挂了不存在的段号，点过去是空的，比不挂更糟',
+)
+
+add(
+  'D11',
+  '每个 part 绑定到真实单元',
+  (() => {
+    const parts = pre?.parts ?? []
+    if (!parts.length) return false
+    return parts.every((p) => (p.unitIds ?? []).length > 0 && (p.segmentIds ?? []).length > 0)
+  })(),
+  'part 是模型概括的切法，不绑单元就跟原文小节没有 ID 关联',
+)
+
 /* ---------- 报告 ---------- */
 console.log('需求符合度审计\n' + '='.repeat(64))
 let pass = 0

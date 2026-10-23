@@ -275,13 +275,22 @@ export class StudyService {
         // 折叠着也要能看到"有哪几个知识点"，只给名字，不给正文
         const kpNames = kpList.map((kp) => `<li>${t(kp.name)}</li>`).join('')
         const kps = kpList
-          .map(
-            (kp, j) => `<div class="sc-kp">
-      <div class="sc-kp-h">知识点 ${j + 1}　${t(kp.name)}</div>
+          .map((kp, j) => {
+            // 原文回指：点一下跳到读中加工那一段。
+            // 没有回指就不显示 —— 假链接比没有链接更糟。
+            const ids = kp.segmentIds ?? []
+            const jump =
+              ids.length > 0
+                ? `<a class="sc-kp-jump" href="#" data-seg="${escAttr(ids[0])}">看原文 ${t(ids[0])}${
+                    ids.length > 1 ? ` 等 ${ids.length} 段` : ''
+                  }</a>`
+                : '<span class="sc-kp-nojump" title="这条知识点的依据还没定位到具体段落">原文位置待定位</span>'
+            return `<div class="sc-kp">
+      <div class="sc-kp-h">知识点 ${j + 1}　${t(kp.name)}${jump}</div>
       <div class="sc-kp-b">${md(kp.content)}</div>
       ${kp.note ? `<div class="sc-kp-note">备注：${t(kp.note)}</div>` : ''}
-    </div>`,
-          )
+    </div>`
+          })
           .join('\n      ')
         return `<section class="sc-part">
     <h3>${headingOf(p, i)}<span class="sc-lv" data-lv="${escAttr(a.level ?? '')}">${t(a.level ?? '—')}</span></h3>

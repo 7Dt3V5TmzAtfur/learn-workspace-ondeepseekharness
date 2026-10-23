@@ -188,6 +188,24 @@ check(
   '假的 units.json 比没有更糟：用户会以为结构是对的',
 )
 
+// ---- study-preflight 知识点回指 ----
+console.log('\n9. study-preflight：知识点与 part 都要能回到原文')
+check(
+  '要求知识点挂 segmentIds',
+  has('study-preflight', /segmentIds/),
+  '没有段号，用户看到一个知识点无路可走',
+)
+check(
+  '说明找不到就不挂、挂错比不挂更糟',
+  has('study-preflight', /挂错比不挂|宁缺毋滥/),
+  '挂到错的段落上，用户会以为自己记错了',
+)
+check(
+  '要求 part 挂 unitIds',
+  has('study-preflight', /unitIds/),
+  'part 标题是模型概括的，不挂单元就跟原文小节对不上',
+)
+
 console.log(`\n${'─'.repeat(60)}`)
 console.log(`通过 ${pass}　失败 ${fails.length}`)
 
