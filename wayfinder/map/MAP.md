@@ -47,13 +47,14 @@
 
 <!-- 已关闭的 ticket：一行一条，够判断相关性即可，细节点链接进去看 -->
 
-- （尚无 — 全部在等用户拍板）
+- [11 `recalled` 阶段缺失](tickets/11-recalled-stage-missing.md) — **已修**。状态机加 `recalled`，`saveQa` 返回 `next`；`next` 不再跳过 QA 直接从图谱跳到费曼考核
+- [01 正文 Markdown 未渲染](tickets/01-markdown-not-rendered.md) — **已修**（占位符法）。实测 `**` 422 → 0，表格 0 → 2，37 处高亮完好
+- 附带修复：`study_status` 从 222 KB 瘦到 0.7 KB（新增 `status()`，不再返回正文）
 
 ## Open tickets
 
 | Ticket | 类型 | 要决定什么 | 需要用户 |
 |---|---|---|---|
-| [01 正文 Markdown 未渲染](tickets/01-markdown-not-rendered.md) | task | 422 处 `**` 怎么修 | 否（方案已定，占位符法） |
 | [02 「整行有颜色」没实现](tickets/02-row-color-not-implemented.md) | grilling | 整行底色是 A 标签行通栏 / B 左侧竖条 / C 两者 | **是** |
 | [03 考核门槛太松](tickets/03-drill-gate-too-loose.md) | grilling | 要不要 60 秒/150 字硬门槛 | **是** |
 | [04 无复习调度](tickets/04-no-review-schedule.md) | task | 1/3/7 天间隔复习怎么做 | 部分 |
@@ -63,12 +64,26 @@
 | [08 关系门禁缺失](tickets/08-relation-gate-missing.md) | task | 八种关系逐类表态 + 边要原文出处 | 部分 |
 | [09 信息架构](tickets/09-information-architecture.md) | prototype | 3 个方案选 1 | **是** |
 | [10 视觉体系](tickets/10-visual-system.md) | prototype | 三色换橙/品红/青？整行底色形态？ | **是** |
+| [12 高亮只占 0.85%](tickets/12-highlight-too-sparse.md) | grilling | 要不要设高亮下界 | **是** |
 
-## Frontier（可以立刻推进的）
+## Frontier
 
-无阻塞、不需要用户拍板的：**01 / 05 / 04（部分）**。
-需要用户先回答才能推进的：**02 / 03 / 07 / 09 / 10**。
-依赖 09/10 结论的：**06**（3 个形态待选）。
+**已修（本次）**：01、11
+**零阻塞、不用问用户、可以立刻做**：05（段内密度 + 死代码）、04（复习调度）
+**必须先问用户**：02 / 03 / 07 / 09 / 10 / 12 —— 这六张决定了 v3 的形态，没有用户回答就动手等于猜
+
+## 程序化核实过的硬数字（可直接引用）
+
+| 指标 | 修复前 | 修复后 |
+|---|---|---|
+| 正文 `**` 字面量 | 422 | **0** |
+| `<table>` 数量 | 0 | **2** |
+| 三色高亮数 | 37 | 37（未退化） |
+| 整段染色 | 0 | 0（没有倒退到 v1） |
+| `study_status` 响应 | 222 KB | **0.7 KB** |
+| 无 CSS 规则的 class | 7 | 7（待修，见 06） |
+| 高亮占全文比例 | 0.85% | 0.85%（太低，见 12） |
+| 标注覆盖的段数 | 37/182 | 37/182（见 07） |
 
 ## Not yet specified
 
