@@ -82,4 +82,8 @@ if (dangling.length) {
   for (const v of dangling) console.log(`    ${v}`)
 }
 
-process.exitCode = missing.length || dangling.length ? 1 : 0
+// 两项检查：class 有没有样式、CSS 变量有没有悬空
+const bad = (missing.length ? 1 : 0) + (dangling.length ? 1 : 0)
+console.log(`\n通过 ${2 - bad}　失败 ${bad}`)
+
+process.exitCode = bad ? 1 : 0
