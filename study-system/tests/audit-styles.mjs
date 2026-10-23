@@ -65,4 +65,21 @@ if (missing.length) {
 console.log('\n=== 已覆盖 ===')
 console.log('  ' + covered.join('  '))
 
-process.exitCode = missing.length ? 1 : 0
+/* ---- CSS 变量悬空检查 ----
+ *
+ * 写 var(--sc-sp-1) 但没定义 --sc-sp-1 时，浏览器不会报错，
+ * 只会静默失效 —— 该有间距的地方没间距，该有颜色的地方没颜色。
+ * 这种错肉眼极难发现，因为它只表现为"看起来有点挤"。
+ */
+const usedVars = new Set([...client.matchAll(/var\((--sc-[a-z0-9-]+)/g)].map((m) => m[1]))
+const definedVars = new Set([...client.matchAll(/(--sc-[a-z0-9-]+)\s*:\s*[^;]+/g)].map((m) => m[1]))
+const dangling = [...usedVars].filter((v) => !definedVars.has(v))
+
+console.log(`\n=== CSS 变量 ===`)
+console.log(`使用 ${usedVars.size} 个，定义 ${definedVars.size} 个，悬空 ${dangling.length} 个`)
+if (dangling.length) {
+  console.log('  悬空（用了但没定义，样式会静默失效）：')
+  for (const v of dangling) console.log(`    ${v}`)
+}
+
+process.exitCode = missing.length || dangling.length ? 1 : 0

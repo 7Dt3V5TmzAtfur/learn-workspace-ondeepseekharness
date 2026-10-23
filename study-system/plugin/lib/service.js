@@ -245,27 +245,36 @@ export class StudyService {
 
     /* ③ 每一部分的目标、要求、重点、难点
      * 用户的原话是"每一部分的目标、要求、重点、难点"——四个都要有。
-     * 早期版本把这一段和 ④ 混在一起、且没有 ③ 的标题，
-     * 界面上只能看到 ① ② 然后突然是"第一部分/第二部分"，编号断了。 */
+     *
+     * 但全展开有 5800 字，用户打开就累了（"太复杂就不想学"）。
+     * 所以：标题 + 一句要求（骨架）默认可见，重点/难点折进 details。
+     * 想核对细节的人点开，不想的先扫过 —— 二八法则里那 20% 的骨架先到手。 */
     const partGoals = parts
       .map(
         (p, i) => `<section class="sc-part">
     <h3>${headingOf(p, i)}</h3>
     ${p.requirements ? `<p class="sc-req">${t(p.requirements)}</p>` : ''}
-    ${kv('目标', p.goal ? t(p.goal) : '<span class="sc-muted">（未单列，见下方考核要求）</span>')}
-    ${kv('重点', `<ul class="sc-kv2-v sc-list">${li(p.keyPoints)}</ul>`)}
-    ${kv('难点', `<ul class="sc-kv2-v sc-list">${li(p.difficulties)}</ul>`)}
+    <details class="sc-fold">
+      <summary>重点与难点</summary>
+      ${kv('重点', `<ul class="sc-kv2-v sc-list">${li(p.keyPoints)}</ul>`)}
+      ${kv('难点', `<ul class="sc-kv2-v sc-list">${li(p.difficulties)}</ul>`)}
+    </details>
   </section>`,
       )
       .join('\n  ')
 
     /* ④ 每一部分的考核方式（了解/理解/掌握/熟练掌握）+ 知识点、内容、备注
      * 档位做成带 data-lv 的 chip，四档用同一色的 4 级不透明度，
-     * 这样扫一眼就知道每部分要求到什么程度，不用逐字读。 */
+     * 这样扫一眼就知道每部分要求到什么程度，不用逐字读。
+     * 知识点同样折叠：先看到"这部分考到什么程度 + 有哪几个知识点"，
+     * 展开才看到每个知识点的内容与备注。 */
     const partAssess = parts
       .map((p, i) => {
         const a = p.assessment ?? {}
-        const kps = (p.knowledgePoints ?? [])
+        const kpList = p.knowledgePoints ?? []
+        // 折叠着也要能看到"有哪几个知识点"，只给名字，不给正文
+        const kpNames = kpList.map((kp) => `<li>${t(kp.name)}</li>`).join('')
+        const kps = kpList
           .map(
             (kp, j) => `<div class="sc-kp">
       <div class="sc-kp-h">知识点 ${j + 1}　${t(kp.name)}</div>
@@ -273,12 +282,19 @@ export class StudyService {
       ${kp.note ? `<div class="sc-kp-note">备注：${t(kp.note)}</div>` : ''}
     </div>`,
           )
-          .join('\n    ')
+          .join('\n      ')
         return `<section class="sc-part">
     <h3>${headingOf(p, i)}<span class="sc-lv" data-lv="${escAttr(a.level ?? '')}">${t(a.level ?? '—')}</span></h3>
     ${a.requirement ? `<div class="sc-req">考核要求：${t(a.requirement)}</div>` : ''}
-    ${a.purpose ? `<div class="sc-muted">为什么要考这个：${t(a.purpose)}</div>` : ''}
-    ${kps || '<div class="sc-muted">（这一部分没有单列知识点）</div>'}
+    ${
+      kpList.length
+        ? `<details class="sc-fold">
+      <summary>${kpList.length} 个知识点</summary>
+      <ul class="sc-list sc-kp-names">${kpNames}</ul>
+      ${kps}
+    </details>`
+        : '<div class="sc-muted">（这一部分没有单列知识点）</div>'
+    }
   </section>`
       })
       .join('\n  ')
@@ -791,6 +807,63 @@ export class StudyService {
         sampleIds: g.ids.slice(0, 8),
       })),
     }
+  }
+
+  /**
+   * 拿到了什么 —— 与 coverage 并行的另一个视角。
+   *
+   * 为什么需要它：`coverage` 数的是"加工了多少段"，那是完成主义 KPI。
+   * 用户真在意的是"这份资料给我留下了什么能用的东西"。
+   * 一段不标但整个单元讲通了，比标满 182 段碎片有价值得多。
+   *
+   * 依据：原则/反完成主义阅读 —— 「一本书若有一句话引发共鸣或改变认知，
+   * 即已回本」「高 ROI 来自击中点而非覆盖面」。
+   *
+   * 这里只数"真东西"，不数过程：
+   * - 能复述的点：核心档标注（用户读到会被要求停下来回想）
+   * - 能自测的点：QA 问答
+   * - 能落地的点：最小行动（drills 里的 minimalAction）
+   * - 能讲清的概念：术语追问
+   *
+   * 刻意不做的事：不给"完成度百分比"，不设达标线。
+   * 一旦有百分比，就会有人为了 100% 去标碎片。
+   */
+  async harvested(docId) {
+    const ann = (await this.store.artifact(docId, 'annotations.json').catch(() => null))?.items ?? []
+    const qa = (await this.store.artifact(docId, 'qa.json').catch(() => null))?.items ?? []
+    const terms = await this.store.jsonl(docId, 'terms.jsonl').catch(() => [])
+    const drills = await this.store.jsonl(docId, 'drills.jsonl').catch(() => [])
+
+    // 只要"能复述"的核心档，参考档和攻坚档不算"拿到的点"
+    const core = ann.filter((a) => a.tier === 'core')
+    // 有效考核：合书、够时长、没抄原文
+    const validDrills = drills.filter((d) => d.valid !== false)
+    const actions = validDrills.map((d) => String(d.minimalAction ?? '').trim()).filter(Boolean)
+
+    return {
+      // 四个"拿到了"的桶
+      keyPoints: core.length,
+      selfTests: qa.length,
+      actions: actions.length,
+      terms: terms.length,
+      // 让界面能直接展示"拿到了什么"，而不是"完成了多少"
+      highlights: [
+        ...core.slice(0, 6).map((a) => ({ kind: 'keypoint', label: a.title || a.quote, where: a.segmentId })),
+      ],
+      // 一条给用户看的话，不带百分比
+      summary: this.harvestSentence({ core: core.length, qa: qa.length, actions: actions.length, terms: terms.length }),
+    }
+  }
+
+  /** 把四个桶说成人话。没有百分比，因为"拿到 7 个点"本身就是进度。 */
+  harvestSentence({ core, qa, actions, terms }) {
+    const bits = []
+    if (core) bits.push(`${core} 处能复述的要点`)
+    if (qa) bits.push(`${qa} 道自测`)
+    if (terms) bits.push(`${terms} 个查过的词`)
+    if (actions) bits.push(`${actions} 个能落地的行动`)
+    if (!bits.length) return '还没拿到东西。先读一段，标一句你觉得重要的。'
+    return `已经拿到 ${bits.join('、')}。`
   }
 
   async status(docId) {

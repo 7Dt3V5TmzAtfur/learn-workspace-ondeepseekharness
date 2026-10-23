@@ -333,6 +333,54 @@ check(
 )
 check('暂停回顾有总开关', /'暂停回顾'/.test(clientSrc), '不能关的功能迟早被反感')
 
+/* ---------------------------------------------- 9. 反完成主义 */
+
+console.log('\n9. 第一性原理：反完成主义（原则/反完成主义阅读、深度阅读的二八法则）')
+
+// 这一节防的是"看起来完工、实际没用"：
+// 覆盖率 100% 但全是碎片，界面很满但一个点都没记住。
+const serviceSrc = readFileSync(join('D:', 'learn', 'study-system', 'plugin', 'lib', 'service.js'), 'utf8')
+
+check(
+  '主指标是"拿到了什么"而不是"完成了多少"',
+  /sc-harvest/.test(clientSrc) && /harvested/.test(serviceSrc),
+  '百分比会让人为了填满去标碎片，那比漏标更糟',
+)
+check(
+  '百分比降级到次要位置且明说不标也没关系',
+  /不标也没关系/.test(clientSrc),
+  '只把百分比挪走还不够，得说清"不标不是欠账"',
+)
+check(
+  '成果口径不含百分比',
+  (() => {
+    const m = /harvestSentence\(\{[^}]*\}\)\s*\{([\s\S]{0,900}?)\n  \}/.exec(serviceSrc)
+    if (!m) return false
+    return !/%/.test(m[1])
+  })(),
+  '一旦给出完成度百分比，反完成主义就失效了',
+)
+check(
+  '碎片 quote 会被判出来',
+  /quote-fragment/.test(readFileSync(join('D:', 'learn', 'study-system', 'plugin', 'lib', 'rules.js'), 'utf8')),
+  '"维度""按需"这种 quote 让覆盖率虚高却没留下信息',
+)
+check(
+  '纯标题段不判碎片（标题本来就短）',
+  /isHeadingOnly/.test(readFileSync(join('D:', 'learn', 'study-system', 'plugin', 'lib', 'rules.js'), 'utf8')),
+  '标题段判碎片会导致 Agent 不敢标标题',
+)
+check(
+  '读前六段式默认只给骨架，细节折叠',
+  /sc-fold/.test(clientSrc) && /<details class="sc-fold">/.test(serviceSrc),
+  '5800 字一次铺开，用户没读就累了',
+)
+check(
+  '折叠是可点开可键盘操作的',
+  /summary:focus-visible/.test(clientSrc),
+  '只能用鼠标点的折叠区，键盘用户打不开',
+)
+
 /* ---------------------------------------------- 汇总 */
 
 console.log(`\n${'─'.repeat(62)}`)

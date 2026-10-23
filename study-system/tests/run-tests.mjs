@@ -1538,8 +1538,74 @@ await test('保存关系图后 project() 能拿到 archify 图列表', async () 
   }
 })
 
+/* ---- 第一性原理：反完成主义 ---- */
+
+section('17. 反完成主义（原则/反完成主义阅读、深度阅读的二八法则）')
+
+await test('碎片 quote 被判出，完整判断句放行', async () => {
+  // 「维度」这种标了等于没标：覆盖率好看，用户读不到东西。
+  const frag = rules.validateAnnotation(
+    [{ segmentId: '¶1', label: 'd', tier: 'core', quote: '维度', title: '表格' }],
+    { totalChars: 1000, segments: [{ id: '¶1', chars: 200, text: '这是一段两百字的正文，里面写了维度以及其他很多东西，足够长到可以挑出一句完整的判断。' }] },
+  )
+  assert.ok(
+    frag.issues.some((i) => i.code === 'quote-fragment'),
+    '短 quote 应判 quote-fragment',
+  )
+  const good = rules.validateAnnotation(
+    [{ segmentId: '¶1', label: 'd', tier: 'core', quote: '这是一段两百字的正文', title: '示例' }],
+    { totalChars: 1000, segments: [{ id: '¶1', chars: 200, text: '这是一段两百字的正文，里面写了维度以及其他很多东西，足够长到可以挑出一句完整的判断。' }] },
+  )
+  assert.ok(
+    !good.issues.some((i) => i.code === 'quote-fragment'),
+    '完整判断句不应被判碎片',
+  )
+})
+
+await test('纯标题段不判碎片', async () => {
+  // 标题本身就是几个字，标标题是正确做法，判碎片会逼 Agent 去标正文。
+  const res = rules.validateAnnotation(
+    [{ segmentId: '¶1', label: 'c', tier: 'ref', quote: '执行工具', title: '执行工具', keyword: '小节' }],
+    { totalChars: 1000, segments: [{ id: '¶1', chars: 10, text: '## 执行工具' }] },
+  )
+  assert.ok(
+    !res.issues.some((i) => i.code === 'quote-fragment'),
+    '标题段不该判碎片',
+  )
+})
+
+await test('短段落不判 quote-too-long', async () => {
+  // 段长 30 字、quote 28 字，比例 93%，但这一段只有一个信息点，没法更短。
+  const res = rules.validateAnnotation(
+    [{ segmentId: '¶1', label: 's', tier: 'core', quote: '执行工具的安全不应依赖单一机制', title: '分层防护' }],
+    { totalChars: 1000, segments: [{ id: '¶1', chars: 30, text: '执行工具的安全不应依赖单一机制，而应构建多层防护体系。' }] },
+  )
+  assert.ok(
+    !res.issues.some((i) => i.code === 'quote-too-long'),
+    '短段落不该被判整段加粗',
+  )
+})
+
+await test('成果口径不含百分比，且四个桶都数得到', async () => {
+  const svc = new StudyService(workspace)
+  const hv = await svc.harvested(DOC_ID)
+  assert.ok(!/%/.test(hv.summary), `成果文案不该出现百分比：${hv.summary}`)
+  for (const k of ['keyPoints', 'selfTests', 'actions', 'terms']) {
+    assert.equal(typeof hv[k], 'number', `${k} 应是数字`)
+  }
+  assert.ok(hv.summary.length > 0, '成果文案不能是空的')
+})
+
+await test('没有任何成果时给的是引导而不是 0%', async () => {
+  const svc = new StudyService(workspace)
+  const sentence = svc.harvestSentence({ core: 0, qa: 0, actions: 0, terms: 0 })
+  assert.ok(!/%|0 /.test(sentence), `空状态不该出现百分比或 0：${sentence}`)
+  assert.match(sentence, /先读一段|还没/, `空状态应是引导语气：${sentence}`)
+})
+
 console.log(`\n${'─'.repeat(52)}`)
 console.log(`通过 ${passed}　失败 ${failed}`)
+
 if (failed > 0) {
   console.log('\n失败详情：')
   for (const f of failures) console.log(`\n[${f.name}]\n${f.error.stack}`)

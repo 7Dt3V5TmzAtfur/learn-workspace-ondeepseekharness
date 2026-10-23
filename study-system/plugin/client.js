@@ -278,6 +278,30 @@ body[data-ds-dark-theme] .sc-root{
 .sc-kp-b>p{margin:0 0 4px}
 .sc-kp-b>p:last-child{margin-bottom:0}
 .sc-kp-note{color:var(--dsw-alias-label-secondary);font-size:var(--sc-fs-sm);margin-top:var(--sc-sp-1);line-height:1.7}
+/* 折叠区：读前六段式默认只给骨架，重点难点与知识点正文折起来。
+   打开页面要读的字从 5845 降到 2796（-52%），想核对细节的人再点开。
+   summary 做成一眼可点的样子，不能像普通小标题那样看不出能点。 */
+.sc-fold{margin-top:var(--sc-sp-1);border-top:1px solid var(--dsw-alias-border-l1)}
+.sc-fold>summary{cursor:pointer;list-style:none;padding:6px 0;font-size:var(--sc-fs-sm);
+  color:var(--dsw-alias-label-secondary);display:flex;align-items:center;gap:6px;user-select:none}
+.sc-fold>summary::-webkit-details-marker{display:none}
+.sc-fold>summary::before{content:'▸';display:inline-block;font-size:10px;
+  transition:transform .15s ease;color:var(--dsw-alias-label-secondary)}
+.sc-fold[open]>summary::before{transform:rotate(90deg)}
+.sc-fold>summary:hover{color:var(--dsw-alias-label-primary)}
+.sc-fold>summary:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}
+.sc-fold[open]>summary{margin-bottom:var(--sc-sp-1)}
+.sc-kp-names{margin:0 0 var(--sc-sp-1)}
+/* 「拿到了什么」：主指标一句话 + 要点列表。
+   刻意不用进度条：进度条会让人想把它填满，而去标没用的碎片。 */
+.sc-harvest{margin-top:var(--sc-sp-2);font-size:var(--sc-fs-md);line-height:1.7;
+  color:var(--dsw-alias-label-primary);font-weight:600}
+.sc-harvest-list{margin:var(--sc-sp-1) 0 0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.sc-harvest-list>li{display:flex;gap:8px;align-items:baseline;font-size:var(--sc-fs-sm);
+  color:var(--dsw-alias-label-secondary);line-height:1.6}
+.sc-harvest-where{flex:none;font-variant-numeric:tabular-nums;font-size:var(--sc-fs-xs);
+  color:var(--dsw-alias-label-secondary);opacity:.75;min-width:38px}
+@media (prefers-reduced-motion:reduce){.sc-fold>summary::before{transition:none}}
 /* 档位标签：了解/理解/掌握/熟练掌握 四档用同一强调色的 4 级不透明度 */
 .sc-lv{display:inline-block;font-size:var(--sc-fs-xs);line-height:16px;padding:0 6px;border-radius:var(--sc-r-sm);
   color:var(--dsw-alias-label-primary);margin-left:5px;vertical-align:1px;white-space:nowrap;
@@ -1304,10 +1328,14 @@ body[data-ds-dark-theme] .sc-root{
     function RecallPane({ project }) {
       const pairs = project.qa ?? []
       const [cov, setCov] = useState(null)
+      const [harvest, setHarvest] = useState(null)
       useEffect(() => {
         let alive = true
         api(`/coverage/${encodeURIComponent(project.id)}`)
           .then((d) => alive && setCov(d))
+          .catch(() => {})
+        api(`/harvested/${encodeURIComponent(project.id)}`)
+          .then((d) => alive && setHarvest(d))
           .catch(() => {})
         return () => {
           alive = false
@@ -1332,12 +1360,34 @@ body[data-ds-dark-theme] .sc-root{
             '闭上书，按顺序过一遍下面的问答。先在心里答，再点开核对。',
             '答不上来的说明那段只是"看过"，不是"记住"——回到读中加工把那段的三色高亮再看一遍。',
           ),
-          // 覆盖率必须带分母。只说"已标注 37"没有意义，
-          // 用户看不出还有 145 段没碰。
+          // 主指标是"拿到了什么"，不是"完成了多少"。
+          // 依据：原则/反完成主义阅读 —— 一本书有一句话改变认知就回本，
+          // 高 ROI 来自击中点而非覆盖面。百分比只在次要位置提一句。
+          h(
+            'div',
+            { className: 'sc-harvest' },
+            harvest?.summary ?? '还没拿到东西。先读一段，标一句你觉得重要的。',
+          ),
+          harvest?.highlights?.length
+            ? h(
+                'ul',
+                { className: 'sc-harvest-list' },
+                harvest.highlights.slice(0, 5).map((x, i) =>
+                  h(
+                    'li',
+                    { key: i },
+                    h('span', { className: 'sc-harvest-where' }, x.where),
+                    x.label,
+                  ),
+                ),
+              )
+            : null,
           h(
             'div',
             { className: 'sc-muted', style: { marginTop: 8 } },
-            `加工进度 ${doneCount}/${total} 段（${pct}%），还剩 ${left} 段没标；QA ${pairs.length} 条。`,
+            `想核对的话：${doneCount}/${total} 段有标注（${pct}%）` +
+              (left > 0 ? `，还有 ${left} 段没标。` : '。') +
+              ' 不标也没关系——标的是一句话，不是任务清单。',
           ),
           left > 0 && (cov?.groups ?? []).length
             ? h(

@@ -13,7 +13,7 @@
       "segmentId": "¶2",
       "label": "e",
       "title": "《Her》里的 Samantha",
-      "quote": "她拥有强大的",
+      "quote": "连接语言“大脑”与真实数字世界的“手脚和感官”",
       "note": "用电影开场说明：智能之所以动人，是因为有工具",
       "tier": "ref"
     },
@@ -40,7 +40,7 @@
       "segmentId": "¶5",
       "title": "五类工具的审视特征",
       "tier": "core",
-      "quote": "作用对象"
+      "quote": "可以从两个特征来审视它们"
     },
     {
       "segmentId": "¶6",
@@ -136,7 +136,7 @@
       "segmentId": "¶17",
       "title": "形态与数量是两个独立问题",
       "tier": "hard",
-      "quote": "部署应用"
+      "quote": "Agent 的能力应该以什么形式来表达"
     },
     {
       "segmentId": "¶18",
@@ -167,7 +167,7 @@
       "segmentId": "¶21",
       "title": "通用优于专用的例子",
       "tier": "ref",
-      "quote": "元能力"
+      "quote": "通用工具优于专用工具，除非存在明确的安全、权限或性能理由"
     },
     {
       "segmentId": "¶22",
@@ -221,14 +221,14 @@
       "segmentId": "¶28",
       "label": "t",
       "title": "这个选择会反复出现",
-      "quote": "同样的选择",
+      "quote": "第九章将讨论 Agent 在持续进化中沉淀新能力时如何做出同样的选择",
       "tier": "ref"
     },
     {
       "segmentId": "¶29",
       "label": "e",
       "title": "让代码来编排工具调用",
-      "quote": "它让模型可以用代码",
+      "quote": "而不是一次调用一个工具、把每个中间结果都搬进上下文",
       "note": "串联多个工具，而不是把中间结果都搬进上下文",
       "tier": "ref"
     },
@@ -254,7 +254,7 @@
       "segmentId": "¶32",
       "title": "工具描述的核心",
       "tier": "ref",
-      "quote": "什么时候用"
+      "quote": "让 LLM 知道“什么时候用”，而不只是“能做什么”"
     },
     {
       "segmentId": "¶33",
@@ -268,7 +268,7 @@
       "segmentId": "¶34",
       "label": "e",
       "title": "参数描述要用具体例子",
-      "quote": "比单写",
+      "quote": "参数描述应该用具体例子代替抽象规范",
       "note": "给一个真实的时间戳例子，胜过只说格式名",
       "tier": "ref"
     },
@@ -317,7 +317,7 @@
       "segmentId": "¶40",
       "title": "静默输入转换是最隐蔽的反模式",
       "tier": "hard",
-      "quote": "修正"
+      "quote": "一种比功能缺失更隐蔽的反模式是"
     },
     {
       "segmentId": "¶41",
@@ -453,7 +453,7 @@
       "segmentId": "¶57",
       "label": "q",
       "title": "工具的供应链风险",
-      "quote": "工具描述投毒",
+      "quote": "工具的 description 会随工具定义原样进入模型上下文",
       "note": "description 会原样进入上下文，等于可执行指令",
       "tier": "hard"
     },
@@ -488,7 +488,7 @@
       "segmentId": "¶61",
       "title": "这一节问的是：一次该看见多少",
       "tier": "core",
-      "quote": "能力的表达形式"
+      "quote": "一次该让模型看见多少"
     },
     {
       "label": "s",
@@ -496,7 +496,7 @@
       "segmentId": "¶62",
       "title": "四层应对手段总纲",
       "tier": "core",
-      "quote": "按需"
+      "quote": "答案有三层，一层比一层更“按需”"
     },
     {
       "segmentId": "¶63",
@@ -521,7 +521,7 @@
       "segmentId": "¶65",
       "title": "Pi 的代理工具方案",
       "tier": "ref",
-      "quote": "搜索→查看定义→调用"
+      "quote": "核心模块刻意不内置 MCP，优先建议把能力封装成带 README 的 CLI 工具"
     },
     {
       "segmentId": "¶66",
@@ -544,7 +544,7 @@
       "segmentId": "¶68",
       "label": "e",
       "title": "按动作类型分组",
-      "quote": "搜索工具",
+      "quote": "主动查找信息（网络搜索、知识库搜索、文件搜索）",
       "note": "搜索/读取/解析三类，按动作而非业务划分",
       "tier": "ref"
     },
@@ -561,7 +561,7 @@
       "segmentId": "¶70",
       "title": "检索式预筛的实测提升",
       "tier": "hard",
-      "quote": "**检索式预筛选"
+      "quote": "按语义相似度先筛出一批候选工具再注入"
     },
     {
       "segmentId": "¶71",
@@ -576,7 +576,7 @@
       "segmentId": "¶72",
       "label": "q",
       "title": "一次性检索的局限",
-      "quote": "它按用户的初始查询做",
+      "quote": "实际可能牵出文件访问、代码分析、命令执行等多步骤、跨领域的工具链",
       "note": "任务开始时预见不到所有需求",
       "tier": "hard"
     },
@@ -592,7 +592,7 @@
       "segmentId": "¶74",
       "label": "e",
       "title": "工程上的等价做法",
-      "quote": "工具搜索工具",
+      "quote": "在系统提示词里只保留少数基础工具",
       "note": "只留基础工具 + 一个搜索工具；Claude 的 Tool Search Tool 即此类",
       "tier": "ref"
     },
@@ -676,7 +676,7 @@
       "segmentId": "¶84",
       "label": "t",
       "title": "这套机制很有效但很繁琐",
-      "quote": "工程上却相当繁琐",
+      "quote": "的机制虽然有效，工程上却相当繁琐",
       "note": "前提是把工具当成\"面向模型的正式定义\"；下一节 Skills 换更轻的思路",
       "tier": "ref"
     },
@@ -862,7 +862,7 @@
       "segmentId": "¶107",
       "label": "d",
       "title": "提取为文本是两阶段过程",
-      "quote": "这是一个两阶段过程",
+      "quote": "先通过专门工具（如 OCR 服务、音频转录服务）将非文本内容转为纯文本",
       "note": "先提取成文本，再交给主模型处理",
       "tier": "core"
     },
@@ -887,7 +887,7 @@
       "segmentId": "¶110",
       "label": "d",
       "title": "工具化分析优于提取为文本",
-      "quote": "将多模态分析作为工具",
+      "quote": "是一种比提取为文本更好的方法",
       "tier": "core"
     },
     {
@@ -934,14 +934,14 @@
       "segmentId": "¶116",
       "label": "d",
       "title": "为什么不能只靠一层",
-      "quote": "多层防护体系",
+      "quote": "执行工具的安全不应依赖单一机制，而应构建多层防护体系",
       "tier": "core"
     },
     {
       "segmentId": "¶117",
       "label": "d",
       "title": "第一层：输入验证",
-      "quote": "检查所有参数的合法性",
+      "quote": "发现异常输入时立即拒绝，不尝试“智能”修正",
       "note": "关键是快速失败：发现异常立即拒绝，不做\"智能\"修正",
       "tier": "core"
     },
@@ -1061,7 +1061,7 @@
       "segmentId": "¶132",
       "label": "q",
       "title": "为什么轻量模型就够",
-      "quote": "关键在于审查对象不同",
+      "quote": "审查的是开放式思考，因此需要能力相近的模型",
       "note": "开放思考要能力相近；分类问题轻量模型够用",
       "tier": "hard"
     },
@@ -1100,7 +1100,7 @@
       "segmentId": "¶137",
       "label": "c",
       "title": "表格",
-      "quote": "维度",
+      "quote": "操作前（事前审批）或操作后（事后验证）",
       "note": "提议者-审核者 vs Sidecar 的对照表",
       "keyword": "表格",
       "tier": "ref"
@@ -1109,7 +1109,7 @@
       "segmentId": "¶138",
       "label": "e",
       "title": "Sidecar 的另一类用途",
-      "quote": "构造和补充上下文",
+      "quote": "Sidecar 模型以旁路方式并行筛选相关的用户记忆",
       "note": "并行筛记忆、摘要长输出、取最新信息",
       "tier": "ref"
     },
@@ -1157,7 +1157,7 @@
       "segmentId": "¶144",
       "label": "s",
       "title": "头尾各留 50 行",
-      "quote": "头部保留",
+      "quote": "通常包含最终错误信息或成功标志",
       "note": "头尾保留 + 中间提示 + 文件引导",
       "tier": "core"
     },
@@ -1293,7 +1293,7 @@
       "segmentId": "¶161",
       "label": "d",
       "title": "子 Agent 的核心价值是专业化分工",
-      "quote": "与其构建一个",
+      "quote": "与其构建一个“全能”的 Agent，不如构建一组各自专精的 Agent",
       "note": "一组专精 Agent 优于一个全能 Agent",
       "tier": "core"
     },
@@ -1308,7 +1308,7 @@
       "segmentId": "¶163",
       "label": "e",
       "title": "要素一：角色定义要清晰",
-      "quote": "开门见山说明",
+      "quote": "开门见山说明“你是专门负责 XXX 的助手 Agent”",
       "note": "别让子 Agent 猜自己是谁",
       "tier": "ref"
     },
@@ -1355,7 +1355,7 @@
       "segmentId": "¶169",
       "label": "t",
       "title": "原语之上承载四种协作形态",
-      "quote": "同步调用",
+      "quote": "等待子 Agent 返回，适合快速完成的任务",
       "note": "同步/异步/流式/多轮；拓扑与分工见第十章",
       "tier": "ref"
     },
@@ -1379,7 +1379,7 @@
       "segmentId": "¶172",
       "label": "q",
       "title": "HITL 没人响应怎么办",
-      "quote": "超时和降级策略",
+      "quote": "需要设置超时阈值和默认行为",
       "note": "要设阈值与默认行为，还要分优先级队列",
       "tier": "hard"
     },
@@ -1470,7 +1470,7 @@
       "core": 64,
       "hard": 28
     },
-    "highlightedChars": 2953,
+    "highlightedChars": 3446,
     "totalChars": 29831,
     "ratio": 0.1106,
     "labelCounts": {

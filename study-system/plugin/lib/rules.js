@@ -40,6 +40,23 @@ export const TOTAL_HIGHLIGHT_BUDGET = 0.20
  * 太短的段落里标一半字是正常做法，密度没有参考意义。
  */
 export const SEGMENT_DENSITY_MIN_CHARS = 60
+/**
+ * 段长不超过这个数时，不判 quote-too-long。
+ *
+ * 一段 30 字、quote 28 字，比例 93%，但这一段本来就只有一个信息点，
+ * 不存在"挑哪句"的余地。要求它更短只能把 quote 截成半句，反而更差。
+ * 60 与 SEGMENT_DENSITY_MIN_CHARS 取同一个数：低于 60 字的段落，
+ * 密度和取舍都谈不上。
+ */
+export const SHORT_SEGMENT_FOR_QUOTE = 60
+/**
+ * quote 不超过这个字数，且所在段落不是纯标题时，判为"碎片"。
+ *
+ * 依据：这类 quote 让覆盖率好看，但用户读到那里什么都得不到。
+ * 系统会因此显得"完工"，实际一个能用的点都没留下 —— 这比漏标更糟，
+ * 因为它把"没做"伪装成"做了"。
+ */
+export const FRAGMENT_QUOTE_MAX_CHARS = 6
 export const SUMMARY_TARGET_CHARS = 300
 export const SUMMARY_TOLERANCE = 0.4
 
@@ -159,12 +176,31 @@ export function validateAnnotation(items, context) {
       } else {
         quoteChars = [...quote].length
         const segChars = [...segText].length
-        if (quoteChars >= segChars * 0.9) {
+        // 短段落（本身就只有一句话）不该被判"整段加粗"：
+        // 段长 30 字、quote 28 字，比例 93% 触发了阈值，但这段根本没法再短。
+        // 阈值只在段落长到"里面确实有多个信息点可供取舍"时才成立。
+        const tooShortToSplit = segChars <= SHORT_SEGMENT_FOR_QUOTE
+        if (!tooShortToSplit && quoteChars >= segChars * 0.9) {
           issues.push(
             issue(
               'warn',
               'quote-too-long',
               'quote 几乎等于整段：挑一句最关键的短语即可，整段加粗等于没有重点',
+              where,
+            ),
+          )
+        }
+        // ---- 碎片检查 ----
+        // 「维度」「按需」「比单写」这种 quote 也算"标了"，覆盖率会很好看，
+        // 但用户读到那里得不到任何信息 —— 系统看起来完工，实际一个点都没留下。
+        // 纯标题段豁免：标题本身就只有几个字，标标题是正确做法。
+        const isHeadingOnly = /^#{1,6}\s/.test(segText.trim()) || /^\*\*[^*]+\*\*[.。]?$/.test(segText.trim())
+        if (!isHeadingOnly && quoteChars <= FRAGMENT_QUOTE_MAX_CHARS) {
+          issues.push(
+            issue(
+              'warn',
+              'quote-fragment',
+              `quote 只有 ${quoteChars} 字，用户看到「${quote}」得不到信息。请换成一句完整的判断（建议 12-30 字）`,
               where,
             ),
           )

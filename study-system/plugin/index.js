@@ -610,6 +610,11 @@ export function apply(ctx, config = {}) {
             const docId = decodeURIComponent(route.slice('/coverage/'.length))
             return send(res, 200, await svcOf(url).coverage(docId))
           }
+          // 拿到了什么：与 coverage 并行的另一个视角（不数过程，只数成果）
+          if (req.method === 'GET' && route.startsWith('/harvested/')) {
+            const docId = decodeURIComponent(route.slice('/harvested/'.length))
+            return send(res, 200, await svcOf(url).harvested(docId))
+          }
           // 复习到期清单（界面顶部提醒用）
           if (req.method === 'GET' && route === '/review') {
             return send(res, 200, await svcOf(url).reviewDue())
