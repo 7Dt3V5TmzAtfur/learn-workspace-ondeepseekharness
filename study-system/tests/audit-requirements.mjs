@@ -163,6 +163,127 @@ add(
   'study-companion 是否引用原则',
 )
 
+/* ---------- 真实数据完整性 ----------
+ *
+ * 上面查的都是"代码里有没有这个功能"。但功能在 ≠ 数据里真有东西：
+ * 六段式的第③④段（重点难点 / 考核方式与知识点）一度看起来"实现了"，
+ * 渲染出来却是空的 —— 因为字段名跟需求说法不一致，没人去读真实数据。
+ * 所以这里直接读真实项目，看每一段是不是真的有内容。
+ */
+const DOC = 'chapter4-d6eaed'
+const dataDir = join(ROOT, '.study', DOC)
+const readJson = (f) => {
+  try {
+    return JSON.parse(readFileSync(join(dataDir, f), 'utf8'))
+  } catch {
+    return null
+  }
+}
+
+const pre = readJson('preflight.json')
+const ann = readJson('annotations.json')
+const qa = readJson('qa.json')
+const rel = readJson('relations.json')
+const textsMap = new Map(
+  (readJson('segment-texts.json')?.items ?? []).map((t) => [t.id, String(t.text ?? '')]),
+)
+
+add(
+  'D1',
+  '第③段（每部分目标/要求/重点/难点）在真实数据里有内容',
+  Array.isArray(pre?.parts) &&
+    pre.parts.length > 0 &&
+    pre.parts.every(
+      (p) =>
+        (p.keyPoints?.length ?? 0) > 0 &&
+        (p.difficulties?.length ?? 0) > 0 &&
+        String(p.requirements ?? '').trim().length > 0,
+    ),
+  `parts 每项都要有 keyPoints / difficulties / requirements，实际 ${pre?.parts?.length ?? 0} 项`,
+)
+
+add(
+  'D2',
+  '第④段（考核方式 + 知识点）在真实数据里有内容',
+  Array.isArray(pre?.parts) &&
+    pre.parts.length > 0 &&
+    pre.parts.every(
+      (p) =>
+        p.assessment?.level &&
+        p.assessment?.requirement &&
+        (p.knowledgePoints?.length ?? 0) > 0 &&
+        p.knowledgePoints.every((k) => k.name && k.content),
+    ),
+  'parts 每项都要有 assessment.level 与 knowledgePoints[].name/content',
+)
+
+add(
+  'D3',
+  '掌握度四档在真实数据里被用到',
+  (() => {
+    const lv = new Set((pre?.parts ?? []).map((p) => p.assessment?.level).filter(Boolean))
+    return lv.size >= 2 && [...lv].every((x) => ['了解', '理解', '掌握', '熟练掌握'].includes(x))
+  })(),
+  '至少用到两档，且必须是四档之内的值',
+)
+
+add(
+  'D4',
+  '标注覆盖到全部段落，没有漏段',
+  (() => {
+    const segs = readJson('segments.json')?.items ?? []
+    if (!segs.length || !ann?.items) return false
+    const done = new Set(ann.items.map((a) => a.segmentId))
+    return segs.every((s) => done.has(s.id))
+  })(),
+  '还有段落没标注，需求③的"逐段"没做到',
+)
+
+add(
+  'D5',
+  '高亮占比落在原则要求的 10%-20%',
+  (() => {
+    const r = ann?.stats?.ratio
+    return typeof r === 'number' && r >= 0.1 && r <= 0.2
+  })(),
+  `实际 ${ann?.stats?.ratio}：低于 10% 三色注意力失效，高于 20% 违反二八法则`,
+)
+
+add(
+  'D6',
+  '每条标注的 quote 都能在原文里逐字找到',
+  Boolean(ann?.items?.length) &&
+    ann.items.every((a) => textsMap.get(a.segmentId)?.includes(a.quote)),
+  '有 quote 不是原文片段，高亮会标错位置',
+)
+
+add(
+  'D7',
+  'QA 条数在 6-12 之间且每条不超 100 字',
+  (() => {
+    const items = qa?.items ?? []
+    return (
+      items.length >= 6 &&
+      items.length <= 12 &&
+      items.every((p) => [...String(p.q)].length <= 100 && [...String(p.a)].length <= 100)
+    )
+  })(),
+  '条数或字数超限，服务端会拒',
+)
+
+add(
+  'D8',
+  '知识图谱每条边都有原文出处或标明是推断',
+  (() => {
+    const edges = rel?.edges ?? []
+    if (!edges.length) return false
+    return edges.every((e) =>
+      e.evidence === 'inference' ? Boolean(e.why) : [...textsMap.values()].some((t) => t.includes(e.quote)),
+    )
+  })(),
+  '有边既没出处也没标推断，等于把猜测当事实',
+)
+
 /* ---------- 报告 ---------- */
 console.log('需求符合度审计\n' + '='.repeat(64))
 let pass = 0

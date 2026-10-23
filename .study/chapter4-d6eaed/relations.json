@@ -238,7 +238,7 @@
       "from": "four-dims",
       "relation": "application",
       "to": "form-spectrum",
-      "quote": "四个决策维度。 综合起来，一项能力究竟该做成哪种形态，取决于",
+      "quote": "一项能力究竟该做成哪种形态，取决于四点",
       "segmentId": "¶26"
     },
     {
@@ -246,8 +246,8 @@
       "from": "four-dims",
       "relation": "application",
       "to": "dedicated-cases",
-      "quote": "四个决策维度。 综合起来，一项能力究竟该做成哪种形态，取决于",
-      "segmentId": "¶26"
+      "quote": "通用性有其边界，以下四种情况值得保留独立的专用工具",
+      "segmentId": "¶23"
     },
     {
       "id": "e10",
@@ -304,7 +304,7 @@
       "from": "retrieval-prefilter",
       "relation": "prerequisite",
       "to": "active-discovery",
-      "quote": "检索式预筛选。 更进一步的方案是不把全部工具定义一次性注入上",
+      "quote": "更进一步的方案是不把全部工具定义一次性注入上下文",
       "segmentId": "¶70"
     },
     {
@@ -312,7 +312,7 @@
       "from": "active-discovery",
       "relation": "prerequisite",
       "to": "skill-as-doc",
-      "quote": "再进一步是主动工具发现：Agent 在执行过程中意识到能力缺口，主动声明需求，由系统动态匹配并注入。最轻量的一层是 Skills：干脆不把工具当成需要注册、检索、注入的正式定义",
+      "quote": "最轻量的一层是",
       "segmentId": "¶62"
     },
     {
@@ -341,7 +341,7 @@
       "label": "一次性匹配，无法预见多步需求",
       "relation": "contrast",
       "to": "active-discovery",
-      "quote": "检索式预筛选。 更进一步的方案是不把全部工具定义一次性注入上",
+      "quote": "而是按语义相似度先筛出一批候选工具再注入",
       "segmentId": "¶70"
     },
     {
@@ -384,15 +384,15 @@
       "label": "设计目标相反：一个控信息量、一个控后果",
       "relation": "contrast",
       "to": "execution",
-      "quote": "感知工具  Agent 主动调用  获取信息 \n 执行工具  Agent 主动调用  改变世界",
-      "segmentId": "¶7"
+      "quote": "执行工具改变外部世界，因此必须回答一个感知工具无需考虑的问题",
+      "segmentId": "¶154"
     },
     {
       "id": "e25",
       "from": "perception",
       "relation": "prerequisite",
       "to": "smart-summary",
-      "quote": "- 感知工具：关键在于粒度权衡、上下文感知的智能总结，以及分页与显式截断等接口设计",
+      "quote": "关键在于粒度权衡、上下文感知的智能总结，以及分页与显式截断等接口设计",
       "segmentId": "¶178"
     },
     {
@@ -400,7 +400,7 @@
       "from": "execution",
       "relation": "prerequisite",
       "to": "proposer-reviewer",
-      "quote": "- 执行工具：关键在于层次化的安全防护、提议者-审核者审查（事前审批与事后验证）与 Sidecar",
+      "quote": "关键在于层次化的安全防护、提议者-审核者审查（事前审批与事后验证）",
       "segmentId": "¶178"
     },
     {
@@ -408,7 +408,7 @@
       "from": "execution",
       "relation": "prerequisite",
       "to": "sidecar",
-      "quote": "- 执行工具：关键在于层次化的安全防护、提议者-审核者审查（事前审批与事后验证）与 Sidecar 机制",
+      "quote": "与 Sidecar 机制",
       "segmentId": "¶178"
     },
     {
@@ -417,7 +417,7 @@
       "label": "都引入第二视角，但时机不同",
       "relation": "contrast",
       "to": "sidecar",
-      "quote": "提议者-审核者机制解决的是“操作执行前审批或操作完成后验证”的问题，而 Sidecar 机制解决的是另一个问题：“操作执行时如何实时",
+      "quote": "解决的是另一个问题",
       "segmentId": "¶128"
     },
     {
@@ -433,24 +433,24 @@
       "from": "execution",
       "relation": "prerequisite",
       "to": "side-effect-unknown",
-      "quote": "动调用  获取信息 \n 执行工具  Agent 主动调用  改变世界 \n 协作工",
-      "segmentId": "¶7"
+      "quote": "它的副作用到底发生了没有",
+      "segmentId": "¶154"
     },
     {
       "id": "e31",
       "from": "collaboration",
       "relation": "prerequisite",
       "to": "lifecycle-primitives",
-      "quote": "- 协作工具：关键在于子 Agent 的生命周期原语（创建、消息、取消、发现）和人工介入的学习闭环",
-      "segmentId": "¶178"
+      "quote": "协作工具的接口可以归纳为三组原语",
+      "segmentId": "¶168"
     },
     {
       "id": "e32",
       "from": "collaboration",
       "relation": "prerequisite",
       "to": "hitl",
-      "quote": "动调用  改变世界 \n 协作工具  Agent 主动调用  驱动其他 Agent",
-      "segmentId": "¶7"
+      "quote": "和人工介入的学习闭环",
+      "segmentId": "¶178"
     },
     {
       "id": "e33",
