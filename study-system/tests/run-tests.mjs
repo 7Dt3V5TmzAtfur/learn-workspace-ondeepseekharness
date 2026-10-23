@@ -17,6 +17,7 @@ const { StudyService } = await import(`file://${join(LIB, 'service.js')}`)
 const { renderMarkdown, parseMermaid, layoutGraph } = await import(`file://${join(LIB, 'markdown.js')}`)
 const { findWorkspaceRoot, findWorkspaceRoots } = await import(`file://${join(LIB, 'store.js')}`)
 const rules = await import(`file://${join(LIB, 'rules.js')}`)
+const { splitGraph, buildArchifyFigures } = await import(`file://${join(LIB, 'archify-figures.js')}`)
 
 let passed = 0
 let failed = 0
@@ -158,25 +159,34 @@ section('3. 标注规则与三色预算')
 
 // 8 段 × 100 字 = 800 字。核心档上限 10% = 80 字，所以核心最多标 0 段；
 // 用 20 段 × 100 字 = 2000 字做预算测试，1 段核心 = 5%（合规），1 段攻坚 = 5%（合规）。
-const SEGS = Array.from({ length: 20 }, (_, i) => ({ id: `¶${i + 1}`, chars: 100 }))
+// 每段 100 字正文。正文里嵌一个固定的可引用短语，供 quote 命中；
+// 新的三色高亮规则要求"高亮加在原文短语上"，所以测试必须提供真实正文。
+const SEGS = Array.from({ length: 20 }, (_, i) => {
+  const key = `关键短语${i + 1}`
+  const filler = '填充内容'.repeat(20)
+  const text = `${filler}${key}${filler}`.slice(0, 100)
+  return { id: `¶${i + 1}`, chars: 100, text }
+})
 const CTX = { segments: SEGS, totalChars: 2000 }
 
 await test('合法标注通过', async () => {
   const r = rules.validateAnnotation(
     [
-      { segmentId: '¶2', label: 'd', title: '负荷的定义' },
-      { segmentId: '¶4', label: 'q', title: '为何上限是20%' },
+      { segmentId: '¶2', label: 'd', title: '负荷的定义' , quote: '关键短语2' },
+      { segmentId: '¶4', label: 'q', title: '为何上限是20%' , quote: '关键短语4' },
     ],
     CTX,
   )
   assert.ok(r.ok, JSON.stringify(r.issues))
   assert.equal(r.stats.byTier.core, 1)
   assert.equal(r.stats.byTier.hard, 1)
-  assert.equal(r.stats.ratio, 0.1)
+  // 预算按 quote 字数算（每段 5 字），不再按整段 100 字
+  assert.equal(r.stats.highlightedChars, 10)
+  assert.equal(r.stats.ratio, 0.005)
 })
 
 await test('非法标签被拒', async () => {
-  const r = rules.validateAnnotation([{ segmentId: '¶1', label: 'x', title: 'x' }], CTX)
+  const r = rules.validateAnnotation([{ segmentId: '¶1', label: 'x', title: 'x' , quote: '关键短语1' }], CTX)
   assert.equal(r.ok, false)
   assert.ok(r.issues.some((i) => i.code === 'bad-label'))
 })
@@ -184,8 +194,8 @@ await test('非法标签被拒', async () => {
 await test('同一段重复标注被拒', async () => {
   const r = rules.validateAnnotation(
     [
-      { segmentId: '¶1', label: 'd', title: 'a' },
-      { segmentId: '¶1', label: 'e', title: 'b' },
+      { segmentId: '¶1', label: 'd', title: 'a' , quote: '关键短语1' },
+      { segmentId: '¶1', label: 'e', title: 'b' , quote: '关键短语1' },
     ],
     CTX,
   )
@@ -194,20 +204,20 @@ await test('同一段重复标注被拒', async () => {
 })
 
 await test('#c 缺两字关键词被拒', async () => {
-  const r = rules.validateAnnotation([{ segmentId: '¶1', label: 'c', title: '补充' }], CTX)
+  const r = rules.validateAnnotation([{ segmentId: '¶1', label: 'c', title: '补充' , quote: '关键短语1' }], CTX)
   assert.equal(r.ok, false)
   assert.ok(r.issues.some((i) => i.code === 'c-needs-keyword'))
 })
 
 await test('#c 带两字关键词则通过', async () => {
-  const r = rules.validateAnnotation([{ segmentId: '¶1', label: 'c', title: '作者背景', keyword: '背景' }], CTX)
+  const r = rules.validateAnnotation([{ segmentId: '¶1', label: 'c', title: '作者背景', keyword: '背景' , quote: '关键短语1' }], CTX)
   assert.ok(r.ok, JSON.stringify(r.issues))
 })
 
 await test('总高亮超 20% 被拒（二八法则）', async () => {
   // 5 段核心 = 500/2000 = 25% > 20%
   const r = rules.validateAnnotation(
-    SEGS.slice(0, 5).map((s) => ({ segmentId: s.id, label: 'd', title: 't' })),
+    SEGS.slice(0, 5).map((s) => ({ segmentId: s.id, label: 'd', title: 't', quote: s.text })),
     CTX,
   )
   assert.equal(r.ok, false)
@@ -220,7 +230,7 @@ await test('总高亮超 20% 被拒（二八法则）', async () => {
 await test('核心档单独超 10% 被拒', async () => {
   // 3 段核心 = 300/2000 = 15%，总量 15% 未超但核心档已超 10%
   const r = rules.validateAnnotation(
-    SEGS.slice(0, 3).map((s) => ({ segmentId: s.id, label: 's', title: 't' })),
+    SEGS.slice(0, 3).map((s) => ({ segmentId: s.id, label: 's', title: 't', quote: s.text })),
     CTX,
   )
   assert.equal(r.ok, false)
@@ -230,20 +240,20 @@ await test('核心档单独超 10% 被拒', async () => {
 await test('参考档不占预算，可以多标', async () => {
   const r = rules.validateAnnotation(
     [
-      { segmentId: '¶1', label: 'e', title: 'a' },
-      { segmentId: '¶2', label: 'e', title: 'b' },
-      { segmentId: '¶3', label: 't', title: 'c' },
-      { segmentId: '¶5', label: 'd', title: '核心一段' },
+      { segmentId: '¶1', label: 'e', title: 'a' , quote: '关键短语1' },
+      { segmentId: '¶2', label: 'e', title: 'b' , quote: '关键短语2' },
+      { segmentId: '¶3', label: 't', title: 'c' , quote: '关键短语3' },
+      { segmentId: '¶5', label: 'd', title: '核心一段' , quote: '关键短语5' },
     ],
     CTX,
   )
   assert.ok(r.ok, JSON.stringify(r.issues))
   assert.equal(r.stats.byTier.ref, 3)
-  assert.equal(r.stats.highlightedChars, 100, '参考档不应计入高亮字数')
+  assert.equal(r.stats.highlightedChars, 5, '参考档不应计入高亮字数，只剩核心那段的 quote 字数')
 })
 
 await test('未知段落锚点被拒', async () => {
-  const r = rules.validateAnnotation([{ segmentId: '¶99', label: 'd', title: 't' }], CTX)
+  const r = rules.validateAnnotation([{ segmentId: '¶99', label: 'd', title: 't' , quote: '关键短语99' }], CTX)
   assert.equal(r.ok, false)
   assert.ok(r.issues.some((i) => i.code === 'unknown-segment'))
 })
@@ -457,7 +467,7 @@ await test('保存读前建构后阶段推进到 planned', async () => {
 await test('保存超预算标注被拒且不推进阶段', async () => {
   const svc = new StudyService(workspace)
   const proj = await loadProject(svc)
-  const all = proj.segments.map((s) => ({ segmentId: s.id, label: 'd', title: '全部' }))
+  const all = proj.segments.map((s) => ({ segmentId: s.id, label: 'd', title: '全部', quote: (s.text || '').slice(0, 12) || 'x' }))
   const res = await svc.saveAnnotation(DOC_ID, all)
   assert.equal(res.check.ok, false, '全部标为核心档应当被拒')
   const after = await loadProject(svc)
@@ -469,7 +479,7 @@ await test('修正后的标注通过并产出 annotated.md', async () => {
   const proj = await loadProject(svc)
   const first = proj.segments[0].id
   const res = await svc.saveAnnotation(DOC_ID, [
-    { segmentId: first, label: 'd', title: '认知负荷理论提出者' },
+    { segmentId: first, label: 'd', title: '认知负荷理论提出者', quote: (proj.segments[0].text || '').slice(0, 10) },
   ])
   assert.ok(res.check.ok, JSON.stringify(res.check.issues))
   const md = await readFile(join(workspace, '.study', DOC_ID, 'annotated.md'), 'utf8')
@@ -565,7 +575,7 @@ section('8. 工具返回值必须是无损 JSON')
 
 await test('校验失败的结果里不含 undefined（否则宿主拒绝回传模型）', async () => {
   const svc = new StudyService(workspace)
-  const res = await svc.saveAnnotation(DOC_ID, [{ segmentId: '¶2', label: 'd', title: 'x' }])
+  const res = await svc.saveAnnotation(DOC_ID, [{ segmentId: '¶2', label: 'd', title: 'x' , quote: '关键短语2' }])
   const undefinedPaths = []
   const walk = (value, path) => {
     if (value === undefined) return undefinedPaths.push(path)
@@ -887,6 +897,209 @@ await test('向下搜索能发现 .study', async () => {
 })
 
 await rm(wsWs, { recursive: true, force: true })
+
+
+/* ------------------------------------------- 13. 三色高亮落在原文短语上 */
+
+section('13. 三色高亮：加粗原文短语，而不是整段变色')
+
+await test('quote 命中时高亮落在原文位置', () => {
+  const segs = [
+    { id: '¶1', chars: 40, text: '默认取向是通用优于专用，只在四种情况下退回专用工具。' },
+  ]
+  const html = rules.renderAnnotatedHtml(segs, {
+    items: [{ segmentId: '¶1', label: 's', tier: 'core', title: '通用优先', quote: '通用优于专用' }],
+  })
+  assert.ok(html.includes('<strong class="sc-hl-core">通用优于专用</strong>'), html)
+  // 段落容器本身不带高亮 class，否则整段变色
+  assert.ok(!/class="sc-seg sc-hl/.test(html), '段落不应整体变色')
+})
+
+await test('quote 不在原文时校验报 quote-not-found', () => {
+  const segs = [{ id: '¶1', chars: 20, text: '原始文字' }]
+  const r = rules.validateAnnotation([{ segmentId: '¶1', label: 'd', title: 't', quote: '不存在的片段' }], {
+    segments: segs,
+    totalChars: 20,
+  })
+  assert.equal(r.ok, false)
+  assert.ok(r.issues.some((i) => i.code === 'quote-not-found'), JSON.stringify(r.issues))
+})
+
+await test('缺 quote 被拒（不允许整段标注）', () => {
+  const segs = [{ id: '¶1', chars: 20, text: '原始文字' }]
+  const r = rules.validateAnnotation([{ segmentId: '¶1', label: 'd', title: 't' }], {
+    segments: segs,
+    totalChars: 20,
+  })
+  assert.equal(r.ok, false)
+  assert.ok(r.issues.some((i) => i.code === 'no-quote'))
+})
+
+await test('预算按 quote 字数算，不按整段字数', () => {
+  // 10 段 × 100 字 = 1000 字。核心档上限 10% = 100 字。
+  // quote 各 8 字 × 3 段 = 24 字 = 2.4%，远低于上限 → 应通过。
+  const segs = Array.from({ length: 10 }, (_, i) => ({
+    id: `¶${i + 1}`,
+    chars: 100,
+    text: `前文${'填'.repeat(46)}关键短语${i + 1}${'填'.repeat(46)}`,
+  }))
+  const items = [0, 1, 2].map((i) => ({
+    segmentId: `¶${i + 1}`,
+    label: 'd',
+    title: 'x',
+    quote: `关键短语${i + 1}`,
+  }))
+  const r = rules.validateAnnotation(items, { segments: segs, totalChars: 1000 })
+  assert.ok(r.ok, `按片段算应当通过：${JSON.stringify(r.issues)}`)
+  // 「关键短语N」每个 5 字（关键短语=4 + 数字=1），3 段共 15 字
+  assert.equal(r.stats.highlightedChars, 15)
+})
+
+await test('标题行里的 quote 也能高亮', () => {
+  const segs = [{ id: '¶1', chars: 20, text: '## 三种负荷的区分' }]
+  const html = rules.renderAnnotatedHtml(segs, {
+    items: [{ segmentId: '¶1', label: 'd', tier: 'core', title: '小结', quote: '三种负荷' }],
+  })
+  assert.ok(html.includes('<strong class="sc-hl-core">三种负荷</strong>'), html)
+})
+
+await test('HTML 特殊字符先转义再高亮，不会注入', () => {
+  const segs = [{ id: '¶1', chars: 20, text: '用 <script> 攻击 & 测试' }]
+  const html = rules.renderAnnotatedHtml(segs, {
+    items: [{ segmentId: '¶1', label: 'd', tier: 'core', title: 't', quote: '<script>' }],
+  })
+  assert.ok(!html.includes('<script>'), '未转义，存在注入风险')
+  assert.ok(html.includes('&lt;script&gt;'), html)
+})
+
+/* --------------------------------------------------- 14. QA 自测问答 */
+
+section('14. QA 自测问答（每条 ≤100 字）')
+
+await test('合法 QA 落盘并可读回', async () => {
+  const svc = new StudyService(workspace)
+  const res = await svc.saveQa(DOC_ID, [
+    { q: '三种负荷分别来自哪里？', a: '内在来自材料复杂度，外在来自设计不当，相关来自学习者的加工努力。' },
+  ])
+  assert.equal(res.accepted, true, JSON.stringify(res.issues))
+  assert.equal(res.count, 1)
+  const back = await svc.qa(DOC_ID)
+  assert.equal(back.length, 1)
+  assert.match(back[0].q, /三种负荷/)
+})
+
+await test('问题超 100 字被拒', async () => {
+  const svc = new StudyService(workspace)
+  const res = await svc.saveQa(DOC_ID, [{ q: '问'.repeat(101), a: '答' }])
+  assert.equal(res.accepted, false)
+  assert.ok(res.issues.some((i) => i.code === 'qa-question-too-long'))
+})
+
+await test('回答超 100 字被拒', async () => {
+  const svc = new StudyService(workspace)
+  const res = await svc.saveQa(DOC_ID, [{ q: '问题', a: '答'.repeat(101) }])
+  assert.equal(res.accepted, false)
+  assert.ok(res.issues.some((i) => i.code === 'qa-answer-too-long'))
+})
+
+await test('空 QA 列表被拒', async () => {
+  const svc = new StudyService(workspace)
+  await assert.rejects(() => svc.saveQa(DOC_ID, []), /QA 为空/)
+})
+
+/* ------------------------------------ 15. 参考资料标注来源类型 */
+
+section('15. 参考资料区分来源')
+
+await test('refs 按「原文 / 联网检索 / 我的知识」分组', () => {
+  const svc = new StudyService(workspace)
+  const md = svc.renderRefs([
+    { title: '原始讲义', source: '原文', kind: 'pdf' },
+    { title: 'Sweller 1988', source: '联网检索', url: 'https://example.com/a' },
+    { title: '我记忆里的定义', source: '我的知识' },
+  ])
+  assert.match(md, /## 原文/)
+  assert.match(md, /## 联网检索/)
+  assert.match(md, /## 我的知识/)
+  assert.match(md, /https:\/\/example\.com\/a/)
+})
+
+await test('未标来源的条目归入「我的知识」而不是无声丢弃', () => {
+  const svc = new StudyService(workspace)
+  const md = svc.renderRefs([{ title: '某本书' }])
+  assert.match(md, /## 我的知识/)
+  assert.match(md, /某本书/)
+})
+
+/* --------------------------------- 16. archify 拆图与生成 */
+
+section('16. 知识点逻辑图交给 archify')
+
+await test('大图按根节点拆成多张可读规模的小图', () => {
+  // 造一条 40 节点的长链，必须被拆开，否则画布超宽、字号被判定不可读
+  const nodes = Array.from({ length: 40 }, (_, i) => ({ id: `n${i}`, label: `知识点${i}` }))
+  const edges = Array.from({ length: 39 }, (_, i) => ({ from: `n${i}`, to: `n${i + 1}`, relation: 'prerequisite' }))
+  const groups = splitGraph({ nodes, edges }, 18)
+  assert.ok(groups.length > 1, `应拆成多张，实际 ${groups.length}`)
+  for (const g of groups) assert.ok(g.nodes.length <= 18, `单张不应超过 18 节点，实际 ${g.nodes.length}`)
+  // 所有节点都被分到，不丢
+  const total = groups.reduce((a, g) => a + g.nodes.length, 0)
+  assert.equal(total, 40)
+})
+
+await test('拆图保留组内关系，不产生悬空边', () => {
+  const nodes = Array.from({ length: 30 }, (_, i) => ({ id: `n${i}`, label: `K${i}` }))
+  const edges = Array.from({ length: 29 }, (_, i) => ({ from: `n${i}`, to: `n${i + 1}`, relation: 'prerequisite' }))
+  const groups = splitGraph({ nodes, edges }, 10)
+  for (const g of groups) {
+    const ids = new Set(g.nodes.map((n) => n.id))
+    for (const e of g.edges) {
+      assert.ok(ids.has(e.from) && ids.has(e.to), `悬空边 ${e.from}->${e.to}`)
+    }
+  }
+})
+
+await test('archify 能把关系图生成为可打开的 HTML', async () => {
+  const rel = {
+    nodes: [
+      { id: 'a', label: '内在负荷', kind: 'concept' },
+      { id: 'b', label: '外在负荷', kind: 'concept' },
+      { id: 'c', label: '降低外在负荷', kind: 'method' },
+    ],
+    edges: [
+      { from: 'a', to: 'c', relation: 'prerequisite' },
+      { from: 'b', to: 'c', relation: 'prerequisite' },
+    ],
+  }
+  const dir = await mkdtemp(join(tmpdir(), 'arch-'))
+  const r = await buildArchifyFigures(rel, { workDir: dir, outDir: dir, docTitle: '测试图' })
+  assert.ok(r.cli, '没找到 archify CLI')
+  assert.ok(r.figures.length >= 1)
+  const made = r.figures.filter((f) => f.produced)
+  assert.ok(made.length >= 1, `未产出 HTML：${JSON.stringify(r.figures)}`)
+  const html = await readFile(join(dir, made[0].file), 'utf8')
+  assert.ok(html.length > 10000, `HTML 太小，可能是空壳：${html.length}`)
+  assert.match(html, /内在负荷/, '图里应包含节点标签')
+  await rm(dir, { recursive: true, force: true })
+})
+
+await test('保存关系图后 project() 能拿到 archify 图列表', async () => {
+  const svc = new StudyService(workspace)
+  const res = await svc.saveRelations(DOC_ID, {
+    nodes: [
+      { id: 'x', label: '节点甲' },
+      { id: 'y', label: '节点乙' },
+    ],
+    edges: [{ from: 'x', to: 'y', relation: 'prerequisite' }],
+  })
+  assert.ok(res.check.ok)
+  assert.ok(res.figures, '保存结果里应带 figures')
+  const proj = await svc.project(DOC_ID)
+  assert.ok(Array.isArray(proj.figures), 'project() 应返回 figures 数组')
+  if (proj.figures.length) {
+    assert.match(proj.figures[0].url, /graph-\d+\.html$/, `url 形状不对：${proj.figures[0].url}`)
+  }
+})
 
 console.log(`\n${'─'.repeat(52)}`)
 console.log(`通过 ${passed}　失败 ${failed}`)

@@ -27,14 +27,15 @@
 │  ├ 输入框停靠条：当前文档 · 阶段 · 下一步                      │
 │  ├ 三色注意力阅读器（渲染宿主给好的 HTML）                     │
 │  ├ 术语追问（选中文字 → 带 ¶N 上下文）                        │
-│  ├ 知识图谱（纯 SVG，坐标由宿主算）                            │
+│  ├ 知识图谱（iframe 嵌入 archify 生成的 HTML）                 │
 │  └ 费曼考核 / 读前建构                                        │
 ├─────────────────────────────────────────────────────────────┤
 │  能力层  Host 插件  @local/dsh-study-copilot (index.js)       │
 │  ├ 多格式提取  extract.js（pdf/docx/pptx/xlsx/html/epub/…）   │
 │  ├ 项目存储    store.js    <workspace>/.study/<docId>/        │
 │  ├ 规则校验    rules.js    标签/三色预算/六段式/目标分级       │
-│  ├ 内容渲染    markdown.js Markdown→HTML + 图谱布局算法        │
+│  ├ 内容渲染    markdown.js Markdown→HTML（短语级高亮）         │
+│  ├ 图谱生成    archify-figures.js → archify CLI → HTML        │
 │  ├ Agent 工具  study_ingest · study_read · study_save         │
 │  │             study_term · study_status · study_drill        │
 │  ├ HTTP API    /study-copilot/api/*（数据 + 图片资源）         │
@@ -42,7 +43,7 @@
 ├─────────────────────────────────────────────────────────────┤
 │  方法层  技能  .dsh/skills/study-*                            │
 │  study-companion 总控 → preflight → annotate → map            │
-│                     → explain-term → feynman                  │
+│                     → recall → explain-term → feynman         │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -50,8 +51,8 @@
 
 - **插件 = 机制，技能 = 方法。** 提取格式、落盘、算覆盖率、渲染三色、算图坐标，这些是确定性计算，写成插件；"怎么拆解语义、怎么定重难点、怎么出思考题"是判断，写成技能让模型执行。两者不重叠。
 - **同一个操作两个调用者。** 界面上的"导入文档""保存标注"和 Agent 的 `study_ingest`/`study_save` 调的是同一个 Host 服务方法（`StudyService.*`），没有两套逻辑。
-- **界面不自己算，也不自己解析。** 宿主返回的 `/project` 里，每段都带渲染好的 `html`，
-  图谱带算好的 `graphLayout`（节点坐标 + 边折线拐点）。界面只做三件事：插入 HTML、画 SVG、处理点击。
+- **界面不自己算，也不自己解析。** 宿主返回的 `/project` 里，每段都带渲染好的 `html`
+  （高亮已经嵌在里面），图谱给出 `figures[]` 的 URL。界面只做三件事：插入 HTML、填 iframe 的 src、处理点击。
   这样"什么算粗体""标签怎么折行"只实现一次。**这条是踩过坑之后加的**：早期版本让客户端
   自己逐行输出 `<p>`，结果是粗体显示成字面星号、表格塌成一堆竖线、图片显示成链接源码。
 - **技能可单独使用。** 不安装插件时，技能仍能靠纯文本工作（降级路径在技能里写明）。
@@ -95,19 +96,26 @@
 
 插件在保存标注时校验：总高亮占比 ≤ 20%（二八法则），每段至多 1 个档位，`#c` 标签必须带两字关键词。
 
-## 4. 五个阶段（状态机）
+## 4. 六个阶段（状态机）
 
 ```
-ingested ──preflight──▶ planned ──annotate──▶ annotated ──quiz──▶ drilled ──▶ done
-   导入        读前建构         读中标注          读后考核
+ingested ──preflight──▶ planned ──annotate──▶ annotated ──map──▶ mapped
+   导入        读前建构         读中标注            知识图谱
+                                      │
+                                      ├──qa──▶ recalled ──drill──▶ drilled ──▶ done
+                                      │        读后自测              费曼考核
+                                      └─（terms 随时记录，不占阶段）
 ```
+
+图谱与自测都只依赖 `annotated`，可以任选顺序；`quiz.md` 在读前就生成，
+所以"考核"阶段只由 `drills.jsonl` 的真实记录点亮。
 
 每个阶段插件都返回"下一步该调什么"，技能里写明该阶段要交付什么、达标标准是什么。
 
 ## 5. 界面设计
 
 **入口**：左侧栏新增一个书本图标（`sidebar.panellist` id = `study-copilot`），点击进入主面板。
-**主面板**：四个 Tab —— 精读加工 / 读前建构 / 知识图谱 / 费曼考核。
+**主面板**：四个 Tab —— 精读加工 / 读前建构 / 知识图谱 / 费曼考核（自测 QA 在精读页底部）。
 **输入框停靠条**：显示当前文档 + 阶段进度条 + 「继续」按钮，随时知道读到哪。
 
 **渲染职责划分**
@@ -117,7 +125,7 @@ ingested ──preflight──▶ planned ──annotate──▶ annotated ─�
 | 段落正文 | `segments[].html` | 插入 HTML |
 | 六段式 | `preflightHtml` | 插入 HTML |
 | 思考题 / 参考 | `quizHtml` / `refsHtml` | 插入 HTML |
-| 图谱 | `mermaid` + `graphLayout` | 画 SVG |
+| 图谱 | `figures[]`（archify HTML 的 URL） | `<iframe src>` |
 | 图片 | `/asset/<docId>/<path>` 路由 | `<img src>` |
 
 **术语追问（对应 3min.top 那种"指着词就问"）**
@@ -127,11 +135,17 @@ ingested ──preflight──▶ planned ──annotate──▶ annotated ─�
 - 回答必须结合**当前段落上下文**：提问时自动带上 `¶N` 段落原文
 
 **知识图谱**
-- 纯 SVG，零前端依赖（不引 Mermaid.js CDN，断网/企业网络下不会失效）
-- 分层：Kahn 拓扑排序；虚线对比边不参与分层，成环也不会死循环
-- 降交叉：重心法迭代 4 轮
-- 走线：横移只在层间空隙（空隙无节点），跨多层竖移走右侧专用边道
-- 交互：点节点聚焦直接关系、悬停看完整定义、可切到 Mermaid 源
+- 嵌的是 **archify 生成的 HTML**，不是 Mermaid 源码，也不是手绘 SVG
+- `relations.json` 保存成功后宿主自动调 archify，产物 `graph-N.html` 落在 `.study/<docId>/`
+- 超过 18 节点按根节点自动拆图：archify 的 `browser-check` 会按视口缩放判断字号可读性，
+  33 节点铺 4348px 宽缩到 1440 后 12.5px 字变成 4px，会被判定不可读而拒绝出图
+- 界面上方一排按钮切换子图，下方 `<details>` 列关系清单，附"新窗口打开"
+- 出图失败不阻塞阶段推进（关系数据已存好），界面显示失败原因
+
+**三色高亮**
+- 宿主端在段落 HTML 里把 `quote` 逐字命中处包成 `<strong class="sc-hl-{tier}">`
+- 界面按 `data-id="¶N"` 切出每段 HTML，用 `dangerouslySetInnerHTML` 插入
+- 段落本身**不染色**（`<section class="sc-seg">` 没有颜色 class）——整段变色等于没标
 
 ## 6. 测试策略
 
@@ -144,7 +158,10 @@ ingested ──preflight──▶ planned ──annotate──▶ annotated ─�
 | 语义 | 生成思考题 ≠ 完成考核 | `§7` |
 | 无损 | 工具返回值必须是无损 JSON | `§8` |
 | **渲染** | **Markdown 语法真的被解析（含 XSS 转义）** | **`§9`** |
-| **布局** | **节点不重叠、走线不穿节点、标签不溢出** | **`§10`** |
+| **高亮** | **quote 必须逐字在原文、预算按 quote 字数算、段落不整段染色** | **`§11`** |
+| **需求** | **用户提的 16 条要求逐条断言** | **`tests/audit-requirements.mjs`** |
+| **接口** | **真实 HTTP：图能取到且是 HTML、越界被拒、QA 能存能读** | **`tests/e2e-check.mjs`** |
+| **界面** | **渲染出来的内容对不对（不是接口 200）** | **`tests/audit-ui.mjs`** |
 | 界面审计 | 实际接口返回的内容能否正确渲染 | `tests/audit-ui.mjs` |
 | 图谱质量 | 几何指标 + Pillow 预览图 | `tests/check-graph-quality.mjs` |
 | 技能 | frontmatter 合法、可被发现 | 技能目录自查 |

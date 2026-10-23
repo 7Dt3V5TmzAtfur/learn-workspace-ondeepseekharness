@@ -61,7 +61,13 @@ function tierOf(label) {
 
 /**
  * 校验段落标注。
- * @param {Array<{segmentId:string,label:string,title?:string,keyword?:string,tier?:string,note?:string}>} items
+ *
+ * 关键：三色高亮的是**原文里的短语（quote）**，不是整段。
+ * 早期版本按整段字数算预算，导致一个 200 字的段落一标就超预算、
+ * 而且渲染出来整段变色，注意力机制完全失效。
+ * 现在每条标注必须给出原文片段，预算按片段字数算。
+ *
+ * @param {Array<{segmentId:string,label:string,quote:string,title?:string,keyword?:string,tier?:string,note?:string}>} items
  * @param {{segments:Array<{id:string,chars:number}>, totalChars:number}} context
  */
 export function validateAnnotation(items, context) {
@@ -77,6 +83,8 @@ export function validateAnnotation(items, context) {
   const seen = new Map()
   const byTier = { core: 0, hard: 0, ref: 0 }
   let highlightedChars = 0
+  const tierCharsMap = { core: 0, hard: 0, ref: 0 }
+  const quoteRanges = new Map() // segmentId -> [[start,end], ...] 用于检测片段重叠
 
   for (const item of items) {
     const where = item?.segmentId ?? '(缺少 segmentId)'
@@ -108,6 +116,48 @@ export function validateAnnotation(items, context) {
       else if ([...kw].length !== 2) issues.push(issue('warn', 'c-keyword-len', `#c 关键词建议两字，当前是 "${kw}"`, where))
     }
 
+    // ---- 原文片段：必须原样出现在该段落里 ----
+    const quote = String(item.quote ?? '').trim()
+    const segText = context.segments.find((s) => s.id === item.segmentId)?.text ?? ''
+    let quoteChars = 0
+    if (!quote) {
+      issues.push(
+        issue(
+          'error',
+          'no-quote',
+          '缺少 quote：三色高亮要加在原文的具体短语上，请给出原文片段（不要整段照抄）',
+          where,
+        ),
+      )
+    } else if (segText) {
+      const idx = segText.indexOf(quote)
+      if (idx < 0) {
+        issues.push(
+          issue(
+            'error',
+            'quote-not-found',
+            `quote 在段落里找不到：「${quote.slice(0, 30)}${quote.length > 30 ? '…' : ''}」。必须逐字照抄原文`,
+            where,
+          ),
+        )
+      } else {
+        quoteChars = [...quote].length
+        const segChars = [...segText].length
+        if (quoteChars >= segChars * 0.9) {
+          issues.push(
+            issue(
+              'warn',
+              'quote-too-long',
+              'quote 几乎等于整段：挑一句最关键的短语即可，整段加粗等于没有重点',
+              where,
+            ),
+          )
+        }
+        if (!quoteRanges.has(item.segmentId)) quoteRanges.set(item.segmentId, [])
+        quoteRanges.get(item.segmentId).push([idx, idx + quote.length])
+      }
+    }
+
     const expected = tierOf(label)
     const tier = item.tier ?? expected
     if (!ATTENTION_TIERS[tier]) {
@@ -120,9 +170,9 @@ export function validateAnnotation(items, context) {
       )
     }
     byTier[tier] += 1
-    const chars = context.segments.find((s) => s.id === item.segmentId)?.chars ?? 0
+    tierCharsMap[tier] += quoteChars
     // 参考档是"需要时回查"，不算注意力高亮，不进预算
-    if (tier !== 'ref') highlightedChars += chars
+    if (tier !== 'ref') highlightedChars += quoteChars
   }
 
   const totalChars = context.totalChars || context.segments.reduce((a, s) => a + s.chars, 0) || 1
@@ -134,19 +184,15 @@ export function validateAnnotation(items, context) {
         'error',
         'budget-total',
         `高亮覆盖 ${(ratio * 100).toFixed(1)}%，超过二八法则上限 ${TOTAL_HIGHLIGHT_BUDGET * 100}%。` +
-          '请只保留真正需要停下来想的段落，其余降级或不标。',
+          '请缩短 quote，或减少核心/攻坚档的条数。',
       ),
     )
   }
 
   for (const [key, def] of Object.entries(ATTENTION_TIERS)) {
     if (def.budget === null) continue
-    const count = byTier[key]
-    if (!count) continue
-    const tierChars = items
-      .filter((it) => (it.tier ?? tierOf(String(it.label).replace(/^#/, '').toLowerCase())) === key)
-      .reduce((a, it) => a + (context.segments.find((s) => s.id === it.segmentId)?.chars ?? 0), 0)
-    const tierRatio = tierChars / totalChars
+    if (!byTier[key]) continue
+    const tierRatio = tierCharsMap[key] / totalChars
     if (tierRatio > def.budget) {
       issues.push(
         issue(
@@ -173,6 +219,7 @@ export function validateAnnotation(items, context) {
       highlightedChars,
       totalChars,
       ratio: Number(ratio.toFixed(4)),
+      tierChars: tierCharsMap,
       labelCounts: Object.fromEntries(Object.keys(ROLE_LABELS).map((k) => [k, labels.filter((l) => l === k).length])),
     },
   }
@@ -350,23 +397,71 @@ export function validateRelations(graph) {
 
 const TIER_CLASS = { core: 'sc-hl-core', hard: 'sc-hl-hard', ref: 'sc-hl-ref' }
 
+const escHtml = (s) =>
+  String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
+
 /**
- * 把原文 + 标注渲染成带三色高亮的 HTML 片段。
- * 段落以 ¶N 分组，供界面按段落交互。
+ * 在段落文字里把 quote 包成三色 <strong>，返回转义安全的 HTML。
+ *
+ * 这是"三色加粗原文"的唯一实现点：
+ * - 命中：`<strong class="sc-hl-core">原文片段</strong>`
+ * - 未命中：原样输出（校验阶段已经拦过，这里只是兜底）
+ *
+ * 为什么不用 innerHTML 拼字符串再替换：原文可能有 <、& 等字符，
+ * 必须先转义再插入标签，否则会出现 XSS 或标签错乱。这里采用
+ * "按命中位置切片 + 逐片转义"的方式，天然安全。
+ */
+function highlightQuote(text, quote, tierClass) {
+  if (!quote) return escHtml(text)
+  const idx = text.indexOf(quote)
+  if (idx < 0) return escHtml(text)
+  const before = text.slice(0, idx)
+  const hit = text.slice(idx, idx + quote.length)
+  const after = text.slice(idx + quote.length)
+  return `${escHtml(before)}<strong class="${tierClass}">${escHtml(hit)}</strong>${escHtml(after)}`
+}
+
+/**
+ * 把原文 + 标注渲染成 HTML：整篇按 ¶N 分段，段内在原文位置做三色加粗。
+ *
+ * @param {Array<{id:string,text:string}>} segments
+ * @param {{items:Array}} annotation
  */
 export function renderAnnotatedHtml(segments, annotation) {
   const byId = new Map((annotation?.items ?? []).map((it) => [it.segmentId, it]))
-  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]))
   return segments
     .map((seg) => {
       const a = byId.get(seg.id)
-      const cls = a ? TIER_CLASS[a.tier] ?? TIER_CLASS.core : ''
-      const tag = a ? `<span class="sc-tag sc-tag-${a.label}">#${a.label} ${esc(a.title ?? '')}</span>` : ''
-      const body = seg.text
+      const tierClass = a ? TIER_CLASS[a.tier] ?? TIER_CLASS.core : ''
+
+      // 段落角色徽标：#d 定义|Definition 形式（渐构要求的输出格式）
+      let tag = ''
+      if (a) {
+        const role = ROLE_LABELS[String(a.label).replace(/^#/, '').toLowerCase()]
+        const en = role?.en ?? ''
+        const zh = role?.zh ?? ''
+        const kw = a.keyword ? `${escHtml(a.keyword)} ` : ''
+        tag =
+          `<span class="sc-tag sc-tag-${escHtml(a.label)}" title="${escHtml(zh)}｜${escHtml(en)}">` +
+          `#${escHtml(a.label)} ${kw}${escHtml(a.title ?? '')}` +
+          `<span class="sc-tag-en">${escHtml(en)}</span></span>`
+      }
+
+      // 正文：如果是标题行就渲染成标题，否则做三色高亮
+      const quote = a?.quote ? String(a.quote).trim() : ''
+      const body = String(seg.text)
         .split('\n')
-        .map((line) => (line.startsWith('#') ? `<div class="sc-h">${esc(line)}</div>` : `<p>${esc(line)}</p>`))
+        .map((line) => {
+          if (!line.trim()) return ''
+          if (line.startsWith('#')) return `<div class="sc-h">${highlightQuote(line, quote, tierClass)}</div>`
+          return `<p>${highlightQuote(line, quote, tierClass)}</p>`
+        })
         .join('')
-      return `<section class="sc-seg ${cls}" data-id="${esc(seg.id)}">${tag}${body}</section>`
+
+      // 备注单独一行，不参与高亮
+      const note = a?.note ? `<div class="sc-seg-note">${escHtml(a.note)}</div>` : ''
+      const tierAttr = a ? ` data-tier="${escHtml(a.tier ?? '')}"` : ''
+      return `<section class="sc-seg" data-id="${escHtml(seg.id)}"${tierAttr}>${tag}${body}${note}</section>`
     })
     .join('\n')
 }

@@ -69,7 +69,11 @@ window.__ModuleLoader__.load({
 .sc-legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:-1px}
 .sc-dock{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--dsw-alias-border-l1);border-radius:8px;background:var(--dsw-alias-bg-layer-1);font-size:12px;color:var(--dsw-alias-label-secondary)}
 .sc-dock b{color:var(--dsw-alias-label-primary);font-weight:500}
-.sc-pop{position:absolute;z-index:20;background:var(--dsw-alias-bg-overlay);border:1px solid var(--dsw-alias-border-l2);border-radius:8px;padding:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:12px;min-width:180px}
+.sc-seg-meta{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:12px}
+.sc-details{margin-top:8px}
+.sc-details>summary{cursor:pointer;font-size:12px;color:var(--dsw-alias-label-secondary);user-select:none}
+.sc-details[open]>summary{margin-bottom:4px}
+.sc-pop{max-width:min(420px,calc(100% - 32px));right:16px;bottom:16px;position:absolute;z-index:20;background:var(--dsw-alias-bg-overlay);border:1px solid var(--dsw-alias-border-l2);border-radius:8px;padding:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:12px;min-width:180px}
 .sc-pre{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;line-height:1.65;background:var(--dsw-alias-bg-layer-2);padding:10px;border-radius:6px;overflow:auto;max-height:340px;margin:0}
 /* ---- Markdown 渲染结果 ---- */
 .sc-md{line-height:1.85;overflow-wrap:anywhere}
@@ -292,37 +296,153 @@ window.__ModuleLoader__.load({
 
     /* -------------------------------------------------------- 精读面板 */
 
-    function ReadingPane({ project, onAsk }) {
-      const [selected, setSelected] = useState(null)
+    /**
+     * 读中加工面板。
+     *
+     * 关键：正文用宿主渲染好的 annotatedHtml —— 三色高亮已经加在
+     * 原文的具体短语上（<strong class="sc-hl-core">…</strong>），
+     * 界面只负责把它塞进 DOM，不再自己拼颜色。
+     *
+     * 早期版本按段落套 class 整段变色，导致"每段都是一块颜色"、
+     * 注意力机制完全失效；现在高亮是短语级的。
+     */
+    function ReadingPane({ project, onAsk, onLocate, workspace }) {
+      const [sel, setSel] = useState(null)
       const [selText, setSelText] = useState('')
       const [onlyAnnotated, setOnlyAnnotated] = useState(false)
+      const [asking, setAsking] = useState(false)
+      const [answer, setAnswer] = useState(null)
+      const [listening, setListening] = useState(false)
+
       const items = project.annotations?.items ?? []
       const stats = project.annotations?.stats
       const issues = project.annotations?.issues
       const byId = useMemo(() => new Map(items.map((it) => [it.segmentId, it])), [items])
-
-      // 段落正文与 HTML 已由宿主渲染好，界面不再自己切块/解析
       const segments = project.segments ?? []
+
+      // 宿主已经把整篇渲染成带高亮的 HTML；这里按 ¶N 切回来以便逐段交互
+      const htmlBySeg = useMemo(() => {
+        const raw = project.annotatedHtml ?? ''
+        const out = new Map()
+        const re = /<section class="sc-seg"[^>]*data-id="([^"]+)"[^>]*>([\s\S]*?)<\/section>/g
+        let m
+        while ((m = re.exec(raw))) out.set(m[1], m[2])
+        return out
+      }, [project.annotatedHtml])
+
       const shown = onlyAnnotated ? segments.filter((s) => byId.has(s.id)) : segments
 
-      const tierClass = (tier) => (tier === 'hard' ? 'sc-hl-hard' : tier === 'ref' ? 'sc-hl-ref' : 'sc-hl-core')
-
-      // 选中文字：getSelection() 返回 Selection 对象，必须 toString() 才是文字
+      /** 读当前选中的文字（Selection 必须 toString() 才是文字） */
       const readSelection = () => {
         const sel = window.getSelection?.()
         return String(sel ? sel.toString() : '').trim()
       }
 
+      /**
+       * 语音提问。
+       *
+       * 用户场景是"手在翻页、正在读"，打字会打断节奏，所以语音是刚需。
+       * 但浏览器语音识别依赖厂商服务，可能不可用——因此做成"增强"：
+       * 有 SpeechRecognition 就显示麦克风，没有就完全不显示，
+       * 手打输入始终可用。
+       */
+      const canVoice =
+        typeof window !== 'undefined' &&
+        Boolean(window.SpeechRecognition || window.webkitSpeechRecognition)
+
+      /**
+       * 发起追问。
+       *
+       * 这里只负责"带上段落上下文记录这次追问"，答案必须由 Agent 在对话里给出
+       * （解释词语要看上下文，界面端没有模型）。
+       *
+       * 为了让用户点了就真的能得到回答，这里把问题写进剪贴板并给出明确指引：
+       * 用户按 Ctrl+V 回车即可。试过直接写输入框，但输入框不在本插件的控制范围内，
+       * 硬改 DOM 很脆弱；宁可让用户多按一次，也不能让按钮点了没反应。
+       */
+      const doAsk = async (word, segmentId) => {
+        if (!word) return
+        setAsking(true)
+        setAnswer(null)
+        try {
+          const r = await api('/term', {
+            method: 'POST',
+            body: JSON.stringify({
+              workspace,
+              docId: project.id,
+              term: word,
+              segmentId,
+              question: word,
+              source: 'ui',
+            }),
+          })
+          const prompt = `在《${project.title ?? project.id}》${segmentId ?? ''} 这段里，「${word}」是什么意思？请结合上下文解释，不要只给字典释义。`
+          let copied = false
+          try {
+            await navigator.clipboard.writeText(prompt)
+            copied = true
+          } catch {
+            copied = false
+          }
+          setAnswer({
+            word,
+            prompt,
+            copied,
+            text:
+              (copied ? '问题已复制，粘贴到下方输入框并回车，Agent 就会结合上下文解释。' : '请复制下面这句话，粘贴到输入框并回车：') +
+              (r?.context ? `\n\n该段原文：${String(r.context).slice(0, 140)}…` : ''),
+          })
+          if (onAsk) onAsk(word, segmentId)
+        } catch (e) {
+          setAnswer({ word, text: `追问失败：${e.message}`, error: true })
+        } finally {
+          setAsking(false)
+        }
+      }
+
+      const startVoice = () => {
+        const Ctor = window.SpeechRecognition || window.webkitSpeechRecognition
+        if (!Ctor) return
+        const rec = new Ctor()
+        rec.lang = 'zh-CN'
+        rec.interimResults = false
+        rec.maxAlternatives = 1
+        rec.onresult = (e) => {
+          const said = String(e.results?.[0]?.[0]?.transcript ?? '').trim()
+          setListening(false)
+          if (said) {
+            setSelText(said)
+            if (sel) doAsk(said, sel.seg.id)
+          }
+        }
+        rec.onerror = () => setListening(false)
+        rec.onend = () => setListening(false)
+        setListening(true)
+        try {
+          rec.start()
+        } catch {
+          setListening(false)
+        }
+      }
+
       return h(
         'div',
         { style: { position: 'relative' } },
+
+        // ---- 顶部图例：三色语义 + 预算进度 ----
         h(
           'div',
           { className: 'sc-legend' },
-          h('span', null, h('i', { style: { background: '#4f8ff7' } }), '核心（≤10%）'),
-          h('span', null, h('i', { style: { background: '#e5484d' } }), '攻坚（≤8%）'),
-          h('span', null, h('i', { style: { background: '#30a46c' } }), '参考'),
-          stats ? h('span', null, `已标 ${stats.total}/${segments.length} 段 · 高亮 ${pct(stats.ratio)}`) : null,
+          h('span', null, h('i', { style: { background: '#4f8ff7' } }), '核心 ≤10%'),
+          h('span', null, h('i', { style: { background: '#e5484d' } }), '攻坚 ≤8%'),
+          h('span', null, h('i', { style: { background: '#30a46c' } }), '参考 不限'),
+          stats
+            ? h(
+                'span',
+                { title: '高亮字数 / 全文总字数' },
+                `已标 ${stats.total}/${segments.length} 段 · 高亮 ${stats.highlightedChars}/${stats.totalChars} 字（${pct(stats.ratio)}）`,
+              )
+            : h('span', { className: 'sc-muted' }, '还没有标注'),
           h(
             'label',
             { style: { marginLeft: 'auto', cursor: 'pointer', userSelect: 'none' } },
@@ -335,80 +455,128 @@ window.__ModuleLoader__.load({
             '只看已标注',
           ),
         ),
+
         h(IssueList, { issues }),
-        h('div', { className: 'sc-md' },
+
+        // ---- 正文：直接用宿主的 annotatedHtml，高亮已在原文位置上 ----
+        h(
+          'div',
+          { className: 'sc-md', onMouseUp: () => setSelText(readSelection()) },
           shown.map((seg) => {
             const a = byId.get(seg.id)
+            const inner = htmlBySeg.get(seg.id)
             return h(
               'section',
               {
                 key: seg.id,
-                className: `sc-seg ${a ? tierClass(a.tier) : ''}`,
+                className: 'sc-seg',
                 'data-seg': seg.id,
+                style: { cursor: 'pointer' },
                 onClick: () => {
                   setSelText(readSelection())
-                  setSelected({ seg })
+                  setSel({ seg })
+                  setAnswer(null)
                 },
               },
               h(
                 'div',
-                { style: { display: 'flex', alignItems: 'center', gap: 6, marginBottom: 3 } },
+                { className: 'sc-seg-meta' },
                 a
-                  ? h('span', { className: `sc-tag sc-tag-${a.label}` }, `#${a.label}${a.title ? ` ${a.title}` : ''}`)
+                  ? h('span', { className: `sc-tag sc-tag-${a.label}` }, `#${a.label}`)
                   : h('span', { className: 'sc-tag' }, seg.id),
                 seg.chapter ? h('span', { className: 'sc-muted' }, seg.chapter) : null,
                 h('span', { className: 'sc-muted', style: { marginLeft: 'auto' } }, `${seg.chars} 字`),
               ),
-              a?.note ? h('div', { className: 'sc-muted', style: { marginBottom: 4 } }, `💡 ${a.note}`) : null,
-              h('div', { dangerouslySetInnerHTML: { __html: seg.html || '' } }),
+              // 有宿主渲染的高亮版就用它；否则退回纯文本 Markdown
+              inner !== undefined
+                ? h('div', { dangerouslySetInnerHTML: { __html: inner } })
+                : h('div', { dangerouslySetInnerHTML: { __html: seg.html || '' } }),
             )
           }),
         ),
-        selected
+
+        // ---- 追问浮层 ----
+        sel
           ? h(
               'div',
-              { className: 'sc-pop', style: { right: 16, bottom: 16 } },
-              h('div', { className: 'sc-muted' }, `${selected.seg.id} · ${selected.seg.chars} 字`),
+              { className: 'sc-pop' },
+              h(
+                'div',
+                { style: { display: 'flex', alignItems: 'center', gap: 8 } },
+                h('b', null, `${sel.seg.id}`),
+                h('span', { className: 'sc-muted' }, `${sel.seg.chars} 字`),
+                h(
+                  'button',
+                  {
+                    className: 'sc-btn',
+                    style: { marginLeft: 'auto' },
+                    onClick: () => {
+                      setSel(null)
+                      setSelText('')
+                      setAnswer(null)
+                    },
+                  },
+                  '关闭',
+                ),
+              ),
               selText
-                ? h(
-                    'div',
-                    { style: { marginTop: 4 } },
-                    '选中：',
-                    h('b', null, selText.length > 40 ? `${selText.slice(0, 40)}…` : selText),
-                  )
-                : h('div', { className: 'sc-muted', style: { marginTop: 4 } }, '先在正文里选中一段文字'),
+                ? h('div', { style: { marginTop: 6 } }, '选中：', h('b', null, selText.length > 40 ? `${selText.slice(0, 40)}…` : selText))
+                : h('div', { className: 'sc-muted', style: { marginTop: 6 } }, '在正文里选中不懂的词，或直接说/打出来'),
               h(
                 'div',
                 { style: { marginTop: 8, display: 'flex', gap: 6, flexWrap: 'wrap' } },
                 h(
                   'button',
-                  {
-                    className: 'sc-btn sc-btn-primary',
-                    disabled: !selText,
-                    onClick: () => {
-                      const word = selText || prompt('要问哪个词？') || ''
-                      if (word.trim()) onAsk(word.trim(), selected.seg.id)
-                    },
-                  },
-                  '问选中的词',
+                  { className: 'sc-btn sc-btn-primary', disabled: !selText || asking, onClick: () => doAsk(selText, sel.seg.id) },
+                  asking ? '追问中…' : '问选中的词',
                 ),
+                canVoice
+                  ? h(
+                      'button',
+                      { className: `sc-btn ${listening ? 'sc-btn-primary' : ''}`, disabled: listening || asking, onClick: startVoice },
+                      listening ? '🎙 聆听中…' : '🎙 语音提问',
+                    )
+                  : null,
                 h(
                   'button',
                   {
                     className: 'sc-btn',
                     onClick: () => {
                       const word = prompt('要问哪个词？') || ''
-                      if (word.trim()) onAsk(word.trim(), selected.seg.id)
+                      if (word.trim()) {
+                        setSelText(word.trim())
+                        doAsk(word.trim(), sel.seg.id)
+                      }
                     },
                   },
                   '手动输入',
                 ),
-                h(
-                  'button',
-                  { className: 'sc-btn', onClick: () => { setSelected(null); setSelText('') } },
-                  '关闭',
-                ),
               ),
+              answer
+                ? h(
+                    'div',
+                    { style: { marginTop: 10, paddingTop: 8, borderTop: '1px solid var(--dsw-alias-border-l1)' } },
+                    h('div', { className: 'sc-muted' }, `「${answer.word}」在这段话里的意思`),
+                    h('div', { style: { marginTop: 4, lineHeight: 1.7, whiteSpace: 'pre-wrap' } }, answer.text),
+                    // 没能自动复制时，把问题原样给出，让用户手动选中复制
+                    answer.prompt && !answer.copied
+                      ? h(
+                          'div',
+                          {
+                            style: {
+                              marginTop: 6,
+                              padding: 8,
+                              background: 'var(--dsw-alias-bg-layer-1)',
+                              borderRadius: 6,
+                              userSelect: 'all',
+                              fontSize: 12,
+                            },
+                          },
+                          answer.prompt,
+                        )
+                      : null,
+                  )
+                : null,
             )
           : null,
       )
@@ -485,213 +653,189 @@ window.__ModuleLoader__.load({
       return lines
     }
 
+    /**
+     * 知识图谱面板。
+     *
+     * 用户明确要求「知识点之间的逻辑衔接图用 archify 技能实现」，
+     * 所以这里不自己画 SVG，而是内嵌 archify 生成好的独立 HTML。
+     * 那些 HTML 自带暗色/亮色主题、缩放、节点详情，比自己画的信息量大得多。
+     *
+     * 关系图节点多时 archify 会拆成多张（保证字号可读），
+     * so 这里做成多张切换，而不是硬塞一张大图。
+     */
     function GraphPane({ project }) {
-      const graph = project.relations
-      const layout = project.graphLayout
-      const [hover, setHover] = useState(null)
-      const [selNode, setSelNode] = useState(null)
-      const [showSource, setShowSource] = useState(false)
+      const figures = project.figures ?? []
+      const [active, setActive] = useState(0)
+      const nodes = project.relations?.nodes ?? []
+      const edges = project.relations?.edges ?? []
 
-      if (!graph) {
-        return h(
-          Empty,
-          null,
-          h('div', null, '还没有知识图谱。'),
-          h('div', { className: 'sc-muted', style: { marginTop: 8 } }, '说「梳理知识点关系」，Agent 会生成节点与关系。'),
-        )
-      }
-
-      const kindOf = new Map((graph.nodes ?? []).map((n) => [n.id, n.kind]))
-      const labelOf = new Map((graph.nodes ?? []).map((n) => [n.id, n.label]))
-
-      // 选中某节点时：高亮它的直接关联边，其余淡出
-      const relatedEdges = selNode
-        ? new Set((graph.edges ?? []).map((e, i) => (e.from === selNode || e.to === selNode ? i : null)).filter((x) => x !== null))
-        : null
-      const relatedNodes = selNode
-        ? new Set(
-            [
-              selNode,
-              ...(graph.edges ?? []).flatMap((e) =>
-                e.from === selNode ? [e.to] : e.to === selNode ? [e.from] : [],
-              ),
-            ],
-          )
-        : null
-
-      const svg = layout
-        ? h(
-            'svg',
-            {
-              className: 'sc-graph',
-              viewBox: `0 0 ${layout.width} ${layout.height}`,
-              width: layout.width,
-              height: layout.height,
-              style: { width: `${layout.width}px`, height: `${layout.height}px` },
-            },
-            // 箭头定义
-            h(
-              'defs',
-              null,
-              h(
-                'marker',
-                {
-                  id: 'sc-arrow',
-                  viewBox: '0 0 10 10',
-                  refX: '9',
-                  refY: '5',
-                  markerWidth: '7',
-                  markerHeight: '7',
-                  orient: 'auto-start-reverse',
-                },
-                h('path', { d: 'M 0 0 L 10 5 L 0 10 z', fill: 'currentColor', opacity: '0.55' }),
-              ),
-            ),
-            // 边：宿主已给出折线拐点（points），客户端只负责连线和装箭头
-            layout.edges.map((e, i) => {
-              const hl = relatedEdges ? relatedEdges.has(i) : false
-              const dim = relatedEdges ? !relatedEdges.has(i) : false
-              const pts = e.points ?? [
-                [e.x1, e.y1],
-                [e.x2, e.y2],
-              ]
-              const path = pts.map((p, k) => `${k === 0 ? 'M' : 'L'} ${p[0]} ${p[1]}`).join(' ')
-              // 标签放在最长一段的中点
-              let best = 0
-              let bestLen = -1
-              for (let k = 1; k < pts.length; k += 1) {
-                const len = Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1])
-                if (len > bestLen) {
-                  bestLen = len
-                  best = k
-                }
-              }
-              const midX = (pts[best][0] + pts[best - 1][0]) / 2
-              const midY = (pts[best][1] + pts[best - 1][1]) / 2
-              const arrowOk = !e.dashed
-              return h(
-                'g',
-                {
-                  key: `e${i}`,
-                  className: 'sc-gedge',
-                  'data-dashed': e.dashed,
-                  'data-hl': hl,
-                  'data-dim': dim,
-                  style: { color: hl ? '#4f8ff7' : 'currentColor' },
-                },
-                h('path', {
-                  d: path,
-                  'marker-end': arrowOk ? 'url(#sc-arrow)' : undefined,
-                  'stroke-linejoin': 'round',
-                }),
-                (hl || (graph.edges.length <= 24 && !dim)) && e.label
-                  ? h('text', { x: midX, y: midY - 4, textAnchor: 'middle' }, String(e.label).slice(0, 18))
-                  : null,
-              )
-            }),
-            // 节点
-            layout.nodes.map((n) => {
-              const kind = kindOf.get(n.id) ?? 'concept'
-              const dim = relatedNodes ? !relatedNodes.has(n.id) : false
-              const lines = wrapToWidth(n.label, n.w - 20, 11.5, 3)
-              const lineH = 13
-              const startY = n.y + n.h / 2 - ((lines.length - 1) * lineH) / 2 + 4
-              return h(
-                'g',
-                {
-                  key: n.id,
-                  className: 'sc-gnode',
-                  'data-k': kind,
-                  'data-sel': selNode === n.id,
-                  'data-dim': dim,
-                  onClick: (ev) => {
-                    ev.stopPropagation()
-                    setSelNode(selNode === n.id ? null : n.id)
-                  },
-                  onMouseEnter: () => setHover({ node: n, kind }),
-                  onMouseLeave: () => setHover(null),
-                },
-                h('rect', { x: n.x, y: n.y, width: n.w, height: n.h, rx: 8 }),
-                ...lines.map((ln, li) =>
-                  h(
-                    'text',
-                    { key: li, x: n.x + n.w / 2, y: startY + li * lineH, textAnchor: 'middle' },
-                    ln,
-                  ),
-                ),
-              )
-            }),
-          )
-        : null
+      const current = figures[active]
 
       return h(
         'div',
-        { style: { position: 'relative' }, onClick: () => setSelNode(null) },
-        h(IssueList, { issues: graph.check?.issues }),
+        { style: { display: 'flex', flexDirection: 'column', gap: 10, height: '100%' } },
+
+        // ---- 概览 ----
         h(
           'div',
-          { className: 'sc-glegend' },
-          Object.entries(KIND_COLOR).map(([k, color]) =>
-            h('span', { key: k }, h('i', { style: { background: color } }), KIND_LABEL[k] ?? k),
-          ),
-          h('span', { style: { marginLeft: 'auto' } }, `${(graph.nodes ?? []).length} 节点 · ${(graph.edges ?? []).length} 关系`),
-        ),
-        h(
-          'div',
-          { style: { display: 'flex', gap: 8, marginBottom: 8, alignItems: 'center', flexWrap: 'wrap' } },
-          selNode
-            ? h(
-                'span',
-                { className: 'sc-muted' },
-                `聚焦：${labelOf.get(selNode) ?? selNode}　`,
-                h('button', { className: 'sc-btn', style: { padding: '1px 8px' }, onClick: () => setSelNode(null) }, '取消聚焦'),
-              )
-            : h('span', { className: 'sc-muted' }, '点节点可聚焦它的直接关系；虚线代表对比/类比等非层级关系'),
+          { className: 'sc-legend' },
+          h('span', null, `知识点 ${nodes.length} 个`),
+          h('span', null, `关系 ${edges.length} 条`),
+          figures.length
+            ? h('span', null, `archify 图 ${figures.length} 张`)
+            : h('span', { className: 'sc-muted' }, '尚未生成图'),
           h(
-            'button',
-            { className: 'sc-btn', style: { marginLeft: 'auto' }, onClick: () => setShowSource((v) => !v) },
-            showSource ? '隐藏 Mermaid' : '查看 Mermaid 源',
+            'a',
+            {
+              href: current ? current.url : '#',
+              target: '_blank',
+              rel: 'noreferrer',
+              className: 'sc-btn',
+              style: { marginLeft: 'auto', textDecoration: 'none', opacity: current ? 1 : 0.4 },
+            },
+            '新窗口打开',
           ),
         ),
-        layout
-          ? h('div', { className: 'sc-graph-wrap' }, svg)
-          : h('div', { className: 'sc-muted' }, '图谱布局未生成（relations 可能缺少可用的节点）。'),
-        hover
+
+        // ---- 多张图的切换 ----
+        figures.length > 1
           ? h(
               'div',
-              { className: 'sc-gtip', style: { right: 16, top: 40 } },
-              h('div', null, h('b', null, hover.node.label)),
-              h('div', { className: 'sc-muted' }, `类型：${KIND_LABEL[hover.kind] ?? hover.kind}`),
-              h(
-                'div',
-                { className: 'sc-muted', style: { marginTop: 4 } },
-                ...(graph.edges ?? [])
-                  .filter((e) => e.from === hover.node.id || e.to === hover.node.id)
-                  .slice(0, 6)
-                  .map((e, i) =>
-                    h(
-                      'div',
-                      { key: i },
-                      e.from === hover.node.id
-                        ? `→ ${labelOf.get(e.to) ?? e.to}（${REL_LABEL[e.relation] ?? e.relation}）`
-                        : `← ${labelOf.get(e.from) ?? e.from}（${REL_LABEL[e.relation] ?? e.relation}）`,
-                    ),
-                  ),
+              { style: { display: 'flex', gap: 6, flexWrap: 'wrap' } },
+              figures.map((f, i) =>
+                h(
+                  'button',
+                  {
+                    key: f.index,
+                    className: `sc-btn ${i === active ? 'sc-btn-primary' : ''}`,
+                    onClick: () => setActive(i),
+                    title: `第 ${f.index} 张：${f.nodeCount} 个知识点、${f.edgeCount} 条关系`,
+                  },
+                  f.title,
+                ),
               ),
             )
           : null,
-        showSource
+
+        // ---- 图本体：archify 的 HTML 直接用 iframe 内嵌 ----
+        current
+          ? h('iframe', {
+              key: current.url,
+              src: current.url,
+              title: current.title,
+              style: {
+                flex: 1,
+                minHeight: 520,
+                width: '100%',
+                border: '1px solid var(--dsw-alias-border-l1)',
+                borderRadius: 10,
+                background: 'var(--dsw-alias-bg-base)',
+              },
+            })
+          : h(
+              Empty,
+              null,
+              nodes.length
+                ? '关系数据已有，但还没生成 archify 图。让 Agent 重新保存一次知识点关系图即可。'
+                : '还没有知识点关系图。先完成读前建构与标注，再让 Agent 生成知识点关系。',
+            ),
+
+        // ---- 关系清单：图看的是结构，清单用来核对 ----
+        nodes.length
           ? h(
-              'div',
-              { className: 'sc-card', style: { marginTop: 10 } },
-              h('h4', null, 'Mermaid 源（可交给 archify 出独立架构图）'),
-              h('pre', { className: 'sc-pre' }, project.mermaid ?? ''),
+              'details',
+              { className: 'sc-details' },
+              h('summary', null, `关系清单（${edges.length} 条）`),
+              h(
+                'div',
+                { style: { marginTop: 6, display: 'flex', flexDirection: 'column', gap: 4 } },
+                edges.slice(0, 200).map((e, i) => {
+                  const label = (id) => nodes.find((n) => n.id === id)?.label ?? id
+                  const rel = REL_ZH_UI[e.relation] ?? e.relation
+                  return h(
+                    'div',
+                    { key: i, className: 'sc-muted', style: { fontSize: 12 } },
+                    `${label(e.from)} ——${rel}→ ${label(e.to)}`,
+                  )
+                }),
+              ),
             )
           : null,
       )
     }
 
-    /* -------------------------------------------------------- 考核面板 */
+    /** 关系中文名，与宿主 archify-figures.js 的 REL_ZH 保持一致 */
+    const REL_ZH_UI = {
+      prerequisite: '前置',
+      'part-of': '整体-部分',
+      partof: '整体-部分',
+      contains: '包含',
+      contrast: '对比',
+      cause: '因果',
+      'example-of': '例证',
+      example: '例证',
+      application: '应用',
+      apply: '应用',
+      sequence: '次序',
+      analogy: '类比',
+      related: '相关',
+    }
+
+    /**
+     * QA 自测卡片。
+     *
+     * 答案默认折叠——这是「主动回忆」的关键：
+     * 先自己回想，再点开核对。答案直接摊开会让人不假思索地读过去，
+     * 那就退化成"又读了一遍"，起不到自测作用。
+     */
+    function QaCard({ pairs }) {
+      const [open, setOpen] = useState({})
+      if (!pairs?.length) {
+        return h(
+          'div',
+          { className: 'sc-card' },
+          h('h4', null, '读完自测（QA）'),
+          h('div', { className: 'sc-muted' }, '还没有 QA。读完全文后让 Agent 生成一份速查问答，每条不超过 100 字。'),
+        )
+      }
+      return h(
+        'div',
+        { className: 'sc-card' },
+        h('h4', null, `读完自测（QA，${pairs.length} 条）`),
+        h('div', { className: 'sc-muted', style: { marginBottom: 8 } }, '先在心里答一遍，再点开核对答案。'),
+        pairs.map((p, i) =>
+          h(
+            'div',
+            { key: i, style: { padding: '7px 0', borderBottom: '1px solid var(--dsw-alias-border-l1)' } },
+            h(
+              'div',
+              { style: { display: 'flex', gap: 8, alignItems: 'flex-start' } },
+              h('span', { className: 'sc-muted', style: { minWidth: 18 } }, `${i + 1}.`),
+              h('div', { style: { flex: 1, lineHeight: 1.65 } }, p.q),
+              h(
+                'button',
+                {
+                  className: 'sc-btn',
+                  style: { flex: 'none' },
+                  onClick: () => setOpen((v) => ({ ...v, [i]: !v[i] })),
+                },
+                open[i] ? '收起' : '看答案',
+              ),
+            ),
+            open[i]
+              ? h(
+                  'div',
+                  { style: { marginTop: 6, marginLeft: 26, lineHeight: 1.7, color: 'var(--dsw-alias-label-secondary)' } },
+                  p.a,
+                  (p.segmentIds ?? []).length
+                    ? h('span', { className: 'sc-muted' }, `　（${p.segmentIds.join('、')}）`)
+                    : null,
+                )
+              : null,
+          ),
+        ),
+      )
+    }
 
     function QuizPane({ project }) {
       const [terms, setTerms] = useState(project.terms ?? [])
@@ -699,6 +843,7 @@ window.__ModuleLoader__.load({
       return h(
         'div',
         null,
+        h(QaCard, { pairs: project.qa }),
         h(
           'div',
           { className: 'sc-card' },
@@ -847,7 +992,8 @@ window.__ModuleLoader__.load({
             })
             const data = await api(`/project/${encodeURIComponent(docId)}${q(wsPath)}`)
             setProject(data)
-            setTab('quiz')
+            // 注意：这里不再 setTab('quiz')。用户正在读，追问后应该留在原地，
+            // 答案由 ReadingPane 就地显示；跳到别的页签会打断阅读。
           } catch (e) {
             setError(e.message)
           } finally {
@@ -1019,7 +1165,7 @@ window.__ModuleLoader__.load({
                     'div',
                     { className: 'sc-pane' },
                     tab === 'read'
-                      ? h(ReadingPane, { project, onAsk: ask })
+                      ? h(ReadingPane, { project, onAsk: ask, workspace: wsPath })
                       : tab === 'plan'
                         ? h(PreflightPane, { project })
                         : tab === 'graph'

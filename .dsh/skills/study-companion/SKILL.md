@@ -1,6 +1,6 @@
 ---
 name: study-companion
-description: 学习资料全流程总控。当用户上传/指定一份资料（pdf、docx、pptx、xlsx、epub、html、md、txt 等任意格式）希望"学懂它"、"帮我读这份材料"、"做成学习笔记"、"拆解这份资料"时使用。负责调度 study-preflight、study-annotate、study-map、study-feynman、study-explain-term 五个阶段技能，并保证三色注意力预算不被突破。
+description: 学习资料全流程总控。当用户上传/指定一份资料（pdf、docx、pptx、xlsx、epub、html、md、txt 等任意格式）希望"学懂它"、"帮我读这份材料"、"做成学习笔记"、"拆解这份资料"时使用。负责调度 study-preflight、study-annotate、study-recall、study-map、study-feynman、study-explain-term 六个阶段技能，并保证三色注意力预算不被突破。
 whenToUse: 用户提到某份具体文件/资料并希望理解、拆解、做笔记、复习、被考核；或用户问"接下来该做什么"。
 ---
 
@@ -14,8 +14,20 @@ whenToUse: 用户提到某份具体文件/资料并希望理解、拆解、做�
 ## 一句话流程
 
 ```
-导入资料 → 读前建构（六段式） → 读中标注（渐构 + 三色） → 知识点图谱 → 费曼考核 → 最小行动
+导入 → 读前建构（六段式）→ 读中标注（渐构 + 三色短语高亮）→ 知识点图谱（archify）
+      → 读后自测（QA + 最小行动）→ 费曼考核
 ```
+
+六个阶段各自解决一个具体问题，**不要跳步**：
+
+| 阶段 | 用户此刻的问题 | 交付什么 |
+|---|---|---|
+| 读前 | "这东西值不值得读？怎么读？" | 六段式全景图 + 目标 |
+| 读中 | "哪句是关键？" | 短语级三色高亮 + 角色标签 |
+| 图谱 | "这些概念什么关系？先学哪个？" | archify 交互图 + 学习顺序 |
+| 自测 | "我记住了吗？" | QA 清单（≤100 字）+ 最小行动 |
+| 考核 | "我真会了吗？" | 费曼复述 + 判卷 |
+| 追问 | "这个词什么意思？" | 带上下文的解释（随时可用） |
 
 ## 起步：先看状态，不要瞎猜
 
@@ -34,22 +46,38 @@ study_status            # 不传 docId → 列出工作区全部学习项目
 |---|---|---|---|
 | 导入 | （工具） | `source.md` + `segments.json` | `study_ingest` 返回 segmentCount > 0 |
 | 读前 | `study-preflight` | `preflight.json` 六段式 | `study_save kind=preflight` 校验 ok |
-| 读中 | `study-annotate` | `annotations.json` + `annotated.md` | 校验 ok 且三色预算未超 |
-| 图谱 | `study-map` | `relations.json` + Mermaid | 前置关系无环 |
-| 考核 | `study-feynman` | `quiz.md` | 有思考题且每题的达标要点具体 |
-| 追问 | `study-explain-term` | `terms.jsonl` | 每次回答都带上下文 |
+| 读中 | `study-annotate` | `annotations.json` + 每条的 `quote` | 校验 ok 且三色预算未超 |
+| 图谱 | `study-map` | `relations.json` + archify HTML | 前置关系无环，figures 全部 ok |
+| 自测 | `study-recall` | `qa.json`（每条 ≤100 字）+ 最小行动 | QA 已存且条数 6–12 |
+| 考核 | `study-feynman` | `quiz.md` + `drills.jsonl` | 用户真的复述过并被判卷 |
+| 追问 | `study-explain-term` | `terms.jsonl` | 每次回答都带 ¶N 上下文 |
 
-## 三条不可违反的规则
+## 四条不可违反的规则
 
 1. **不要替用户读完全文再说话。** 长文档用 `study_read` 分批（每次 20 段左右），边读边交付，让用户能跟上。
-2. **不要平均用力。** 三色预算（核心 ≤10%、攻坚 ≤8%、总 ≤20%）被 `study_save` 强制校验。如果被拒，说明标太多 —— 降级或去掉，**不要**为了通过而改 `totalChars`。
-3. **不要编造资料里没有的内容。** 参考资料清单里标注来源类型（原文内部 / 你的知识 / 联网检索）。联网检索必须真的搜过。
+
+2. **不要平均用力。** 三色预算（核心 ≤10%、攻坚 ≤8%、总 ≤20%）被 `study_save` 强制校验。被拒就降级或缩短 quote，**不要**为了通过而改数字。
+
+3. **高亮必须是原文短语，不是整段。** `quote` 字段必须逐字出现在原文里，否则整个提交被拒（`quote-not-found`）。这是注意力机制的核心——整段变色等于没标。
+
+4. **不要编造资料里没有的内容。** 参考资料清单里标注来源（`原文` / `我的知识` / `联网检索`）。联网检索必须真的搜过并给出链接。
+
+## 关于知识图谱的特殊约定
+
+知识图谱页面**嵌入的是 archify 生成的 HTML**，不是 Mermaid 源码，也不是手绘 SVG。
+
+`study_save kind=relations` 成功后系统自动调 archify 出图，你只需要：
+- 把关系想清楚（八种定式关系选对）
+- 节点 ≤40 个，`label` ≤20 字
+- 告诉用户去界面「知识图谱」页签看
+
+**不要**给用户 Mermaid 代码块当作交付物。
 
 ## 降级路径（未安装插件时）
 
 如果 `study_ingest` 工具不可用，用 `read` 直接读文本类文件（md/txt/html），
 把提取结果写在用户看得见的位置，并在回答里说明"没有走插件提取，长文档/PDF 需要安装 study-copilot 插件"。
-其余技能（标注、图谱、考核）都可以纯文本完成。
+此时图谱阶段退化为 Mermaid 代码块 + 纯文本拓扑序。
 
 ## 语气
 

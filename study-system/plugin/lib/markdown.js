@@ -316,6 +316,16 @@ export function renderMarkdown(markdown, options = {}) {
  * 把 Mermaid 源里常用的节点/边语法抽成结构，供 SVG 布局使用。
  * 只支持本项目 relations 用到的子集：graph TD/LR、A["label"]、A -->|rel| B、A -.-> B、A -.-|x| B
  */
+/**
+ * Mermaid 解析 + 布局：**降级路径**，不是主路径。
+ *
+ * 主路径是 archify（见 archify-figures.js）——它产出带交互和明暗主题的独立 HTML。
+ * 这两个函数保留是因为：
+ * 1. archify CLI 不可用时，界面至少还能画出一张静态图，而不是一片空白；
+ * 2. `relations.json` 存的是关系数据，转成 Mermaid 源便于用户复制到别的工具里看。
+ *
+ * 所以：不要在正常流程里优先用它，也不要删——删了就没有兜底了。
+ */
 export function parseMermaid(source) {
   const nodes = new Map()
   const edges = []

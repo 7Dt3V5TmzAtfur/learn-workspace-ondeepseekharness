@@ -99,24 +99,26 @@ const TOOLS = [
     name: 'study_save',
     description:
       '保存某个阶段的产物并做规则校验。kind 取值：' +
-      'preflight（读前六段式）、annotation（逐段渐构标签+三色注意力）、' +
-      'relations（知识点关系图）、quiz（思考题与费曼作业）、refs（参考资料清单）。' +
+      'preflight（读前六段式）、annotation（逐段渐构标签 + 原文片段三色高亮）、' +
+      'relations（知识点关系图，会自动调 archify 出可交互 HTML）、' +
+      'quiz（思考题与费曼作业）、refs（参考资料清单）、qa（读完自测问答，每条≤100字）。' +
       '校验不通过会返回 issues，请按提示修正后重存。',
     parameters: jsonSchema(
       {
         docId: { type: 'string', description: '学习项目 id' },
         kind: {
           type: 'string',
-          enum: ['preflight', 'annotation', 'relations', 'quiz', 'refs'],
+          enum: ['preflight', 'annotation', 'relations', 'quiz', 'refs', 'qa'],
           description: '保存哪一类产物',
         },
         payload: {
           type: 'object',
           description:
-            'preflight: {summary,goals{help,main,subgoals[]},parts[],exercises[],references[]}；' +
-            'annotation: {items:[{segmentId,label,title,tier?,keyword?,note?}]}；' +
+            'preflight: {summary,goals{help,main,subgoals[]},parts[],exercises[],references[{title,source,url?,note?}]}；' +
+            'annotation: {items:[{segmentId,label,quote,title,tier?,keyword?,note?}]}，quote 必须是原文里逐字存在的短语；' +
             'relations: {nodes:[{id,label,kind?}],edges:[{from,to,relation,label?}],direction?}；' +
-            'quiz: {markdown}；refs: {markdown} 或 {references[]}',
+            'quiz: {markdown}；refs: {markdown} 或 {references[]}；' +
+            'qa: {pairs:[{q,a,segmentIds?[]}]}，q 与 a 各自 ≤100 字',
           additionalProperties: true,
         },
       },
@@ -244,6 +246,7 @@ export function apply(ctx, config = {}) {
               const markdown = payload?.markdown ?? svc.renderRefs(payload?.references ?? [])
               return svc.store.writeArtifact(docId, 'refs.md', markdown).then(() => ({ docId, kind }))
             }
+            if (kind === 'qa') return svc.saveQa(docId, payload?.pairs ?? payload?.items ?? payload)
             throw new Error(`未知的 kind: ${kind}`)
           }
           case 'study_term':
@@ -302,28 +305,47 @@ export function apply(ctx, config = {}) {
     '.gif': 'image/gif',
     '.webp': 'image/webp',
     '.bmp': 'image/bmp',
+    // archify 生成的图是独立 HTML，必须能作为文档渲染，否则 iframe 一片空白
+    '.html': 'text/html; charset=utf-8',
+    '.json': 'application/json; charset=utf-8',
+    '.md': 'text/markdown; charset=utf-8',
+    '.txt': 'text/plain; charset=utf-8',
   }
 
   /**
-   * 提供文档目录下的图片资源。
-   * 只允许访问"源文件所在目录"及其子目录，防止用 ../ 跳到别处。
+   * 提供项目内的静态资源。
+   *
+   * 两类来源：
+   * 1. 项目目录 `.study/<docId>/` 内的产物（archify 图 graph-N.html 就放这里）
+   * 2. 原文档所在目录的图片（原文里引用的图）
+   *
+   * 只允许访问这两个根及其子目录，防止用 ../ 跳到别处。
    */
   const serveAsset = async (res, svc, docId, relPath) => {
     try {
-      const meta = await svc.store.meta(docId)
-      if (!meta?.sourcePath) {
+      const projectDir = resolve(svc.store.dir(docId))
+      const meta = await svc.store.meta(docId).catch(() => null)
+      const sourceRoot = meta?.sourcePath ? dirname(resolve(meta.sourcePath)) : null
+
+      // 先找项目目录，再找原文目录
+      const roots = [projectDir, sourceRoot].filter(Boolean)
+      let target = null
+      for (const root of roots) {
+        const cand = resolve(root, relPath)
+        const normRoot = root.endsWith(sep) ? root : root + sep
+        if (cand !== root && !cand.startsWith(normRoot)) continue // 越界，跳过
+        if (existsSync(cand)) {
+          target = cand
+          break
+        }
+      }
+
+      if (!target) {
         res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' })
         res.end('not found')
         return
       }
-      const root = dirname(resolve(meta.sourcePath))
-      const target = resolve(root, relPath)
-      const normRoot = root.endsWith(sep) ? root : root + sep
-      if (target !== root && !target.startsWith(normRoot)) {
-        res.writeHead(403, { 'content-type': 'text/plain; charset=utf-8' })
-        res.end('forbidden')
-        return
-      }
+
       const ext = extname(target).toLowerCase()
       const type = MIME[ext]
       if (!type) {
@@ -331,16 +353,13 @@ export function apply(ctx, config = {}) {
         res.end('unsupported media type')
         return
       }
-      if (!existsSync(target)) {
-        res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' })
-        res.end('not found')
-        return
-      }
+
       const buf = await readFile(target)
       res.writeHead(200, {
         'content-type': type,
         'content-length': buf.length,
-        'cache-control': 'public, max-age=86400',
+        // archify 的 HTML 每次重新生成内容会变，不缓存太久以免看到旧图
+        'cache-control': ext === '.html' ? 'no-cache' : 'public, max-age=86400',
       })
       res.end(buf)
     } catch (e) {
@@ -541,6 +560,15 @@ export function apply(ctx, config = {}) {
           if (req.method === 'POST' && route === '/term') {
             const body = await readBody(req)
             return send(res, 200, await svcOf(url).askTerm(body.docId, body))
+          }
+          // 读完自测问答（每条 ≤100 字）
+          if (req.method === 'POST' && route === '/qa') {
+            const body = await readBody(req)
+            return send(res, 200, await svcOf(url).saveQa(body.docId, body.pairs ?? body.items))
+          }
+          if (req.method === 'GET' && route.startsWith('/qa/')) {
+            const docId = decodeURIComponent(route.slice('/qa/'.length))
+            return send(res, 200, { items: await svcOf(url).qa(docId) })
           }
           if (req.method === 'GET' && route.startsWith('/render/')) {
             const docId = decodeURIComponent(route.slice('/render/'.length))

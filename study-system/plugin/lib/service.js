@@ -7,6 +7,7 @@ import { readFile, stat } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { extractDocument, segmentText } from './extract.js'
 import { StudyStore, slugify, STUDY_DIR_NAME } from './store.js'
+import { buildArchifyFigures } from './archify-figures.js'
 import { renderMarkdown, layoutGraph } from './markdown.js'
 import {
   validateAnnotation,
@@ -159,15 +160,37 @@ export class StudyService {
       }
     }
 
+    // archify 生成的图（每张一个 iframe）。旧项目可能还没生成过，此时返回空数组。
+    const figuresArtifact = await this.store.artifact(docId, 'figures.json').catch(() => null)
+    const figures = (figuresArtifact?.figures ?? []).map((f) => ({
+      index: f.index,
+      title: `第 ${f.index} 张 · ${f.nodeCount} 个知识点`,
+      url: `${imageBase}${encodeURIComponent(f.file)}`,
+      nodeCount: f.nodeCount,
+      edgeCount: f.edgeCount,
+      ok: Boolean(f.ok),
+    }))
+
+    // 三色高亮后的正文。这是"读中加工"页签的主体内容：
+    // 高亮加在原文的具体短语上（quote），不是整段变色。
+    const annotatedHtml = project.annotations
+      ? renderAnnotatedHtml(
+          segments.map((s) => ({ id: s.id, text: s.text, chars: s.chars })),
+          project.annotations,
+        )
+      : null
+
     return {
       ...project,
       segments,
       preflightHtml: project.preflight ? this.renderPreflightHtml(project.preflight) : null,
       quizHtml: project.quiz ? renderMarkdown(project.quiz) : null,
       refsHtml: project.refs ? renderMarkdown(project.refs) : null,
-      annotatedHtml: null,
+      annotatedHtml,
       mermaid,
       graphLayout,
+      figures,
+      qa: (await this.store.artifact(docId, 'qa.json').catch(() => null))?.items ?? [],
       next: nextStepOf(project.progress),
       vocabulary: this.vocabulary(),
     }
@@ -313,8 +336,14 @@ export class StudyService {
 
   async saveAnnotation(docId, items) {
     const segments = await this.store.segments(docId)
+    // quote 校验需要段落正文，而 segments.json 只存了字数摘要，
+    // 正文在 segment-texts.json 里，这里合并进来。
+    const texts = new Map(
+      ((await this.store.artifact(docId, 'segment-texts.json'))?.items ?? []).map((t) => [t.id, t.text]),
+    )
+    const withText = segments.map((s) => ({ ...s, text: texts.get(s.id) ?? '' }))
     const totalChars = segments.reduce((a, s) => a + s.chars, 0)
-    const check = validateAnnotation(items, { segments, totalChars })
+    const check = validateAnnotation(items, { segments: withText, totalChars })
     // 补齐档位：未显式指定时按标签归属落库，渲染与统计都依赖它
     const labelTier = {}
     for (const [tier, def] of Object.entries(ATTENTION_TIERS)) for (const label of def.labels) labelTier[label] = tier
@@ -340,11 +369,47 @@ export class StudyService {
     return { docId, check, next: nextStepOf(await this.store.progressOf(docId)), accepted: true }
   }
 
+  /**
+   * 保存知识点关系图，并立刻生成 archify 图。
+   *
+   * 用户明确要求逻辑衔接图用 archify 技能做，所以这里不是自己画，
+   * 而是把 relations 翻译成 archify 候选、调它的 CLI 出独立 HTML。
+   * archify 失败不阻塞保存——关系数据本身是有效的，
+   * 图上不去只是少了一个视图，不能因此让用户丢数据。
+   */
   async saveRelations(docId, graph) {
     const check = validateRelations(graph)
     await this.store.writeArtifact(docId, 'relations.json', { ...graph, check, savedAt: new Date().toISOString() })
-    if (check.ok) await this.store.saveMeta(docId, { stage: 'mapped' })
-    return { docId, check, mermaid: this.toMermaid(graph), next: nextStepOf(await this.store.progressOf(docId)) }
+
+    let figures = null
+    if (check.ok) {
+      const meta = await this.store.meta(docId)
+      try {
+        figures = await buildArchifyFigures(graph, {
+          workDir: this.store.dir(docId),
+          outDir: this.store.dir(docId),
+          docTitle: meta?.title ?? docId,
+          maxNodes: 18,
+        })
+        if (figures.ok) {
+          await this.store.writeArtifact(docId, 'figures.json', {
+            generatedAt: new Date().toISOString(),
+            ...figures,
+          })
+        }
+      } catch (e) {
+        figures = { ok: false, figures: [], reason: `archify 生成失败：${e?.message ?? e}` }
+      }
+      await this.store.saveMeta(docId, { stage: 'mapped' })
+    }
+
+    return {
+      docId,
+      check,
+      mermaid: this.toMermaid(graph),
+      figures,
+      next: nextStepOf(await this.store.progressOf(docId)),
+    }
   }
 
   async saveQuiz(docId, markdown) {
@@ -377,6 +442,76 @@ export class StudyService {
 
   async drills(docId) {
     return this.store.jsonl(docId, 'drills.jsonl')
+  }
+
+  /**
+   * 读完一份资料后留 QA 自测清单。
+   *
+   * 用户原话：「文件后添加 QA 提问和回答，辅助自己回忆刚才看了什么（每个 QA 不超过 100 字）」。
+   * 对应学习科学里的「主动回忆」：读完立刻自测，比再读一遍有效。
+   *
+   * 硬约束：
+   * - 问题和回答各自不超过 100 字（超了直接拒绝，不截断——截断会把意思弄丢）
+   * - segmentIds 可选，给了就能回跳原文核对
+   */
+  async saveQa(docId, pairs) {
+    const list = Array.isArray(pairs) ? pairs : []
+    if (!list.length) throw new Error('QA 为空：至少给出一条问答')
+    const issues = []
+    const normalized = []
+
+    const known = new Set((await this.store.segments(docId)).map((s) => s.id))
+    for (const [i, p] of list.entries()) {
+      const q = String(p?.q ?? '').trim()
+      const a = String(p?.a ?? '').trim()
+      const where = `第 ${i + 1} 条`
+      if (!q) issues.push({ level: 'error', code: 'qa-no-question', message: `${where}缺少问题` })
+      if (!a) issues.push({ level: 'error', code: 'qa-no-answer', message: `${where}缺少回答` })
+      if ([...q].length > 100) {
+        issues.push({
+          level: 'error',
+          code: 'qa-question-too-long',
+          message: `${where}问题 ${[...q].length} 字，超过 100 字上限`,
+        })
+      }
+      if ([...a].length > 100) {
+        issues.push({
+          level: 'error',
+          code: 'qa-answer-too-long',
+          message: `${where}回答 ${[...a].length} 字，超过 100 字上限`,
+        })
+      }
+      const ids = (Array.isArray(p?.segmentIds) ? p.segmentIds : []).map(String)
+      const unknown = ids.filter((id) => !known.has(id))
+      if (unknown.length) {
+        issues.push({
+          level: 'warn',
+          code: 'qa-unknown-segment',
+          message: `${where}引用了不存在的段落：${unknown.join(',')}（回跳会失效，问答仍可用）`,
+        })
+      }
+      normalized.push({
+        q,
+        a,
+        segmentIds: ids.filter((id) => known.has(id)),
+        chars: { q: [...q].length, a: [...a].length },
+      })
+    }
+
+    if (issues.some((it) => it.level === 'error')) {
+      return { docId, accepted: false, issues, count: 0 }
+    }
+
+    await this.store.writeArtifact(docId, 'qa.json', {
+      items: normalized,
+      savedAt: new Date().toISOString(),
+    })
+    return { docId, accepted: true, issues, count: normalized.length }
+  }
+
+  async qa(docId) {
+    const art = await this.store.artifact(docId, 'qa.json').catch(() => null)
+    return art?.items ?? []
   }
 
   /**
@@ -424,17 +559,34 @@ export class StudyService {
   /* ------------------------------------------------------------ 渲染 */
 
   renderRefs(references) {
-    const lines = ['# 参考资料', '']
-    references.forEach((ref, i) => {
-      const title = ref.title ?? ref.name ?? `资料 ${i + 1}`
-      const bits = [title]
-      if (ref.author) bits.push(ref.author)
-      if (ref.kind) bits.push(`（${ref.kind}）`)
-      let line = `${i + 1}. ${bits.join(' · ')}`
-      if (ref.url) line += `\n   - ${ref.url}`
-      if (ref.note) line += `\n   - 用途：${ref.note}`
-      lines.push(line)
-    })
+    const lines = ['# 参考资料', '', '> 来源标注：`原文`＝资料本身；`我的知识`＝模型已有认知（可能过时）；`联网检索`＝本次实际检索（附链接可回查）。', '']
+
+    // 按来源分组，让用户一眼看出哪些可以直接信、哪些需要自己核实
+    const ORDER = ['原文', '联网检索', '我的知识']
+    const groups = new Map(ORDER.map((k) => [k, []]))
+    for (const ref of references ?? []) {
+      const src = ORDER.includes(ref.source) ? ref.source : '我的知识'
+      groups.get(src).push(ref)
+    }
+
+    let n = 0
+    for (const src of ORDER) {
+      const list = groups.get(src)
+      if (!list.length) continue
+      lines.push(`## ${src}`, '')
+      for (const ref of list) {
+        n += 1
+        const title = ref.title ?? ref.name ?? `资料 ${n}`
+        const bits = [title]
+        if (ref.author) bits.push(ref.author)
+        if (ref.kind) bits.push(`（${ref.kind}）`)
+        let line = `${n}. ${bits.join(' · ')}`
+        if (ref.url) line += `\n   - ${ref.url}`
+        if (ref.note) line += `\n   - 用途：${ref.note}`
+        lines.push(line)
+      }
+      lines.push('')
+    }
     return lines.join('\n') + '\n'
   }
 
@@ -465,7 +617,14 @@ export class StudyService {
         const kw = a.label === 'c' && a.keyword ? `${a.keyword} ` : ''
         out.push(`#${a.label} ${kw}${a.title ?? ''}|${ROLE_LABELS[a.label]?.en ?? a.label}`)
       }
-      out.push(texts.get(seg.id) ?? seg.lead ?? '')
+      let body = texts.get(seg.id) ?? seg.lead ?? ''
+      // 导出 Markdown 时用加粗表达三色高亮，保证纯文本也能看出档位
+      if (a?.quote) {
+        const mark = a.tier === 'ref' ? '*' : '**'
+        body = body.replace(String(a.quote), `${mark}${a.quote}${mark}`)
+      }
+      out.push(body)
+      if (a?.note) out.push(`> 备注：${a.note}`)
     }
     return out.join('\n\n') + '\n'
   }
