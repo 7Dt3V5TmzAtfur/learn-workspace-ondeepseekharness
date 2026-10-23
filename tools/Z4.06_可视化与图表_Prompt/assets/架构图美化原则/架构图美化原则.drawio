@@ -1,0 +1,137 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="xRjN9F-cuysunBoh_yR3">
+    <mxGraphModel dx="1471" dy="906" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1080" pageHeight="1920" math="0" shadow="1">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="heaQBBNUyNwYXnHaVbTF-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="895" width="1314" x="22" y="63" as="geometry" />
+        </mxCell>
+        <mxCell id="title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=bottom;whiteSpace=wrap;rounded=0;fontSize=48;fontColor=#1D1D1F;fontFamily=-apple-system, BlinkMacSystemFont, &#39;Helvetica Neue&#39;, &#39;PingFang SC&#39;, sans-serif;fontStyle=1;" value=" OS Frameworks" vertex="1">
+          <mxGeometry height="60" width="500" x="80" y="80" as="geometry" />
+        </mxCell>
+        <mxCell id="subtitle" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=18;fontColor=#86868B;fontFamily=-apple-system, BlinkMacSystemFont, &#39;Helvetica Neue&#39;, &#39;PingFang SC&#39;, sans-serif;" value="Apple Design System · 纯白一页清组件库与视觉模型大全" vertex="1">
+          <mxGeometry height="40" width="600" x="80" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="m1_title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontColor=#1D1D1F;fontStyle=1;fontFamily=-apple-system;" value="🧅 层级 / 包含 (Hierarchy)" vertex="1">
+          <mxGeometry height="30" width="300" x="80" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="m1_desc" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontColor=#86868B;fontFamily=-apple-system;" value="适用：核心与外围、战略与执行（如个人OS框架）" vertex="1">
+          <mxGeometry height="30" width="360" x="80" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="m1_layer3" parent="1" style="rounded=1;arcSize=10;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E5E5EA;strokeWidth=1;shadow=1;fontColor=#1D1D1F;fontFamily=-apple-system;fontSize=16;fontStyle=1;align=center;verticalAlign=top;spacingTop=15;" value="🛠️ 应用层 (Application)" vertex="1">
+          <mxGeometry height="300" width="360" x="80" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="m1_layer2" parent="m1_layer3" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fillColor=#F5F5F7;strokeColor=none;fontColor=#1D1D1F;fontFamily=-apple-system;fontSize=15;fontStyle=1;align=center;verticalAlign=top;spacingTop=15;" value="⚙️ 能力层 (Kernel)" vertex="1">
+          <mxGeometry height="220" width="320" x="20" y="60" as="geometry" />
+        </mxCell>
+        <mxCell id="m1_layer1" parent="m1_layer3" style="rounded=1;arcSize=15;whiteSpace=wrap;html=1;fillColor=#E8E8ED;strokeColor=none;fontColor=#1D1D1F;fontFamily=-apple-system;fontSize=14;fontStyle=1;align=center;verticalAlign=middle;" value="🧠 认知层 (Framework)" vertex="1">
+          <mxGeometry height="150" width="280" x="40" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="m1_node1" parent="m1_layer3" style="rounded=1;arcSize=20;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=none;fontColor=#1D1D1F;fontSize=13;fontFamily=-apple-system;shadow=0;" value="底层思维" vertex="1">
+          <mxGeometry height="40" width="90" x="68" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="m1_node2" parent="m1_layer3" style="rounded=1;arcSize=20;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=none;fontColor=#1D1D1F;fontSize=13;fontFamily=-apple-system;shadow=0;" value="价值观" vertex="1">
+          <mxGeometry height="40" width="90" x="198" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="m2_title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontColor=#1D1D1F;fontStyle=1;fontFamily=-apple-system;" value="🌊 递进 / 流程 (Progression)" vertex="1">
+          <mxGeometry height="30" width="300" x="520" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="m2_desc" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontColor=#86868B;fontFamily=-apple-system;" value="适用：步骤、演变、闭环（如学习路径）" vertex="1">
+          <mxGeometry height="30" width="360" x="520" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="m2_step1" parent="1" style="rounded=1;arcSize=15;whiteSpace=wrap;html=1;fillColor=#F5F5F7;strokeColor=none;fontColor=#1D1D1F;fontSize=16;fontStyle=1;fontFamily=-apple-system;align=center;verticalAlign=middle;" value="1. 信息输入" vertex="1">
+          <mxGeometry height="60" width="280" x="520" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="m2_step2" parent="1" style="rounded=1;arcSize=15;whiteSpace=wrap;html=1;fillColor=#F5F5F7;strokeColor=none;fontColor=#1D1D1F;fontSize=16;fontStyle=1;fontFamily=-apple-system;align=center;verticalAlign=middle;" value="2. 逻辑处理" vertex="1">
+          <mxGeometry height="60" width="280" x="550" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="m2_step3" parent="1" style="rounded=1;arcSize=15;whiteSpace=wrap;html=1;fillColor=#007AFF;strokeColor=none;fontColor=#FFFFFF;fontSize=16;fontStyle=1;fontFamily=-apple-system;align=center;verticalAlign=middle;shadow=0;" value="3. 视觉呈现" vertex="1">
+          <mxGeometry height="60" width="280" x="580" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="m2_edge1" edge="1" parent="1" source="m2_step1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#C7C7CC;strokeWidth=2;endArrow=blockThin;endFill=1;entryX=0.1;entryY=0;entryDx=0;entryDy=0;exitX=0.1;exitY=1;exitDx=0;exitDy=0;" target="m2_step2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m2_edge2" edge="1" parent="1" source="m2_step2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#C7C7CC;strokeWidth=2;endArrow=blockThin;endFill=1;entryX=0.1;entryY=0;entryDx=0;entryDy=0;exitX=0.1;exitY=1;exitDx=0;exitDy=0;" target="m2_step3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m3_title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontColor=#1D1D1F;fontStyle=1;fontFamily=-apple-system;" value="🎯 对比 / 矩阵 (Matrix)" vertex="1">
+          <mxGeometry height="30" width="300" x="960" y="240" as="geometry" />
+        </mxCell>
+        <mxCell id="m3_desc" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontColor=#86868B;fontFamily=-apple-system;" value="适用：权衡、分类、定位（如时间管理）" vertex="1">
+          <mxGeometry height="30" width="360" x="960" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="m3_q1" parent="1" style="rounded=1;arcSize=15;whiteSpace=wrap;html=1;fillColor=#FFECEE;strokeColor=none;fontColor=#D70015;fontSize=15;fontStyle=1;fontFamily=-apple-system;align=center;verticalAlign=middle;" value="🚀 重要且紧急&#xa;(Do First)" vertex="1">
+          <mxGeometry height="140" width="160" x="960" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="m3_q2" parent="1" style="rounded=1;arcSize=15;whiteSpace=wrap;html=1;fillColor=#EBF4FF;strokeColor=none;fontColor=#007AFF;fontSize=15;fontStyle=1;fontFamily=-apple-system;align=center;verticalAlign=middle;" value="📆 重要不紧急&#xa;(Schedule)" vertex="1">
+          <mxGeometry height="140" width="160" x="1140" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="m3_q3" parent="1" style="rounded=1;arcSize=15;whiteSpace=wrap;html=1;fillColor=#F5F5F7;strokeColor=none;fontColor=#86868B;fontSize=15;fontStyle=1;fontFamily=-apple-system;align=center;verticalAlign=middle;" value="🤝 紧急不重要&#xa;(Delegate)" vertex="1">
+          <mxGeometry height="140" width="160" x="960" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="m3_q4" parent="1" style="rounded=1;arcSize=15;whiteSpace=wrap;html=1;fillColor=#F5F5F7;strokeColor=none;fontColor=#86868B;fontSize=15;fontStyle=1;fontFamily=-apple-system;align=center;verticalAlign=middle;" value="🗑️ 不重要不紧急&#xa;(Eliminate)" vertex="1">
+          <mxGeometry height="140" width="160" x="1140" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="m4_title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontColor=#1D1D1F;fontStyle=1;fontFamily=-apple-system;" value="🌳 发散 / 聚合 (Mindmap)" vertex="1">
+          <mxGeometry height="30" width="300" x="80" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="m4_desc" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=14;fontColor=#86868B;fontFamily=-apple-system;" value="适用：因素拆解、头脑风暴" vertex="1">
+          <mxGeometry height="30" width="360" x="80" y="710" as="geometry" />
+        </mxCell>
+        <mxCell id="m4_root" parent="1" style="rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#1D1D1F;strokeColor=none;fontColor=#FFFFFF;fontSize=16;fontStyle=1;fontFamily=-apple-system;align=center;verticalAlign=middle;" value="⭐️ 核心概念" vertex="1">
+          <mxGeometry height="50" width="140" x="80" y="820" as="geometry" />
+        </mxCell>
+        <mxCell id="m4_node1" parent="1" style="rounded=1;arcSize=15;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E5E5EA;strokeWidth=1;fontColor=#1D1D1F;fontSize=14;fontStyle=1;fontFamily=-apple-system;align=center;verticalAlign=middle;shadow=1;" value="要素 A" vertex="1">
+          <mxGeometry height="45" width="120" x="300" y="750" as="geometry" />
+        </mxCell>
+        <mxCell id="m4_node2" parent="1" style="rounded=1;arcSize=15;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E5E5EA;strokeWidth=1;fontColor=#1D1D1F;fontSize=14;fontStyle=1;fontFamily=-apple-system;align=center;verticalAlign=middle;shadow=1;" value="要素 B" vertex="1">
+          <mxGeometry height="45" width="120" x="300" y="822.5" as="geometry" />
+        </mxCell>
+        <mxCell id="m4_node3" parent="1" style="rounded=1;arcSize=15;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#E5E5EA;strokeWidth=1;fontColor=#1D1D1F;fontSize=14;fontStyle=1;fontFamily=-apple-system;align=center;verticalAlign=middle;shadow=1;" value="要素 C" vertex="1">
+          <mxGeometry height="45" width="120" x="300" y="895" as="geometry" />
+        </mxCell>
+        <mxCell id="m4_edge1" edge="1" parent="1" source="m4_root" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E5E5EA;strokeWidth=2;endArrow=none;" target="m4_node1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="267" y="845" />
+              <mxPoint x="267" y="773" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m4_edge2" edge="1" parent="1" source="m4_root" style="edgeStyle=orthogonalEdgeStyle;rounded=1;curved=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E5E5EA;strokeWidth=2;endArrow=none;" target="m4_node2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m4_edge3" edge="1" parent="1" source="m4_root" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#E5E5EA;strokeWidth=2;endArrow=none;" target="m4_node3">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="266" y="845" />
+              <mxPoint x="266" y="917" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="comp_title" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=20;fontColor=#1D1D1F;fontStyle=1;fontFamily=-apple-system;" value="🧩 零碎 Apple 视觉组件库 (复制备用)" vertex="1">
+          <mxGeometry height="30" width="400" x="520" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="badge_blue" parent="1" style="rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#EBF4FF;strokeColor=none;fontColor=#007AFF;fontSize=13;fontStyle=1;fontFamily=-apple-system;" value="系统核心" vertex="1">
+          <mxGeometry height="30" width="80" x="520" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="badge_green" parent="1" style="rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#E8F8F5;strokeColor=none;fontColor=#34C759;fontSize=13;fontStyle=1;fontFamily=-apple-system;" value="已完成" vertex="1">
+          <mxGeometry height="30" width="80" x="610" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="badge_gray" parent="1" style="rounded=1;arcSize=50;whiteSpace=wrap;html=1;fillColor=#F2F2F7;strokeColor=none;fontColor=#8E8E93;fontSize=13;fontStyle=1;fontFamily=-apple-system;" value="v2.0 迭代" vertex="1">
+          <mxGeometry height="30" width="80" x="700" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="text_note" parent="1" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=13;fontColor=#86868B;fontFamily=-apple-system;" value="📝 细节注释：iOS 极简风不强调连线，排版靠留白和对齐产生逻辑关联。" vertex="1">
+          <mxGeometry height="30" width="450" x="520" y="800" as="geometry" />
+        </mxCell>
+        <mxCell id="MMO793naEjlGUJ7ov40e-3" parent="1" style="rounded=1;arcSize=20;whiteSpace=wrap;html=1;&#xa;fillColor=#FFFFFF08;strokeColor=#FFFFFF15;&#xa;shadow=1;shadowColor=#00FFE556;shadowOffsetX=0;shadowOffsetY=8;shadowBlur=25;" value="" vertex="1">
+          <mxGeometry height="60" width="120" x="514" y="895" as="geometry" />
+        </mxCell>
+        <mxCell id="MMO793naEjlGUJ7ov40e-4" parent="1" style="rounded=1;arcSize=50;whiteSpace=wrap;html=1;&#xa;fillColor=#FFFFFF0D;strokeColor=#FFFFFF10;&#xa;shadow=1;shadowColor=#007AFF33;shadowOffsetX=0;shadowOffsetY=4;shadowBlur=12;&#xa;fontColor=#FFFFFF;fontSize=14;fontStyle=1;" value="" vertex="1">
+          <mxGeometry height="60" width="120" x="657" y="895" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

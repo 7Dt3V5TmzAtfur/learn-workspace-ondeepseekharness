@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "command": "finalize",
+  "status": "fail",
+  "type": "architecture",
+  "quality": "standard",
+  "specification": {
+    "path": "D:\\learn\\study-system\\tests\\.archify-test\\candidate.json",
+    "sha256": "1211981e4acff45062e59153c209ecc69d021bf68323141727853bba8daab314",
+    "bytes": 17925
+  },
+  "artifact": {
+    "path": "D:\\learn\\study-system\\tests\\.archify-test\\graph.html",
+    "sha256": "3917a67a9186a760efd1ff84971a8343ce3528d0faa7a4b0f9ef91d5f8e58dda",
+    "bytes": 874722
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "fail"
+  },
+  "failedStage": "browser-check",
+  "diagnostics": [
+    {
+      "code": "viewer/projected-text-readability",
+      "severity": "error",
+      "message": "Projected primary text is below the readability floor at 1440x900.",
+      "subject": {
+        "artifact": "D:\\learn\\study-system\\tests\\.archify-test\\graph.html",
+        "viewport": {
+          "width": 1440,
+          "height": 900,
+          "theme": "light"
+        }
+      },
+      "evidence": {
+        "text": "Agent 的目标（而非底层 API 操作）",
+        "detail": "primary",
+        "owner": {
+          "kind": "node",
+          "id": "agent-goal"
+        },
+        "minimumProjectedNodeTextPx": 3.3742023701002735,
+        "minimumRequiredNodeTextPx": 6
+      },
+      "supportedFixes": [
+        "increase projected node text to at least 6px at 1440x900, then rerun browser-check"
+      ]
+    },
+    {
+      "code": "viewer/projected-text-readability",
+      "severity": "error",
+      "message": "Projected primary text is below the readability floor at 1600x1000.",
+      "subject": {
+        "artifact": "D:\\learn\\study-system\\tests\\.archify-test\\graph.html",
+        "viewport": {
+          "width": 1600,
+          "height": 1000,
+          "theme": "light"
+        }
+      },
+      "evidence": {
+        "text": "Agent 的目标（而非底层 API 操作）",
+        "detail": "primary",
+        "owner": {
+          "kind": "node",
+          "id": "agent-goal"
+        },
+        "minimumProjectedNodeTextPx": 3.775296262534184,
+        "minimumRequiredNodeTextPx": 6
+      },
+      "supportedFixes": [
+        "increase projected node text to at least 6px at 1600x1000, then rerun browser-check"
+      ]
+    },
+    {
+      "code": "viewer/projected-text-readability",
+      "severity": "error",
+      "message": "Projected primary text is below the readability floor at 1920x1080.",
+      "subject": {
+        "artifact": "D:\\learn\\study-system\\tests\\.archify-test\\graph.html",
+        "viewport": {
+          "width": 1920,
+          "height": 1080,
+          "theme": "light"
+        }
+      },
+      "evidence": {
+        "text": "Agent 的目标（而非底层 API 操作）",
+        "detail": "primary",
+        "owner": {
+          "kind": "node",
+          "id": "agent-goal"
+        },
+        "minimumProjectedNodeTextPx": 4.577484047402006,
+        "minimumRequiredNodeTextPx": 6
+      },
+      "supportedFixes": [
+        "increase projected node text to at least 6px at 1920x1080, then rerun browser-check"
+      ]
+    },
+    {
+      "code": "viewer/projected-text-readability",
+      "severity": "error",
+      "message": "Projected primary text is below the readability floor at 2048x1320.",
+      "subject": {
+        "artifact": "D:\\learn\\study-system\\tests\\.archify-test\\graph.html",
+        "viewport": {
+          "width": 2048,
+          "height": 1320,
+          "theme": "light"
+        }
+      },
+      "evidence": {
+        "text": "Agent 的目标（而非底层 API 操作）",
+        "detail": "primary",
+        "owner": {
+          "kind": "node",
+          "id": "agent-goal"
+        },
+        "minimumProjectedNodeTextPx": 4.687784867821331,
+        "minimumRequiredNodeTextPx": 6
+      },
+      "supportedFixes": [
+        "increase projected node text to at least 6px at 2048x1320, then rerun browser-check"
+      ]
+    }
+  ],
+  "diagnosticSummary": {
+    "total": 4,
+    "shown": 4,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "D:\\learn\\study-system\\tests\\.archify-test\\review-1\\graph.finalize.json",
+    "summaryReceipt": "D:\\learn\\study-system\\tests\\.archify-test\\review-1\\graph.finalize-summary.json",
+    "browserCheckReceipt": "D:\\learn\\study-system\\tests\\.archify-test\\review-1\\graph.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-22T15:49:57.281Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 2924,
+  "browserCheck": {
+    "requested": true,
+    "ran": true
+  }
+}

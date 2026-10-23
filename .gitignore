@@ -1,0 +1,15 @@
+# 学习项目数据（个人资料，不入库）
+.study/
+**/.study/
+# 测试临时产物
+**/tests/.archify-test/
+**/tests/_graph.json
+**/tests/_graph.png
+**/tests/_sample.html
+**/tests/_pf.html
+**/tests/fixtures/
+*.tmp
+# 系统
+Thumbs.db
+desktop.ini
+.DS_Store

@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "command": "deliver",
+  "status": "pending",
+  "receiptId": "0ec1ab2c-965e-4376-b30f-7d8534797af0",
+  "input": "D:\\learn\\study-system\\tests\\.archify-test\\candidate.json",
+  "output": "D:\\learn\\study-system\\tests\\.archify-test\\graph.html"
+}

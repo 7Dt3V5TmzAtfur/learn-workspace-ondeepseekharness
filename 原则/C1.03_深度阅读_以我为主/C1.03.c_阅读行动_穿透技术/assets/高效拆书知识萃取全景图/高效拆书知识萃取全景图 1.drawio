@@ -1,0 +1,196 @@
+<mxfile host="Electron">
+  <diagram name="第 1 页" id="TiqssTndZ-rVvZSDfoBx">
+    <mxGraphModel dx="2540" dy="1024" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E8FF;strokeColor=#555555;strokeWidth=1.5;fontColor=#330066;align=center;" value="&lt;b style=&quot;font-size:26px&quot;&gt;高效拆书知识萃取全景图&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:14px&quot;&gt;核心要义：跳出局部视野，将长文本重塑为高度结构化、可复用的认知模型与实战SOP&lt;/span&gt;" vertex="1">
+          <mxGeometry height="60" width="1630" x="-240" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="layer4_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F9F0FF;strokeColor=#555555;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="180" width="960" x="140" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="layer4_lbl" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F9F0FF;strokeColor=#555555;strokeWidth=1.5;fontColor=#330066;align=center;" value="&lt;b style=&quot;font-size:16px&quot;&gt;沉淀层&lt;br&gt;&lt;br&gt;SOP输出&lt;/b&gt;" vertex="1">
+          <mxGeometry height="180" width="100" x="20" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="layer4_fp" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#330066;fontStyle=1;" value="第一性原理：所学必须落地。利用AI生成可视化工具，牵引知识转化为最小可行性验证（MVP）" vertex="1">
+          <mxGeometry height="25" width="900" x="170" y="105" as="geometry" />
+        </mxCell>
+        <mxCell id="node_4_1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;Claude 提效引擎&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;输入提炼逻辑与Prompt&lt;br&gt;React+Tailwind毛玻璃渲染" vertex="1">
+          <mxGeometry height="80" width="220" x="200" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="node_4_2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;一页清卡片生成&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;系统理论框架图输出&lt;br&gt;技术架构SOP图输出" vertex="1">
+          <mxGeometry height="80" width="220" x="500" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="node_4_3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;复习与实战闭环&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;打印图表常看与优化&lt;br&gt;制定最小MVP行动验证" vertex="1">
+          <mxGeometry height="80" width="220" x="800" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="layer3_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F5FF;strokeColor=#555555;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="220" width="960" x="140" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="layer3_lbl" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F5FF;strokeColor=#555555;strokeWidth=1.5;fontColor=#001144;align=center;" value="&lt;b style=&quot;font-size:16px&quot;&gt;微观层&lt;br&gt;&lt;br&gt;内化增强&lt;/b&gt;" vertex="1">
+          <mxGeometry height="220" width="100" x="20" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="layer3_fp" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#001144;fontStyle=1;" value="第一性原理：拒绝死记硬背，通过多次反复联想与渐进式对抗提问，将书中知识刻入大脑" vertex="1">
+          <mxGeometry height="25" width="900" x="170" y="305" as="geometry" />
+        </mxCell>
+        <mxCell id="layer3_bl" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#001144;fontStyle=1;fillColor=#E6EEFF;" value="工具底座：Obsidian + Modevol 渐构 + Copilot (OpenRouter) + Hover Editor 悬停窗" vertex="1">
+          <mxGeometry height="30" width="920" x="160" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="group3_dashed" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#555555;strokeWidth=1;dashed=1;" vertex="1">
+          <mxGeometry height="135" width="540" x="460" y="335" as="geometry" />
+        </mxCell>
+        <mxCell id="group3_title" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#001144;fontStyle=1;" value="AI 深度交互与对抗思维流 (Copilot)" vertex="1">
+          <mxGeometry height="25" width="540" x="460" y="335" as="geometry" />
+        </mxCell>
+        <mxCell id="node_3_1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;抓重点 (Modevol)&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;渐构标注段落核心目的&lt;br&gt;保持主旨不迷失于细节" vertex="1">
+          <mxGeometry height="80" width="220" x="200" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="node_3_2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;破难点与沉淀脚注&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;Ctrl+Alt+F 即时提问&lt;br&gt;悬停窗维持心流(Flow)" vertex="1">
+          <mxGeometry height="80" width="220" x="480" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="node_3_3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;红队批判与末尾QA&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;要求AI提供反面局限案例&lt;br&gt;生成百字QA辅助回忆复盘" vertex="1">
+          <mxGeometry height="80" width="220" x="760" y="370" as="geometry" />
+        </mxCell>
+        <mxCell id="layer2_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F8F5;strokeColor=#555555;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="200" width="960" x="140" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="layer2_lbl" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F8F5;strokeColor=#555555;strokeWidth=1.5;fontColor=#003311;align=center;" value="&lt;b style=&quot;font-size:16px&quot;&gt;宏观层&lt;br&gt;&lt;br&gt;框架辅助&lt;/b&gt;" vertex="1">
+          <mxGeometry height="200" width="100" x="20" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="layer2_fp" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#003311;fontStyle=1;" value="第一性原理：跳出文本细节束缚，俯瞰全局，建立跨层级的三维结构骨架" vertex="1">
+          <mxGeometry height="25" width="900" x="170" y="545" as="geometry" />
+        </mxCell>
+        <mxCell id="layer2_bl" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#003311;fontStyle=1;fillColor=#D1F2EB;" value="工具底座：Google AI Studio (Gemini 3 Pro) 超长文本逻辑引擎" vertex="1">
+          <mxGeometry height="30" width="920" x="160" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="node_2_1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;阅读顺序解构&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;折叠MD输入全文Prompt&lt;br&gt;分析一二级章节逻辑串联" vertex="1">
+          <mxGeometry height="80" width="220" x="200" y="590" as="geometry" />
+        </mxCell>
+        <mxCell id="node_2_2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;底层逻辑萃取&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;忽略情绪化与比喻案例&lt;br&gt;强制提取至少3级纯净模块" vertex="1">
+          <mxGeometry height="80" width="220" x="500" y="590" as="geometry" />
+        </mxCell>
+        <mxCell id="node_2_3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;结构化骨架输出&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;用短词组渲染Markdown树&lt;br&gt;提炼一句话核心底层逻辑" vertex="1">
+          <mxGeometry height="80" width="220" x="800" y="590" as="geometry" />
+        </mxCell>
+        <mxCell id="layer1_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E8;strokeColor=#555555;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="200" width="960" x="140" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="layer1_lbl" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E8;strokeColor=#555555;strokeWidth=1.5;fontColor=#553300;align=center;" value="&lt;b style=&quot;font-size:16px&quot;&gt;物理层&lt;br&gt;&lt;br&gt;文件拆解&lt;/b&gt;" vertex="1">
+          <mxGeometry height="200" width="100" x="20" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="layer1_fp" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#553300;fontStyle=1;" value="第一性原理：消除格式噪音，化整为零，构建便于独立阅读与多级双链导航的纯净数据源" vertex="1">
+          <mxGeometry height="25" width="900" x="170" y="765" as="geometry" />
+        </mxCell>
+        <mxCell id="layer1_bl" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#553300;fontStyle=1;fillColor=#FFF3D4;" value="工具底座：PDFelement / MinerU -&gt; Pandoc -&gt; Obsidian (Note Refactor 插件)" vertex="1">
+          <mxGeometry height="30" width="920" x="160" y="920" as="geometry" />
+        </mxCell>
+        <mxCell id="node_1_1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;1. 版式清洗&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;PDFelement-12+OCR提取&lt;br&gt;去除乱码与修正格式错误" vertex="1">
+          <mxGeometry height="80" width="220" x="200" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="node_1_2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;2. 语法Markdown化&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;Pandoc或MinerU转换&lt;br&gt;转换为全平台通用笔记格式" vertex="1">
+          <mxGeometry height="80" width="220" x="500" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="node_1_3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;3. 章节切片与双链&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;按H1/H2标题切割文件&lt;br&gt;生成多级目录与双链导航" vertex="1">
+          <mxGeometry height="80" width="220" x="800" y="810" as="geometry" />
+        </mxCell>
+        <mxCell id="right_pillar_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8F8F8;strokeColor=#555555;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="860" width="190" x="1140" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="right_pillar_title" parent="1" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;fontColor=#222;fontStyle=1;" value="&lt;br&gt;&lt;b style=&quot;font-size:18px&quot;&gt;底层精神基座&lt;/b&gt;&lt;br&gt;&lt;br&gt;工具只是提效手段&lt;br&gt;真正值钱的是你大脑的&lt;br&gt;&lt;b style=&quot;font-size:20px;color:#900&quot;&gt;灵魂三问&lt;/b&gt;" vertex="1">
+          <mxGeometry height="120" width="190" x="1140" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="rp_n1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;第一问：明确目的&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;我读这段目的是什么？&lt;br&gt;知识如何为我所用？" vertex="1">
+          <mxGeometry height="90" width="150" x="1160" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="rp_n2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;第二问：操作演练&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;我怎么具体操作它？&lt;br&gt;落地的行动卡点在哪？" vertex="1">
+          <mxGeometry height="90" width="150" x="1160" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="rp_n3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;第三问：同频校验&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;与我过去经验对比&lt;br&gt;有何创新与反共识？" vertex="1">
+          <mxGeometry height="90" width="150" x="1160" y="750" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_l1_1" edge="1" parent="1" source="node_1_1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=2;endArrow=block;" target="node_1_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_l1_2" edge="1" parent="1" source="node_1_2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=2;endArrow=block;" target="node_1_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_l2_1" edge="1" parent="1" source="node_2_1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=2;endArrow=block;" target="node_2_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_l2_2" edge="1" parent="1" source="node_2_2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=2;endArrow=block;" target="node_2_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_l3_1" edge="1" parent="1" source="node_3_1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=2;endArrow=block;" target="node_3_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_l3_2" edge="1" parent="1" source="node_3_2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=2;endArrow=block;" target="node_3_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_l4_1" edge="1" parent="1" source="node_4_1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=2;endArrow=block;" target="node_4_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_l4_2" edge="1" parent="1" source="node_4_2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=2;endArrow=block;" target="node_4_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_inter_1" edge="1" parent="1" source="node_1_3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=2;endArrow=block;dashed=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" target="node_2_1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_inter_2" edge="1" parent="1" source="node_2_3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=2;endArrow=block;dashed=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" target="node_3_1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_inter_3" edge="1" parent="1" source="node_3_3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=2;endArrow=block;dashed=1;exitX=0.5;exitY=0;entryX=0.5;entryY=1;" target="node_4_1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_pillar_1" edge="1" parent="1" source="rp_n3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#990000;strokeWidth=2;endArrow=classic;" target="rp_n2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_pillar_2" edge="1" parent="1" source="rp_n2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#990000;strokeWidth=2;endArrow=classic;" target="rp_n1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_left" edge="1" parent="1" style="edgeStyle=none;html=1;strokeWidth=12;strokeColor=#AD1457;fontColor=#AD1457;endArrow=block;endFill=1;endSize=10;labelBackgroundColor=#FFFFFF;verticalAlign=middle;align=center;" value="&lt;b style=&quot;font-size:18px&quot;&gt;由&lt;br&gt;表&lt;br&gt;及&lt;br&gt;里&lt;br&gt;的&lt;br&gt;知&lt;br&gt;识&lt;br&gt;解&lt;br&gt;构&lt;br&gt;路&lt;br&gt;径&lt;/b&gt;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-20" y="960" as="sourcePoint" />
+            <mxPoint x="-20" y="100" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow_right" edge="1" parent="1" style="edgeStyle=none;html=1;strokeWidth=12;strokeColor=#0277BD;fontColor=#0277BD;endArrow=block;endFill=1;endSize=10;labelBackgroundColor=#FFFFFF;verticalAlign=middle;align=center;" value="&lt;b style=&quot;font-size:18px&quot;&gt;以&lt;br&gt;终&lt;br&gt;为&lt;br&gt;始&lt;br&gt;的&lt;br&gt;工&lt;br&gt;具&lt;br&gt;效&lt;br&gt;能&lt;br&gt;闭&lt;br&gt;环&lt;/b&gt;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1370" y="100" as="sourcePoint" />
+            <mxPoint x="1370" y="960" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="2gJ4Yd_afuXzGpkT7RMO-7" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="860" width="170" x="-230" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="2gJ4Yd_afuXzGpkT7RMO-1" parent="2gJ4Yd_afuXzGpkT7RMO-7" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8F8F8;strokeColor=#555555;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="860" width="170" as="geometry" />
+        </mxCell>
+        <mxCell id="2gJ4Yd_afuXzGpkT7RMO-2" parent="2gJ4Yd_afuXzGpkT7RMO-7" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;fontColor=#222;fontStyle=1;" value="&lt;br&gt;&lt;b style=&quot;font-size:16px&quot;&gt;系统底层基座&lt;/b&gt;&lt;br&gt;&lt;br&gt;贯穿全生命周期的&lt;br&gt;核心统一原则&lt;br&gt;&lt;b style=&quot;font-size:18px;color:#900&quot;&gt;多次反复·联想回忆&lt;/b&gt;" vertex="1">
+          <mxGeometry height="120" width="170" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="2gJ4Yd_afuXzGpkT7RMO-3" parent="2gJ4Yd_afuXzGpkT7RMO-7" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b&gt;抗遗忘心法&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;核心机制在于&lt;br&gt;多次反复与联结&lt;br&gt;而非单次记忆深度" vertex="1">
+          <mxGeometry height="90" width="130" x="20" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="2gJ4Yd_afuXzGpkT7RMO-4" parent="2gJ4Yd_afuXzGpkT7RMO-7" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b&gt;灵魂三问法则&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;目的反向驱动&lt;br&gt;实用操作导向&lt;br&gt;既往经验锚定" vertex="1">
+          <mxGeometry height="90" width="130" x="20" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="2gJ4Yd_afuXzGpkT7RMO-5" parent="2gJ4Yd_afuXzGpkT7RMO-7" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b&gt;大脑主权原则&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;AI只是提效器&lt;br&gt;批判与独立思考&lt;br&gt;决策权归属人类" vertex="1">
+          <mxGeometry height="90" width="130" x="20" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="2gJ4Yd_afuXzGpkT7RMO-6" parent="2gJ4Yd_afuXzGpkT7RMO-7" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;" value="&lt;b&gt;极简 MVP 行动&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;拒绝完美主义&lt;br&gt;寻求最小可用闭环&lt;br&gt;快速迭代升级" vertex="1">
+          <mxGeometry height="90" width="130" x="20" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="9aNQrPx3jOUbcvB8Axgl-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=default;dashed=1;" value="C1.03.c_阅读行动_穿透技术" vertex="1">
+          <mxGeometry height="40" width="180" x="-210" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="wg0A4EgVkXBUocqJXNfn-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=default;dashed=1;" value="看过的书籍 ➡️&amp;nbsp; SOP大脑记忆地图" vertex="1">
+          <mxGeometry height="40" width="200" x="1030" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="wg0A4EgVkXBUocqJXNfn-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;align=left;spacingLeft=10;" value="&lt;div style=&quot;&quot;&gt;&lt;b style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Tools List&lt;/b&gt;&lt;/div&gt;&lt;br&gt;[阅读快速]: 3min.top&lt;br&gt;[拆分深入]: ponder.ing" vertex="1">
+          <mxGeometry height="90" width="130" x="1170" y="860" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

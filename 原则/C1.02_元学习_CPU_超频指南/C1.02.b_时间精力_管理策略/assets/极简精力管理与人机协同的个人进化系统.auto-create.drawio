@@ -1,0 +1,187 @@
+<mxfile host="Electron" agent="Obsidian">
+  <diagram name="Page-1" id="0">
+    <mxGraphModel dx="1496" dy="755" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="465" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="s1x-pVxz8RHmVTc7Oy0w-2" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="1090" width="1610" x="80" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-25" parent="s1x-pVxz8RHmVTc7Oy0w-2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8EAF6;strokeColor=#3949AB;strokeWidth=2;fontColor=#1A237E;" value="&lt;b style=&quot;font-size: 26px;&quot;&gt;[极简精力管理]与人机协同的个人进化系统&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;Count Energy, Not Time | 人脑主导战略定调，AI/自动化主导战术执行 | 每件事情资源尽可能高效多方使用&lt;/span&gt;" vertex="1">
+          <mxGeometry height="70" width="1609.9999999999998" as="geometry" />
+        </mxCell>
+        <mxCell id="KwdORGDUTNvqVpGRmWaN-1" parent="s1x-pVxz8RHmVTc7Oy0w-2" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;dashed=1;" value="C1.02.b_时间精力_管理策略" vertex="1">
+          <mxGeometry height="40" width="240.86614173228347" x="12.677165354330707" y="15" as="geometry" />
+        </mxCell>
+        <mxCell id="KwdORGDUTNvqVpGRmWaN-3" parent="s1x-pVxz8RHmVTc7Oy0w-2" style="rounded=0;whiteSpace=wrap;html=1;" value="停下来，问自己：刚才在干什么？应该放在框架的哪里？" vertex="1">
+          <mxGeometry height="60" width="215.51181102362202" x="1331.1023622047244" y="5" as="geometry" />
+        </mxCell>
+        <mxCell id="s1x-pVxz8RHmVTc7Oy0w-1" connectable="0" parent="s1x-pVxz8RHmVTc7Oy0w-2" style="group" value="" vertex="1">
+          <mxGeometry height="990" width="1597.3228346456692" x="12.677165354330707" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-26" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#AB47BC;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="140" width="1242.3622047244094" x="25.354330708661415" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-27" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#AB47BC;strokeWidth=1.5;fontColor=#4A148C;align=center;verticalAlign=middle;" value="&lt;b style=&quot;font-size: 16px;&quot;&gt;战略定调&lt;br&gt;与灵魂发问&lt;/b&gt;" vertex="1">
+          <mxGeometry height="140" width="126.77165354330708" x="25.354330708661415" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-28" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#4A148C;fillColor=none;strokeColor=none;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;晨间启动机制 (系统运转的启动键)&amp;nbsp; ： 顺应时代，什么赚钱，去尝试后转型&lt;/b&gt;" vertex="1">
+          <mxGeometry height="25" width="1064.8818897637796" x="177.48031496062993" y="10" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-29" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#8E24AA;strokeWidth=1;fontColor=#4A148C;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;1. 定位发问 (主线)&lt;/b&gt;&lt;hr style=&quot;border-color: #8E24AA; margin: 5px 0;&quot;&gt;&lt;div style=&quot;text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;今天做的事，是给1-2条主线添砖加瓦，还是消耗流量？&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="247.20472440944883" x="177.48031496062993" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-30" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#8E24AA;strokeWidth=1;fontColor=#4A148C;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;2. 精力发问 (状态)&lt;/b&gt;&lt;hr style=&quot;border-color: #8E24AA; margin: 5px 0;&quot;&gt;&lt;div style=&quot;text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;大脑当前是高算力(清醒)还是低算力(疲惫)？吃青蛙还是做清理？&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="247.20472440944883" x="456.37795275590554" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-31" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#8E24AA;strokeWidth=1;fontColor=#4A148C;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;3. 过滤发问 (价值)&lt;/b&gt;&lt;hr style=&quot;border-color: #8E24AA; margin: 5px 0;&quot;&gt;&lt;div style=&quot;text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;新信息有确定性回报吗？符合五年法则吗？能丢给LLM吗？&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="247.20472440944883" x="735.275590551181" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-32" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#8E24AA;strokeWidth=1;fontColor=#4A148C;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;第一性原理筛选&lt;/b&gt;&lt;hr style=&quot;border-color: #8E24AA; margin: 5px 0;&quot;&gt;&lt;div style=&quot;text-align: center; line-height: 1.4; font-size: 13px;&quot;&gt;(二八原则 / 五年法则)&lt;/div&gt;" vertex="1">
+          <mxGeometry height="90" width="247.20472440944883" x="1014.1732283464567" y="45" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-33" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE7F6;strokeColor=#7E57C2;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="140" width="1242.3622047244094" x="25.354330708661415" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-34" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#D1C4E9;strokeColor=#7E57C2;strokeWidth=1.5;fontColor=#311B92;align=center;verticalAlign=middle;" value="&lt;b style=&quot;font-size: 16px;&quot;&gt;第五层&lt;br&gt;&lt;br&gt;核心愿景&lt;br&gt;与目标&lt;/b&gt;" vertex="1">
+          <mxGeometry height="140" width="126.77165354330708" x="25.354330708661415" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-35" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5E35B1;strokeWidth=1;fontColor=#311B92;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;主线穿透&lt;/b&gt;&lt;hr style=&quot;border-color: #5E35B1; margin: 5px 0;&quot;&gt;&lt;div style=&quot;text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;围绕1-2条核心主线&lt;br&gt;每年死磕掌握一项硬技能&lt;br&gt;拿到高确定性回报&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="247.20472440944883" x="177.48031496062993" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-36" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5E35B1;strokeWidth=1;fontColor=#311B92;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;学术与事业突破&lt;/b&gt;&lt;hr style=&quot;border-color: #5E35B1; margin: 5px 0;&quot;&gt;&lt;div style=&quot;text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;构建科研流程创新链&lt;br&gt;将精力投资于高ROI产出&lt;br&gt;实现“让别人刮目相看”&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="247.20472440944883" x="456.37795275590554" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-37" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5E35B1;strokeWidth=1;fontColor=#311B92;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;心智觉醒&lt;/b&gt;&lt;hr style=&quot;border-color: #5E35B1; margin: 5px 0;&quot;&gt;&lt;div style=&quot;text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;情绪日志与觉知训练&lt;br&gt;通过立即行动与复盘&lt;br&gt;彻底替代精神自责与内耗&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="247.20472440944883" x="735.275590551181" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-38" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#5E35B1;strokeWidth=1;fontColor=#311B92;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;健康回归&lt;/b&gt;&lt;hr style=&quot;border-color: #5E35B1; margin: 5px 0;&quot;&gt;&lt;div style=&quot;text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;重建作息与运动节律&lt;br&gt;不再逃避身体发出的警报&lt;br&gt;为系统运转提供能量基石&lt;/div&gt;" vertex="1">
+          <mxGeometry height="100" width="247.20472440944883" x="1014.1732283464567" y="180" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-39" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#9E9E9E;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="160" width="1242.3622047244094" x="25.354330708661415" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-40" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0E0E0;strokeColor=#9E9E9E;strokeWidth=1.5;fontColor=#212121;align=center;verticalAlign=middle;" value="&lt;b style=&quot;font-size: 16px;&quot;&gt;动态精力&lt;br&gt;匹配执行&lt;/b&gt;" vertex="1">
+          <mxGeometry height="160" width="126.77165354330708" x="25.354330708661415" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-41" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#424242;fillColor=none;strokeColor=none;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;核心机制: Count Energy, Not Time (抛弃时间块，基于身体算力高低动态匹配任务)&lt;/b&gt;" vertex="1">
+          <mxGeometry height="25" width="1064.8818897637796" x="177.48031496062993" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-42" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFEBEE;strokeColor=#E53935;strokeWidth=1.5;fontColor=#B71C1C;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;🔥 红色极点 (必须完成的3件事)&lt;/b&gt;&lt;hr style=&quot;border-color: #E53935; margin: 5px 0;&quot;&gt;&lt;div style=&quot;text-align: left; padding-left: 5px; line-height: 1.5; font-size: 13px;&quot;&gt;&lt;b style=&quot;color: #B71C1C;&quot;&gt;属性：&lt;/b&gt;重要紧急 / 确定性回报 / MVP&lt;br&gt;&lt;b style=&quot;color: #B71C1C;&quot;&gt;精力：&lt;/b&gt;最高峰时段 (高算力模式)&lt;br&gt;&lt;b style=&quot;color: #B71C1C;&quot;&gt;动作：&lt;/b&gt;吃青蛙！5分钟法则强行启动&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="329.60629921259846" x="177.48031496062993" y="355" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-43" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EEEEEE;strokeColor=#616161;strokeWidth=1.5;fontColor=#212121;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;👥 黑色地带 (可委托/删除的5件事)&lt;/b&gt;&lt;hr style=&quot;border-color: #616161; margin: 5px 0;&quot;&gt;&lt;div style=&quot;text-align: left; padding-left: 5px; line-height: 1.5; font-size: 13px;&quot;&gt;&lt;b&gt;属性：&lt;/b&gt;紧急不重要 / 纯工具类任务&lt;br&gt;&lt;b&gt;精力：&lt;/b&gt;极低谷时段 / 全天候自动化&lt;br&gt;&lt;b&gt;动作：&lt;/b&gt;划线本身代表着已行动&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="329.60629921259846" x="557.7952755905512" y="355" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-44" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#43A047;strokeWidth=1.5;fontColor=#1B5E20;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;🗺️ 绿色微光 (感恩的1个细节)&lt;/b&gt;&lt;hr style=&quot;border-color: #43A047; margin: 5px 0;&quot;&gt;&lt;div style=&quot;text-align: left; padding-left: 5px; line-height: 1.5; font-size: 13px;&quot;&gt;&lt;b style=&quot;color: #1B5E20;&quot;&gt;属性：&lt;/b&gt;重要不紧急 / 情绪充电&lt;br&gt;&lt;b style=&quot;color: #1B5E20;&quot;&gt;精力：&lt;/b&gt;睡前或碎片化时间&lt;br&gt;&lt;b style=&quot;color: #1B5E20;&quot;&gt;动作：&lt;/b&gt;记录感恩，缓解焦虑，能量回血&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="329.60629921259846" x="930.5039370078741" y="355" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-45" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#1E88E5;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="150" width="1242.3622047244094" x="25.354330708661415" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-46" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#1E88E5;strokeWidth=1.5;fontColor=#0D47A1;align=center;verticalAlign=middle;" value="&lt;b style=&quot;font-size: 16px;&quot;&gt;信息护城河&lt;br&gt;Pipeline&lt;/b&gt;" vertex="1">
+          <mxGeometry height="150" width="126.77165354330708" x="25.354330708661415" y="490" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-47" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#0D47A1;fillColor=none;strokeColor=none;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;流水线逻辑: 人脑主导价值判断 (定调/决策) + 工具/LLM主导苦力活 (抓取/总结)&lt;/b&gt;" vertex="1">
+          <mxGeometry height="25" width="1064.8818897637796" x="177.48031496062993" y="500" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-48" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1E88E5;strokeWidth=1;fontColor=#0D47A1;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;Step 1: 战略输入层&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;(人脑过滤主导)&lt;/span&gt;&lt;hr style=&quot;border-color: #1E88E5; margin: 5px 0;&quot;&gt;&lt;ul style=&quot;margin: 5px 0 0 0; padding-left: 20px; text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;&lt;li&gt;主动收敛主线，砍掉泛滥订阅&lt;/li&gt;&lt;li&gt;仅保留 Top 5-8 高信噪比信源&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="100" width="247.20472440944883" x="177.48031496062993" y="525" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-49" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1E88E5;strokeWidth=1;fontColor=#0D47A1;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;Step 2: 自动化收集层&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;(n8n 工具主导)&lt;/span&gt;&lt;hr style=&quot;border-color: #1E88E5; margin: 5px 0;&quot;&gt;&lt;ul style=&quot;margin: 5px 0 0 0; padding-left: 20px; text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;&lt;li&gt;自动监控选定信源并定向抓取&lt;/li&gt;&lt;li&gt;彻底根除主动刷信息流的习惯&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="100" width="247.20472440944883" x="456.37795275590554" y="525" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-50" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1E88E5;strokeWidth=1;fontColor=#0D47A1;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;Step 3: 提取加工层&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;(LLM AI 主导)&lt;/span&gt;&lt;hr style=&quot;border-color: #1E88E5; margin: 5px 0;&quot;&gt;&lt;ul style=&quot;margin: 5px 0 0 0; padding-left: 20px; text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;&lt;li&gt;喂给 Claude 提炼二八抓手&lt;/li&gt;&lt;li&gt;剥离情绪词汇，只呈现实体逻辑&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="100" width="247.20472440944883" x="735.275590551181" y="525" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-51" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#1E88E5;strokeWidth=1;fontColor=#0D47A1;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;Step 4: 决策执行层&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;(人机合一落地)&lt;/span&gt;&lt;hr style=&quot;border-color: #1E88E5; margin: 5px 0;&quot;&gt;&lt;ul style=&quot;margin: 5px 0 0 0; padding-left: 20px; text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;&lt;li&gt;人脑判断价值，给出清晰指令&lt;/li&gt;&lt;li&gt;通过老技术快速跑通 MVP 闭环&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="100" width="247.20472440944883" x="1014.1732283464567" y="525" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-55" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2F1;strokeColor=#00897B;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="160" width="1242.3622047244094" x="25.354330708661415" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-56" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#B2DFDB;strokeColor=#00897B;strokeWidth=1.5;fontColor=#004D40;align=center;verticalAlign=middle;" value="&lt;b style=&quot;font-size: 16px;&quot;&gt;分层学习与&lt;br&gt;生命重塑&lt;/b&gt;" vertex="1">
+          <mxGeometry height="160" width="126.77165354330708" x="25.354330708661415" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-57" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#004D40;fillColor=none;strokeColor=none;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;知行合一的金字塔闭环 (将输入转化为实体资产)&lt;/b&gt;" vertex="1">
+          <mxGeometry height="25" width="1064.8818897637796" x="177.48031496062993" y="670" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-58" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#00897B;strokeWidth=1;fontColor=#004D40;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;第1层：降噪摄入&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;(功利阅读高质信源)&lt;/span&gt;&lt;hr style=&quot;border-color: #00897B; margin: 5px 0;&quot;&gt;&lt;ol style=&quot;margin: 5px 0 0 0; padding-left: 24px; text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;&lt;li&gt;不追新，只学经典&lt;/li&gt;&lt;li&gt;通过AI抓取20%核心&lt;/li&gt;&lt;li&gt;为“用”而读&lt;/li&gt;&lt;/ol&gt;" vertex="1">
+          <mxGeometry height="110" width="247.20472440944883" x="177.48031496062993" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-59" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#00897B;strokeWidth=1;fontColor=#004D40;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;第2层：生理固化&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;(睡眠与重复)&lt;/span&gt;&lt;hr style=&quot;border-color: #00897B; margin: 5px 0;&quot;&gt;&lt;ul style=&quot;margin: 5px 0 0 0; padding-left: 20px; text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;&lt;li&gt;利用充足睡眠巩固记忆&lt;/li&gt;&lt;li&gt;碎片时间间隔重复&lt;/li&gt;&lt;li&gt;尊重脑科学&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="110" width="247.20472440944883" x="456.37795275590554" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-60" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#00897B;strokeWidth=1;fontColor=#004D40;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;第3层：MVP实战&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;(输出式学习)&lt;/span&gt;&lt;hr style=&quot;border-color: #00897B; margin: 5px 0;&quot;&gt;&lt;ul style=&quot;margin: 5px 0 0 0; padding-left: 20px; text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;&lt;li&gt;功能跑通 &amp;gt; 完美主义&lt;/li&gt;&lt;li&gt;结合LLM直接写代码&lt;/li&gt;&lt;li&gt;在Debug中暴露漏洞&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="110" width="247.20472440944883" x="735.275590551181" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-61" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#00897B;strokeWidth=1;fontColor=#004D40;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;第4层：社会化输出&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;(里程碑展示)&lt;/span&gt;&lt;hr style=&quot;border-color: #00897B; margin: 5px 0;&quot;&gt;&lt;ul style=&quot;margin: 5px 0 0 0; padding-left: 20px; text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;&lt;li&gt;每年掌握一项硬技能&lt;/li&gt;&lt;li&gt;做主页宣传卖点/证书&lt;/li&gt;&lt;li&gt;转化为实体资产&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="110" width="247.20472440944883" x="1014.1732283464567" y="695" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-65" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#FFB300;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="160" width="1242.3622047244094" x="25.354330708661415" y="830" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-66" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFECB3;strokeColor=#FFB300;strokeWidth=1.5;fontColor=#FF6F00;align=center;verticalAlign=middle;" value="&lt;b style=&quot;font-size: 16px;&quot;&gt;第一层&lt;br&gt;&lt;br&gt;生命底座&lt;br&gt;与系统防范&lt;/b&gt;" vertex="1">
+          <mxGeometry height="160" width="126.77165354330708" x="25.354330708661415" y="830" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-67" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#FF6F00;fillColor=none;strokeColor=none;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;生理优化为系统提供绝对支撑力，风险防范机制避免系统崩溃反噬与走偏。&lt;/b&gt;" vertex="1">
+          <mxGeometry height="25" width="1064.8818897637796" x="177.48031496062993" y="840" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-68" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FB8C00;strokeWidth=1;fontColor=#E65100;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;🧬 人体生理生态级优化&lt;/b&gt;&lt;hr style=&quot;border-color: #43A047; margin: 5px 0;&quot;&gt;&lt;ul style=&quot;margin: 5px 0 0 0; padding-left: 20px; text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;&lt;li&gt;必须22:00前入睡/每周跑步3H&lt;/li&gt;&lt;li&gt;每日15分钟冥想扫描&lt;/li&gt;&lt;li&gt;强制戒除熬夜等成瘾逃避&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="110" width="247.20472440944883" x="177.48031496062993" y="865" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-69" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FB8C00;strokeWidth=1;fontColor=#E65100;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;⚠️ 风险一：信息囤积陷阱&lt;/b&gt;&lt;hr style=&quot;border-color: #FB8C00; margin: 5px 0;&quot;&gt;&lt;div style=&quot;text-align: left; font-size: 13px; line-height: 1.4;&quot;&gt;&lt;b&gt;对策：彻底执行“信息破产”&lt;/b&gt;&lt;ul style=&quot;margin: 5px 0 0 0; padding-left: 20px;&quot;&gt;&lt;li&gt;周末无情清空未转化的AI笔记&lt;/li&gt;&lt;li&gt;五年后没用的数据全是垃圾&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="247.20472440944883" x="456.37795275590554" y="865" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-70" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FB8C00;strokeWidth=1;fontColor=#E65100;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;⚠️ 风险二：FOMO 技术焦虑&lt;/b&gt;&lt;hr style=&quot;border-color: #FB8C00; margin: 5px 0;&quot;&gt;&lt;div style=&quot;text-align: left; font-size: 13px; line-height: 1.4;&quot;&gt;&lt;b&gt;对策：启用价值过滤网&lt;/b&gt;&lt;ul style=&quot;margin: 5px 0 0 0; padding-left: 20px;&quot;&gt;&lt;li&gt;不学不能解决当下&lt;b&gt;主线&lt;/b&gt;的技术&lt;/li&gt;&lt;li&gt;哪怕圈子再火，五年后呢？&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="247.20472440944883" x="735.275590551181" y="865" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-71" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#FB8C00;strokeWidth=1;fontColor=#E65100;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;⚠️ 风险三：完美主义瘫痪&lt;/b&gt;&lt;hr style=&quot;border-color: #FB8C00; margin: 5px 0;&quot;&gt;&lt;div style=&quot;text-align: left; font-size: 13px; line-height: 1.4;&quot;&gt;&lt;b&gt;对策：先开枪，后瞄准&lt;/b&gt;&lt;ul style=&quot;margin: 5px 0 0 0; padding-left: 20px;&quot;&gt;&lt;li&gt;允许工具简陋与不完美推演&lt;/li&gt;&lt;li&gt;勿让准备工作成为伪勤奋借口&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;" vertex="1">
+          <mxGeometry height="110" width="247.20472440944883" x="1014.1732283464567" y="865" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-72" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECEFF1;strokeColor=#546E7A;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="990" width="253.54330708661416" x="1305.748031496063" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-73" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#263238;fillColor=none;strokeColor=none;" value="&lt;b style=&quot;font-size: 18px;&quot;&gt;四 大 第 一 性 原 理&lt;br&gt;(系统底层引擎)&lt;/b&gt;" vertex="1">
+          <mxGeometry height="60" width="253.54330708661416" x="1305.748031496063" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-74" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#546E7A;strokeWidth=1;fontColor=#263238;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;1. 价值时间轴原理&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;(五年法则)&lt;/span&gt;&lt;hr style=&quot;border-color: #546E7A; margin: 5px 0;&quot;&gt;&lt;ul style=&quot;margin: 5px 0 0 0; padding-left: 20px; text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;&lt;li&gt;剥离眼前的紧急感&lt;/li&gt;&lt;li&gt;用“五年后是否还有价值”&lt;/li&gt;&lt;li&gt;彻底剔除80%的伪需求&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="110" width="202.83464566929132" x="1331.1023622047244" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-75" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#546E7A;strokeWidth=1;fontColor=#263238;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;2. 二八杠杆原理&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;(80/20 Rule)&lt;/span&gt;&lt;hr style=&quot;border-color: #546E7A; margin: 5px 0;&quot;&gt;&lt;ul style=&quot;margin: 5px 0 0 0; padding-left: 20px; text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;&lt;li&gt;永远去寻找能带来&lt;/li&gt;&lt;li&gt;80%结果的那20%&lt;/li&gt;&lt;li&gt;核心关键动作&lt;b&gt;（输出）&lt;/b&gt;&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="110" width="202.83464566929132" x="1331.1023622047244" y="262" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-76" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#546E7A;strokeWidth=1;fontColor=#263238;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;3. 人机协作边界&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;(楚河汉界)&lt;/span&gt;&lt;hr style=&quot;border-color: #546E7A; margin: 5px 0;&quot;&gt;&lt;ul style=&quot;margin: 5px 0 0 0; padding-left: 20px; text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;&lt;li&gt;人脑掌控主观长期战略&lt;/li&gt;&lt;li&gt;决不让权给AI定方向&lt;/li&gt;&lt;li&gt;LLM掌控客观战术推演&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="110" width="202.83464566929132" x="1331.1023622047244" y="423" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-77" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#546E7A;strokeWidth=1;fontColor=#263238;align=center;verticalAlign=middle;spacing=8;" value="&lt;b style=&quot;font-size: 14px;&quot;&gt;4. 生理节律顺应&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size: 12px;&quot;&gt;(Count Energy)&lt;/span&gt;&lt;hr style=&quot;border-color: #546E7A; margin: 5px 0;&quot;&gt;&lt;ul style=&quot;margin: 5px 0 0 0; padding-left: 20px; text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;&lt;li&gt;清醒时死磕高难度主线&lt;/li&gt;&lt;li&gt;疲惫时降级做低端清理&lt;/li&gt;&lt;li&gt;顺从生理节律，绝不逆人性&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="110" width="202.83464566929132" x="1331.1023622047244" y="585" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-78" edge="1" parent="s1x-pVxz8RHmVTc7Oy0w-1" source="SLCEbYdilAT7MOBbuYth-74" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=1;html=1;strokeColor=#546E7A;strokeWidth=3;endArrow=classic;" target="SLCEbYdilAT7MOBbuYth-75">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-79" edge="1" parent="s1x-pVxz8RHmVTc7Oy0w-1" source="SLCEbYdilAT7MOBbuYth-75" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=1;html=1;strokeColor=#546E7A;strokeWidth=3;endArrow=classic;" target="SLCEbYdilAT7MOBbuYth-76">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-80" edge="1" parent="s1x-pVxz8RHmVTc7Oy0w-1" source="SLCEbYdilAT7MOBbuYth-76" style="edgeStyle=orthogonalEdgeStyle;curved=1;rounded=1;html=1;strokeColor=#546E7A;strokeWidth=3;endArrow=classic;" target="SLCEbYdilAT7MOBbuYth-77">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-81" edge="1" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=12;strokeColor=#43A047;fontColor=#43A047;endArrow=block;endFill=1;endSize=10;labelBackgroundColor=#FFFFFF;verticalAlign=middle;align=center;" value="&lt;b style=&quot;font-size:16px;&quot;&gt;精&lt;br&gt;力&lt;br&gt;与&lt;br&gt;能&lt;br&gt;量&lt;br&gt;的&lt;br&gt;消&lt;br&gt;耗&lt;br&gt;与&lt;br&gt;再&lt;br&gt;生&lt;br&gt;循&lt;br&gt;环&lt;/b&gt;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint y="990" as="sourcePoint" />
+            <mxPoint as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="SLCEbYdilAT7MOBbuYth-82" edge="1" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="edgeStyle=orthogonalEdgeStyle;html=1;strokeWidth=12;strokeColor=#E53935;fontColor=#E53935;endArrow=block;endFill=1;endSize=10;labelBackgroundColor=#FFFFFF;verticalAlign=middle;align=center;" value="&lt;b style=&quot;font-size:16px;&quot;&gt;信&lt;br&gt;息&lt;br&gt;与&lt;br&gt;技&lt;br&gt;能&lt;br&gt;的&lt;br&gt;价&lt;br&gt;值&lt;br&gt;变&lt;br&gt;现&lt;br&gt;闭&lt;br&gt;环&lt;/b&gt;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="1597.3228346456692" as="sourcePoint" />
+            <mxPoint x="1597.3228346456692" y="990" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="X3KE_PisFUAjgXy4JWZb-1" parent="s1x-pVxz8RHmVTc7Oy0w-1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;align=left;spacing=8;" value="&lt;div style=&quot;text-align: center; border-bottom: 1px solid #555; padding-bottom: 4px; margin-bottom: 4px;&quot;&gt;&lt;b style=&quot;color: #333;&quot;&gt;Tools List&lt;/b&gt;&lt;/div&gt;&lt;ul style=&quot;margin: 0; padding-left: 24px; text-align: left; line-height: 1.4; font-size: 13px;&quot;&gt;&lt;li&gt;[深思]: 铅笔，纸&lt;/li&gt;&lt;li&gt;[番茄]: 暂停回顾&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="90" width="164.80314960629923" x="1350.1181102362202" y="875" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

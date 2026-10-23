@@ -1,0 +1,3 @@
+- insert:
+    - id: study-copilot
+      name: '@local/dsh-study-copilot'

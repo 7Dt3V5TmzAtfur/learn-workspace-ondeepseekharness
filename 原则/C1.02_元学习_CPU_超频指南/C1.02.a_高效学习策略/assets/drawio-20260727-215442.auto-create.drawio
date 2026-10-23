@@ -1,0 +1,197 @@
+<mxfile host="Electron" agent="Obsidian">
+  <diagram name="Page-1" id="0">
+    <mxGraphModel dx="5030" dy="2305" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="465" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="XNTG3MUbBzei63mt0RzP-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#117A65;strokeWidth=2;fontColor=#004D40;align=center;" value="&lt;b style=&quot;font-size:26px&quot;&gt;《新生：七年就是一辈子》行动与反馈实战全景图&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:14px&quot;&gt;核心要义：抛弃空想与解释，建立【行动试错 ➔ 残酷复盘 ➔ 迭代算法 ➔ 跨界杠杆】的物理闭环&lt;/span&gt;" vertex="1">
+          <mxGeometry height="60" width="1360" x="10" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#666666;fontColor=#333333;" value="&lt;b&gt;#实战指南 #行动闭环&lt;br&gt;#PDCA迭代&lt;/b&gt;" vertex="1">
+          <mxGeometry height="40" width="140" x="20" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FAFAFA;strokeColor=#999999;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="200" width="960" x="180" y="860" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EEEEEE;strokeColor=#666666;strokeWidth=1.5;fontColor=#333333;align=center;" value="&lt;b style=&quot;font-size:16px&quot;&gt;初始设定&lt;br&gt;(Plan)&lt;br&gt;&lt;br&gt;清理系统&lt;/b&gt;" vertex="1">
+          <mxGeometry height="200" width="100" x="60" y="860" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-5" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#333333;fontStyle=1;" value="第一性原理：所有不以“自身实质性进步”为目的的想法，全都是毒概念，必须被隔离。" vertex="1">
+          <mxGeometry height="25" width="900" x="210" y="865" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-6" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#333333;fontStyle=1;fillColor=#E0E0E0;" value="底层动作：在脑海中完成“最差情况预演”，并给自己的系统预留足够的容错率和冗余度。" vertex="1">
+          <mxGeometry height="30" width="920" x="200" y="1020" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#666666;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#D32F2F&quot;&gt;1. 识别并剔除毒概念&lt;/b&gt;&lt;hr style=&quot;border-color:#DDDDDD;margin:5px 0&quot;&gt;列出“表现型/要面子”的念头&lt;br&gt;强行转化为“进取型/要成长”" vertex="1">
+          <mxGeometry height="80" width="180" x="210" y="915" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-8" edge="1" parent="1" source="XNTG3MUbBzei63mt0RzP-7" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#666666;strokeWidth=2;endArrow=block;" target="XNTG3MUbBzei63mt0RzP-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#666666;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#1976D2&quot;&gt;2. 设定未来对标轴&lt;/b&gt;&lt;hr style=&quot;border-color:#DDDDDD;margin:5px 0&quot;&gt;停止与他人的现状比较&lt;br&gt;写下自己5年后的量化目标" vertex="1">
+          <mxGeometry height="80" width="180" x="430" y="915" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-10" edge="1" parent="1" source="XNTG3MUbBzei63mt0RzP-9" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#666666;strokeWidth=2;endArrow=block;" target="XNTG3MUbBzei63mt0RzP-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-11" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#666666;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#388E3C&quot;&gt;3. 建立物理容错层&lt;/b&gt;&lt;hr style=&quot;border-color:#DDDDDD;margin:5px 0&quot;&gt;储蓄“防灾基金”/不All-in&lt;br&gt;接受自己和世界的不完美" vertex="1">
+          <mxGeometry height="80" width="180" x="650" y="915" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-12" edge="1" parent="1" source="XNTG3MUbBzei63mt0RzP-11" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#666666;strokeWidth=2;endArrow=block;" target="XNTG3MUbBzei63mt0RzP-13">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-13" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#666666;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#E64A19&quot;&gt;4. 沙盘推演(做功课)&lt;/b&gt;&lt;hr style=&quot;border-color:#DDDDDD;margin:5px 0&quot;&gt;行动前在脑中预演全流程&lt;br&gt;计算基础概率与胜算" vertex="1">
+          <mxGeometry height="80" width="180" x="870" y="915" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-14" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#81C784;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="200" width="960" x="180" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-15" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#C8E6C9;strokeColor=#4CAF50;strokeWidth=1.5;fontColor=#1B5E20;align=center;" value="&lt;b style=&quot;font-size:16px&quot;&gt;极速行动&lt;br&gt;(Do)&lt;br&gt;&lt;br&gt;碰撞现实&lt;/b&gt;" vertex="1">
+          <mxGeometry height="200" width="100" x="60" y="620" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-16" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#1B5E20;fontStyle=1;" value="第一性原理：新领域没有地图，只有先乱撞（行动）才能获得坐标（反馈），想清楚是做不出来的。" vertex="1">
+          <mxGeometry height="25" width="900" x="210" y="625" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-17" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#1B5E20;fontStyle=1;fillColor=#A5D6A7;" value="底层动作：关闭无效输入源，切断毫无意义的争论，强行以公开的作品/产品去经受市场和他人的毒打。" vertex="1">
+          <mxGeometry height="30" width="920" x="200" y="780" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-18" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#81C784;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#2E7D32&quot;&gt;1. 开启“苍蝇模式”&lt;/b&gt;&lt;hr style=&quot;border-color:#DDDDDD;margin:5px 0&quot;&gt;在新领域无视嘲笑乱撞试错&lt;br&gt;快速多线程并发测试" vertex="1">
+          <mxGeometry height="80" width="180" x="210" y="675" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-19" edge="1" parent="1" source="XNTG3MUbBzei63mt0RzP-18" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#4CAF50;strokeWidth=2;endArrow=block;" target="XNTG3MUbBzei63mt0RzP-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-20" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#81C784;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#2E7D32&quot;&gt;2. 彻底戒断群聊/争论&lt;/b&gt;&lt;hr style=&quot;border-color:#DDDDDD;margin:5px 0&quot;&gt;把所有群静音免打扰&lt;br&gt;放弃说服他人，只做事实" vertex="1">
+          <mxGeometry height="80" width="180" x="430" y="675" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-21" edge="1" parent="1" source="XNTG3MUbBzei63mt0RzP-20" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#4CAF50;strokeWidth=2;endArrow=block;" target="XNTG3MUbBzei63mt0RzP-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-22" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#81C784;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#2E7D32&quot;&gt;3. 强制公开输出&lt;/b&gt;&lt;hr style=&quot;border-color:#DDDDDD;margin:5px 0&quot;&gt;用实名写作/做项目/售卖&lt;br&gt;拿作品去验证市场反应" vertex="1">
+          <mxGeometry height="80" width="180" x="650" y="675" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-23" edge="1" parent="1" source="XNTG3MUbBzei63mt0RzP-22" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#4CAF50;strokeWidth=2;endArrow=block;" target="XNTG3MUbBzei63mt0RzP-24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-24" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#81C784;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#C62828&quot;&gt;4. 承受现实反作用力&lt;/b&gt;&lt;hr style=&quot;border-color:#DDDDDD;margin:5px 0&quot;&gt;收获市场的唾骂或买单&lt;br&gt;感受真金白银的损失或盈利" vertex="1">
+          <mxGeometry height="80" width="180" x="870" y="675" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-25" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#64B5F6;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="200" width="960" x="180" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-26" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#BBDEFB;strokeColor=#2196F3;strokeWidth=1.5;fontColor=#0D47A1;align=center;" value="&lt;b style=&quot;font-size:16px&quot;&gt;残酷检验&lt;br&gt;(Check/Act)&lt;br&gt;&lt;br&gt;修正算法&lt;/b&gt;" vertex="1">
+          <mxGeometry height="200" width="100" x="60" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-27" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#0D47A1;fontStyle=1;" value="第一性原理：不要用嘴道歉，用行动道歉；人微易怒，只有承认“我错了且我很差”，才能重启进化。" vertex="1">
+          <mxGeometry height="25" width="900" x="210" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-28" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#0D47A1;fontStyle=1;fillColor=#90CAF9;" value="底层动作：把错误抽离出“自尊”，当做代码Bug来修；一旦找到门道，立刻切换聚光灯般的专注力。" vertex="1">
+          <mxGeometry height="30" width="920" x="200" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-29" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#64B5F6;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#1565C0&quot;&gt;1. 建立「蠢事黑本」&lt;/b&gt;&lt;hr style=&quot;border-color:#DDDDDD;margin:5px 0&quot;&gt;写下所有因自欺欺人犯的蠢&lt;br&gt;作为筛子过滤未来的错误" vertex="1">
+          <mxGeometry height="80" width="180" x="210" y="435" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-30" edge="1" parent="1" source="XNTG3MUbBzei63mt0RzP-29" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2196F3;strokeWidth=2;endArrow=block;" target="XNTG3MUbBzei63mt0RzP-31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-31" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#64B5F6;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#1565C0&quot;&gt;2. 行动致歉与弥补&lt;/b&gt;&lt;hr style=&quot;border-color:#DDDDDD;margin:5px 0&quot;&gt;认亏并全额承担损失&lt;br&gt;把耗在辩解的精力拿来改进" vertex="1">
+          <mxGeometry height="80" width="180" x="430" y="435" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-32" edge="1" parent="1" source="XNTG3MUbBzei63mt0RzP-31" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2196F3;strokeWidth=2;endArrow=block;" target="XNTG3MUbBzei63mt0RzP-33">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-33" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#64B5F6;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#1565C0&quot;&gt;3. 切换“蜜蜂模式”&lt;/b&gt;&lt;hr style=&quot;border-color:#DDDDDD;margin:5px 0&quot;&gt;找到关键反馈口后停止试错&lt;br&gt;朝着一个特定方向高频输入" vertex="1">
+          <mxGeometry height="80" width="180" x="650" y="435" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-34" edge="1" parent="1" source="XNTG3MUbBzei63mt0RzP-33" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#2196F3;strokeWidth=2;endArrow=block;" target="XNTG3MUbBzei63mt0RzP-35">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-35" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#64B5F6;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#F57F17&quot;&gt;4. 教是最好的学&lt;/b&gt;&lt;hr style=&quot;border-color:#DDDDDD;margin:5px 0&quot;&gt;将修正后的方法论教给别人&lt;br&gt;在分享中完成知识的重组" vertex="1">
+          <mxGeometry height="80" width="180" x="870" y="435" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-36" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#BA68C8;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="200" width="960" x="180" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-37" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#9C27B0;strokeWidth=1.5;fontColor=#4A148C;align=center;" value="&lt;b style=&quot;font-size:16px&quot;&gt;杠杆跃迁&lt;br&gt;(Scale)&lt;br&gt;&lt;br&gt;静待复利&lt;/b&gt;" vertex="1">
+          <mxGeometry height="200" width="100" x="60" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-38" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#4A148C;fontStyle=1;" value="第一性原理：打造超越单点时间和个人体力的“可复制繁殖资产”，从线性劳动力转化为系统架构师。" vertex="1">
+          <mxGeometry height="25" width="900" x="210" y="145" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-39" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#4A148C;fontStyle=1;fillColor=#D1C4E9;" value="底层动作：用资本、高价值IP和顶级战友网络作为杠杆，等待足够长的时间让“复利曲线”穿过拐点。" vertex="1">
+          <mxGeometry height="30" width="920" x="200" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-40" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#BA68C8;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#6A1B9A&quot;&gt;1. 阻断被动/面子支出&lt;/b&gt;&lt;hr style=&quot;border-color:#DDDDDD;margin:5px 0&quot;&gt;识别“必虚”与“必需”开销&lt;br&gt;停止为虚荣心支付复利利息" vertex="1">
+          <mxGeometry height="80" width="180" x="210" y="195" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-41" edge="1" parent="1" source="XNTG3MUbBzei63mt0RzP-40" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9C27B0;strokeWidth=2;endArrow=block;" target="XNTG3MUbBzei63mt0RzP-42">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-42" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#BA68C8;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#6A1B9A&quot;&gt;2. 创造多维/可复制IP&lt;/b&gt;&lt;hr style=&quot;border-color:#DDDDDD;margin:5px 0&quot;&gt;做有繁殖能力的知识产品&lt;br&gt;出版书籍/做课以获取睡后收入" vertex="1">
+          <mxGeometry height="80" width="180" x="430" y="195" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-43" edge="1" parent="1" source="XNTG3MUbBzei63mt0RzP-42" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9C27B0;strokeWidth=2;endArrow=block;" target="XNTG3MUbBzei63mt0RzP-44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-44" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#BA68C8;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#6A1B9A&quot;&gt;3. 组建极高门槛战友局&lt;/b&gt;&lt;hr style=&quot;border-color:#DDDDDD;margin:5px 0&quot;&gt;只与有能力/肯付出的同类结盟&lt;br&gt;创造双赢甚至多赢局" vertex="1">
+          <mxGeometry height="80" width="180" x="650" y="195" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-45" edge="1" parent="1" source="XNTG3MUbBzei63mt0RzP-44" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#9C27B0;strokeWidth=2;endArrow=block;" target="XNTG3MUbBzei63mt0RzP-46">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-46" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E1;strokeColor=#BA68C8;strokeWidth=2;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#D50000&quot;&gt;4. 迎接 Serendipity&lt;/b&gt;&lt;hr style=&quot;border-color:#DDDDDD;margin:5px 0&quot;&gt;保持开放并持续研究新事物&lt;br&gt;享受复利终局的神奇兑现" vertex="1">
+          <mxGeometry height="80" width="180" x="870" y="195" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-47" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8F9FA;strokeColor=#999999;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="920" width="170" x="1170" y="140" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-48" parent="1" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;fontColor=#333;fontStyle=1;" value="&lt;br&gt;&lt;b style=&quot;font-size:16px&quot;&gt;贯穿引擎&lt;br&gt;P D C A&lt;/b&gt;&lt;br&gt;&lt;br&gt;持续自我进化&lt;br&gt;&lt;b style=&quot;font-size:18px;color:#D32F2F&quot;&gt;反向塑造隔离&lt;/b&gt;" vertex="1">
+          <mxGeometry height="120" width="170" x="1170" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-49" edge="1" parent="1" source="XNTG3MUbBzei63mt0RzP-50" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#999999;strokeWidth=2;endArrow=block;" target="XNTG3MUbBzei63mt0RzP-52">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-50" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#999999;strokeWidth=1;shadow=1;" value="&lt;b&gt;[ Plan ] 概念打磨&lt;/b&gt;&lt;br&gt;&lt;br&gt;极速获取定义&lt;br&gt;排除杂念" vertex="1">
+          <mxGeometry height="90" width="130" x="1190" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-51" edge="1" parent="1" source="XNTG3MUbBzei63mt0RzP-52" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#999999;strokeWidth=2;endArrow=block;" target="XNTG3MUbBzei63mt0RzP-54">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-52" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#999999;strokeWidth=1;shadow=1;" value="&lt;b&gt;[ Do ] 暴力破冰&lt;/b&gt;&lt;br&gt;&lt;br&gt;非登山的从容&lt;br&gt;而是死磕的破冰" vertex="1">
+          <mxGeometry height="90" width="130" x="1190" y="480" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-53" edge="1" parent="1" source="XNTG3MUbBzei63mt0RzP-54" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#999999;strokeWidth=2;endArrow=block;" target="XNTG3MUbBzei63mt0RzP-56">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-54" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#999999;strokeWidth=1;shadow=1;" value="&lt;b&gt;[ Check ] 剔除冗余&lt;/b&gt;&lt;br&gt;&lt;br&gt;记录黑本&lt;br&gt;修正算法BUG" vertex="1">
+          <mxGeometry height="90" width="130" x="1190" y="660" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-55" edge="1" parent="1" source="XNTG3MUbBzei63mt0RzP-56" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#D32F2F;strokeWidth=2;endArrow=block;dashed=1;" target="XNTG3MUbBzei63mt0RzP-50">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1360" y="885" />
+              <mxPoint x="1360" y="345" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-56" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#999999;strokeWidth=1;shadow=1;" value="&lt;b&gt;[ Act ] 放大复利&lt;/b&gt;&lt;br&gt;&lt;br&gt;打包为IP产品&lt;br&gt;投资时间/金钱" vertex="1">
+          <mxGeometry height="90" width="130" x="1190" y="840" as="geometry" />
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-57" edge="1" parent="1" style="edgeStyle=none;html=1;strokeWidth=12;strokeColor=#E64A19;fontColor=#E64A19;endArrow=block;endFill=1;endSize=10;verticalAlign=middle;align=center;textDirection=vertical-lr;spacing=20;fontFamily=微软雅黑;" value="&lt;b style=&quot;font-size: 18px;&quot;&gt;行动反馈驱动：从概念内化到跨界杠杆的生长流&lt;/b&gt;">
+          <mxGeometry relative="1" x="-0.02" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="30" y="1050" as="sourcePoint" />
+            <mxPoint x="30" y="140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="XNTG3MUbBzei63mt0RzP-58" edge="1" parent="1" style="edgeStyle=none;html=1;strokeWidth=12;strokeColor=#1976D2;fontColor=#1976D2;endArrow=block;endFill=1;endSize=10;verticalAlign=middle;align=center;textDirection=vertical-lr;spacing=18;fontFamily=微软雅黑;" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;&lt;b&gt;现实毒打降维：用真实盈亏与伤痛强行刷新脑内系统&lt;/b&gt;&lt;/span&gt;">
+          <mxGeometry relative="1" x="-0.02" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="1150" y="140" as="sourcePoint" />
+            <mxPoint x="1150" y="1050" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

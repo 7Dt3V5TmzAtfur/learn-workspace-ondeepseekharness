@@ -1,0 +1,327 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "command": "finalize",
+  "status": "fail",
+  "type": "architecture",
+  "quality": "standard",
+  "startedAt": "2026-10-23T20:05:51.726Z",
+  "specification": {
+    "path": "D:\\learn\\study-system\\tests\\.archify-test\\candidate.json",
+    "sha256": "5a12e71267a24e2b4062e5f2148c59a49ac00624b1aac9e8272b132b0a149e72",
+    "bytes": 22189
+  },
+  "artifact": {
+    "path": "D:\\learn\\study-system\\tests\\.archify-test\\graph.html",
+    "sha256": "3917a67a9186a760efd1ff84971a8343ce3528d0faa7a4b0f9ef91d5f8e58dda",
+    "bytes": 874722
+  },
+  "stages": {
+    "validate": {
+      "status": "fail",
+      "exitCode": 1,
+      "durationMs": null,
+      "command": [
+        "C:\\Users\\x\\.dsh\\dsh-runtimes\\dsh-primary-runtime\\dependencies\\node\\bin\\node.exe",
+        "C:\\Users\\x\\.skills-manager\\skills\\archify-2\\bin\\archify.mjs",
+        "deliver",
+        "architecture",
+        "D:\\learn\\study-system\\tests\\.archify-test\\candidate.json",
+        "D:\\learn\\study-system\\tests\\.archify-test\\graph.html",
+        "--quality",
+        "standard",
+        "--json"
+      ],
+      "receipt": {
+        "schemaVersion": 1,
+        "ok": false,
+        "command": "deliver",
+        "receiptId": "0ec1ab2c-965e-4376-b30f-7d8534797af0",
+        "stage": "render",
+        "type": "architecture",
+        "input": "D:\\learn\\study-system\\tests\\.archify-test\\candidate.json",
+        "output": "D:\\learn\\study-system\\tests\\.archify-test\\graph.html",
+        "error": "Architecture layout validation failed:\n- [composition/excessive-route-detour] architecture connections[31] id \"r31-collaboration-hitl\" \"collaboration\" -> \"hitl\" travels 2230px, 3.9x the 572px shortest obstacle-clearing orthogonal route, and reaches 64px beyond the content bounds — remove the distant via corridor or move it close to the connected content.",
+        "diagnostics": [
+          {
+            "code": "composition/excessive-route-detour",
+            "severity": "error",
+            "message": "[composition/excessive-route-detour] architecture connections[31] id \"r31-collaboration-hitl\" \"collaboration\" -> \"hitl\" travels 2230px, 3.9x the 572px shortest obstacle-clearing orthogonal route, and reaches 64px beyond the content bounds — remove the distant via corridor or move it close to the connected content.",
+            "subject": {
+              "diagramType": "architecture",
+              "collection": "connections",
+              "index": 31,
+              "id": "r31-collaboration-hitl",
+              "from": "collaboration",
+              "to": "hitl"
+            },
+            "evidence": {
+              "points": [
+                [
+                  978,
+                  524
+                ],
+                [
+                  978,
+                  546
+                ],
+                [
+                  1980,
+                  546
+                ],
+                [
+                  1980,
+                  728
+                ],
+                [
+                  978,
+                  728
+                ],
+                [
+                  978,
+                  750
+                ]
+              ],
+              "actualLengthPx": 2230,
+              "shortestLegalPoints": [
+                [
+                  978,
+                  524
+                ],
+                [
+                  978,
+                  528
+                ],
+                [
+                  959,
+                  528
+                ],
+                [
+                  959,
+                  546
+                ],
+                [
+                  805,
+                  546
+                ],
+                [
+                  805,
+                  746
+                ],
+                [
+                  978,
+                  746
+                ],
+                [
+                  978,
+                  750
+                ]
+              ],
+              "shortestLegalLengthPx": 572,
+              "detourRatio": 3.9,
+              "excessLengthPx": 1658,
+              "routeBounds": {
+                "left": 978,
+                "top": 524,
+                "right": 1980,
+                "bottom": 750,
+                "width": 1002,
+                "height": 226
+              },
+              "contentBounds": {
+                "left": 40,
+                "top": 40,
+                "right": 1916,
+                "bottom": 1234,
+                "width": 1876,
+                "height": 1194
+              },
+              "emptyExcursionPx": {
+                "left": 0,
+                "top": 0,
+                "right": 64,
+                "bottom": 0,
+                "maximum": 64
+              },
+              "emptyControlPointClearancePx": {
+                "maximum": 126,
+                "point": [
+                  1980,
+                  728
+                ]
+              },
+              "obstacleCount": 33,
+              "thresholds": {
+                "minimumDetourRatio": 2.5,
+                "minimumExcessLengthPx": 200,
+                "minimumEmptyExcursionPx": 96
+              }
+            },
+            "supportedFixes": [
+              "remove the distant via points and retry automatic routing, or keep the endpoint sides and move the via corridor near the connected nodes while preserving labels and direction"
+            ]
+          }
+        ],
+        "provenance": "failed",
+        "update": {
+          "status": "unavailable",
+          "installedVersion": null,
+          "availableVersion": null,
+          "releaseNotes": null,
+          "checkedAt": null,
+          "source": null,
+          "noticeRequired": false,
+          "noticeText": null,
+          "reason": "disabled"
+        }
+      },
+      "execution": "embedded-in-deliver"
+    },
+    "deliver": {
+      "status": "not-run",
+      "execution": "blocked-by-validate"
+    }
+  },
+  "browserCheck": {
+    "requested": true,
+    "ran": false
+  },
+  "diagnostics": [
+    {
+      "code": "composition/excessive-route-detour",
+      "severity": "error",
+      "message": "[composition/excessive-route-detour] architecture connections[31] id \"r31-collaboration-hitl\" \"collaboration\" -> \"hitl\" travels 2230px, 3.9x the 572px shortest obstacle-clearing orthogonal route, and reaches 64px beyond the content bounds — remove the distant via corridor or move it close to the connected content.",
+      "subject": {
+        "diagramType": "architecture",
+        "collection": "connections",
+        "index": 31,
+        "id": "r31-collaboration-hitl",
+        "from": "collaboration",
+        "to": "hitl"
+      },
+      "evidence": {
+        "points": [
+          [
+            978,
+            524
+          ],
+          [
+            978,
+            546
+          ],
+          [
+            1980,
+            546
+          ],
+          [
+            1980,
+            728
+          ],
+          [
+            978,
+            728
+          ],
+          [
+            978,
+            750
+          ]
+        ],
+        "actualLengthPx": 2230,
+        "shortestLegalPoints": [
+          [
+            978,
+            524
+          ],
+          [
+            978,
+            528
+          ],
+          [
+            959,
+            528
+          ],
+          [
+            959,
+            546
+          ],
+          [
+            805,
+            546
+          ],
+          [
+            805,
+            746
+          ],
+          [
+            978,
+            746
+          ],
+          [
+            978,
+            750
+          ]
+        ],
+        "shortestLegalLengthPx": 572,
+        "detourRatio": 3.9,
+        "excessLengthPx": 1658,
+        "routeBounds": {
+          "left": 978,
+          "top": 524,
+          "right": 1980,
+          "bottom": 750,
+          "width": 1002,
+          "height": 226
+        },
+        "contentBounds": {
+          "left": 40,
+          "top": 40,
+          "right": 1916,
+          "bottom": 1234,
+          "width": 1876,
+          "height": 1194
+        },
+        "emptyExcursionPx": {
+          "left": 0,
+          "top": 0,
+          "right": 64,
+          "bottom": 0,
+          "maximum": 64
+        },
+        "emptyControlPointClearancePx": {
+          "maximum": 126,
+          "point": [
+            1980,
+            728
+          ]
+        },
+        "obstacleCount": 33,
+        "thresholds": {
+          "minimumDetourRatio": 2.5,
+          "minimumExcessLengthPx": 200,
+          "minimumEmptyExcursionPx": 96
+        }
+      },
+      "supportedFixes": [
+        "remove the distant via points and retry automatic routing, or keep the endpoint sides and move the via corridor near the connected nodes while preserving labels and direction"
+      ]
+    }
+  ],
+  "evidence": {
+    "receipt": "D:\\learn\\study-system\\tests\\.archify-test\\review-2\\graph.finalize.json",
+    "summaryReceipt": "D:\\learn\\study-system\\tests\\.archify-test\\review-2\\graph.finalize-summary.json"
+  },
+  "visualReview": "not-requested",
+  "failedStage": "validate",
+  "finishedAt": "2026-10-23T20:05:52.192Z",
+  "durationMs": 466,
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-22T15:49:57.281Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  }
+}

@@ -1,0 +1,162 @@
+<mxfile host="Electron" agent="Obsidian">
+  <diagram name="Page-1" id="0">
+    <mxGraphModel dx="4065" dy="1676" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="465" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E8FF;strokeColor=#555555;strokeWidth=1.5;fontColor=#330066;align=center;" value="&lt;b style=&quot;font-size:26px&quot;&gt;从补偿式安慰到行为强化：重塑你的自我奖励系统&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:14px&quot;&gt;核心要义：放弃“吃苦交易”的被动补偿思维，用精准的正向反馈为具体动作充能，让好习惯自动运转。&lt;/span&gt;" vertex="1">
+          <mxGeometry height="60" width="1370" x="-30" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="tag" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#555555;fontColor=#333333;fontStyle=1;align=center;" value="#行为强化 #反补偿机制 #习惯重塑" vertex="1">
+          <mxGeometry height="30" width="220" x="-10" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="layer4_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F5FF;strokeColor=#555555;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="220" width="960" x="140" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="layer4_lbl" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0F5FF;strokeColor=#555555;strokeWidth=1.5;fontColor=#001144;align=center;" value="&lt;b style=&quot;font-size:16px&quot;&gt;实践层&lt;br&gt;&lt;br&gt;场景重塑&lt;/b&gt;" vertex="1">
+          <mxGeometry height="220" width="100" x="20" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="layer4_first_principle" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#001144;fontStyle=1;" value="【第一性原理】好的奖励机制本身就是源源不断的动力，让你不靠硬撑一步步重塑自我。" vertex="1">
+          <mxGeometry height="25" width="900" x="170" y="105" as="geometry" />
+        </mxCell>
+        <mxCell id="layer4_bottom_logic" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#001144;fontStyle=1;fillColor=#E6EEFF;" value="【底层拷问】每次犒劳前停下自问：“这个奖励，是在强化我刚才的动作，还是在补偿我刚才受过的苦？”" vertex="1">
+          <mxGeometry height="30" width="920" x="160" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="n4_1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;【读书场景】&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;❌ 补偿：刷几小时短视频&lt;br&gt;✅ 奖励：不拿手机凭窗回味&lt;br&gt;&lt;font color=&#39;#555555&#39;&gt;(沉淀舒服的完成感)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="90" width="260" x="180" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="n4_2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;【早起场景】&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;❌ 补偿：周末睡懒觉到中午&lt;br&gt;✅ 奖励：一顿不慌不忙的早餐&lt;br&gt;&lt;font color=&#39;#555555&#39;&gt;(享受专属的悠闲时光)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="90" width="260" x="480" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="n4_3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;【健身场景】&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;❌ 补偿：一顿高热量大餐&lt;br&gt;✅ 奖励：慢洗热水澡/好喝蛋白饮&lt;br&gt;&lt;font color=&#39;#555555&#39;&gt;(体会身体被照顾的清爽)&lt;/font&gt;" vertex="1">
+          <mxGeometry height="90" width="260" x="780" y="160" as="geometry" />
+        </mxCell>
+        <mxCell id="layer3_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#555555;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="220" width="960" x="140" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="layer3_lbl" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F0FDF4;strokeColor=#555555;strokeWidth=1.5;fontColor=#064E3B;align=center;" value="&lt;b style=&quot;font-size:16px&quot;&gt;规则层&lt;br&gt;&lt;br&gt;双重校验&lt;/b&gt;" vertex="1">
+          <mxGeometry height="220" width="100" x="20" y="340" as="geometry" />
+        </mxCell>
+        <mxCell id="layer3_first_principle" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#064E3B;fontStyle=1;" value="【第一性原理】有效的奖励必须让大脑清晰识别目标动作，并彻底消除神经指令层面的冲突。" vertex="1">
+          <mxGeometry height="25" width="900" x="170" y="345" as="geometry" />
+        </mxCell>
+        <mxCell id="layer3_bottom_logic" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#064E3B;fontStyle=1;fillColor=#DCFCE7;" value="【底层机制】奖励同时满足“精确识别”与“方向同频”两个条件，否则你的犒劳就是在亲手拆台。" vertex="1">
+          <mxGeometry height="30" width="920" x="160" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="group3_1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#555555;strokeWidth=1;dashed=1;verticalAlign=top;spacingTop=5;fontStyle=1;" value="条件一：精准度校验" vertex="1">
+          <mxGeometry height="120" width="410" x="180" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="n3_1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;精准标记动作本身&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;奖励具体动作而非模糊的最终结果&lt;br&gt;大脑只记动作，无法挂钩遥远目标&lt;br&gt;(❌奖励瘦十斤 ✅奖励今天早睡)" vertex="1">
+          <mxGeometry height="80" width="370" x="200" y="415" as="geometry" />
+        </mxCell>
+        <mxCell id="group3_2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#555555;strokeWidth=1;dashed=1;verticalAlign=top;spacingTop=5;fontStyle=1;" value="条件二：方向性校验" vertex="1">
+          <mxGeometry height="120" width="410" x="650" y="385" as="geometry" />
+        </mxCell>
+        <mxCell id="n3_2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;避免长期动机混乱&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;奖励本身绝不能与想要的方向矛盾&lt;br&gt;否则长期会倾向于更简单刺激的选项&lt;br&gt;(❌用暴饮暴食奖励健康生活尝试)" vertex="1">
+          <mxGeometry height="80" width="370" x="670" y="415" as="geometry" />
+        </mxCell>
+        <mxCell id="layer2_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E8;strokeColor=#555555;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="220" width="960" x="140" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="layer2_lbl" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF8E8;strokeColor=#555555;strokeWidth=1.5;fontColor=#553300;align=center;" value="&lt;b style=&quot;font-size:16px&quot;&gt;原理层&lt;br&gt;&lt;br&gt;核心作用&lt;/b&gt;" vertex="1">
+          <mxGeometry height="220" width="100" x="20" y="580" as="geometry" />
+        </mxCell>
+        <mxCell id="layer2_first_principle" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#553300;fontStyle=1;" value="【第一性原理】奖励在行为科学里唯一的原始作用，就是强化你想要重复的特定行为。" vertex="1">
+          <mxGeometry height="25" width="900" x="170" y="585" as="geometry" />
+        </mxCell>
+        <mxCell id="layer2_bottom_logic" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#553300;fontStyle=1;fillColor=#FFF3D4;" value="【底层机制】向大脑发送清晰、精准的强有力信号：“刚才这个动作很重要，下次请继续。”" vertex="1">
+          <mxGeometry height="30" width="920" x="160" y="760" as="geometry" />
+        </mxCell>
+        <mxCell id="n2_1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;捕捉关键动作&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;让大脑精准识别出&lt;br&gt;究竟该重复什么行为" vertex="1">
+          <mxGeometry height="80" width="220" x="190" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="n2_2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;植入即时反馈&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;告诉大脑：刚才的&lt;br&gt;这个动作非常重要" vertex="1">
+          <mxGeometry height="80" width="220" x="510" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="n2_3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;形成自驱闭环&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;将过程的苦化为甜头&lt;br&gt;建立无痛重复机制" vertex="1">
+          <mxGeometry height="80" width="220" x="830" y="640" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_1" edge="1" parent="1" source="n2_1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=2;endArrow=block;" target="n2_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2_2" edge="1" parent="1" source="n2_2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=2;endArrow=block;" target="n2_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="layer1_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF0F0;strokeColor=#555555;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="220" width="960" x="140" y="820" as="geometry" />
+        </mxCell>
+        <mxCell id="layer1_lbl" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF0F0;strokeColor=#555555;strokeWidth=1.5;fontColor=#660000;align=center;" value="&lt;b style=&quot;font-size:16px&quot;&gt;陷阱层&lt;br&gt;&lt;br&gt;补偿困境&lt;/b&gt;" vertex="1">
+          <mxGeometry height="220" width="100" x="20" y="820" as="geometry" />
+        </mxCell>
+        <mxCell id="layer1_first_principle" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#660000;fontStyle=1;" value="【第一性原理】警惕极其隐蔽的陷阱：“奖励自己”往往成了悄悄扯后腿的隐形阻力。" vertex="1">
+          <mxGeometry height="25" width="900" x="170" y="825" as="geometry" />
+        </mxCell>
+        <mxCell id="layer1_bottom_logic" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#660000;fontStyle=1;fillColor=#FFE6E6;" value="【底层病因】混淆了被动安抚与主动塑造：大脑最终只记住了过程的苦和最后那顿大餐。" vertex="1">
+          <mxGeometry height="30" width="920" x="160" y="1000" as="geometry" />
+        </mxCell>
+        <mxCell id="n1_1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#990000&quot;&gt;压抑式努力&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;咬牙忍耐很久&lt;br&gt;积累大量心理痛苦" vertex="1">
+          <mxGeometry height="80" width="180" x="180" y="880" as="geometry" />
+        </mxCell>
+        <mxCell id="n1_2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#990000&quot;&gt;交易式补偿&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;终于可以放纵一次&lt;br&gt;把犒劳当成交易筹码" vertex="1">
+          <mxGeometry height="80" width="180" x="420" y="880" as="geometry" />
+        </mxCell>
+        <mxCell id="n1_3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#990000&quot;&gt;释放错误信号&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;行为与目标互相拆台&lt;br&gt;大脑记录下补偿的刺激" vertex="1">
+          <mxGeometry height="80" width="180" x="660" y="880" as="geometry" />
+        </mxCell>
+        <mxCell id="n1_4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px;color:#990000&quot;&gt;动力彻底耗尽&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;越来越没劲不想动&lt;br&gt;进步被亲手毁掉" vertex="1">
+          <mxGeometry height="80" width="180" x="900" y="880" as="geometry" />
+        </mxCell>
+        <mxCell id="e1_1" edge="1" parent="1" source="n1_1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#990000;strokeWidth=2;endArrow=block;" target="n1_2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e1_2" edge="1" parent="1" source="n1_2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#990000;strokeWidth=2;endArrow=block;" target="n1_3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e1_3" edge="1" parent="1" source="n1_3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#990000;strokeWidth=2;endArrow=block;" target="n1_4">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="arrow_up" edge="1" parent="1" style="edgeStyle=none;html=1;strokeWidth=12;strokeColor=#0277BD;fontColor=#0277BD;endArrow=block;endFill=1;endSize=10;verticalAlign=middle;align=center;textDirection=vertical-lr;spacing=20;fontFamily=微软雅黑;" value="&lt;b style=&quot;font-size:18px;color:#0277BD;&quot;&gt;从「补偿痛苦」向「强化行为」的渐进跃迁&lt;/b&gt;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="-10" y="1040" as="sourcePoint" />
+            <mxPoint x="-10" y="100" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="arrow_down" edge="1" parent="1" style="edgeStyle=none;html=1;strokeWidth=12;strokeColor=#AD1457;fontColor=#AD1457;endArrow=block;endFill=1;endSize=10;verticalAlign=middle;align=center;textDirection=vertical-lr;spacing=20;fontFamily=微软雅黑;" value="&lt;b style=&quot;font-size:18px;&quot;&gt;让想成为的那个自己一步一步被塑造出来&lt;/b&gt;">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="1140" y="100" as="sourcePoint" />
+            <mxPoint x="1140" y="1040" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="right_pillar_bg" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8F8F8;strokeColor=#555555;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="940" width="180" x="1180" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="right_pillar_title" parent="1" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;fontColor=#222;fontStyle=1;" value="&lt;br&gt;&lt;b style=&quot;font-size:16px&quot;&gt;全局动力引擎基座&lt;/b&gt;&lt;br&gt;&lt;br&gt;正向行为塑造引擎&lt;br&gt;&lt;b style=&quot;font-size:14px;color:#900&quot;&gt;动力 = 标记动作 +&lt;br&gt;目标同频 + 愉悦反馈&lt;/b&gt;" vertex="1">
+          <mxGeometry height="150" width="180" x="1180" y="110" as="geometry" />
+        </mxCell>
+        <mxCell id="pillar_n1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b&gt;【觉察系统】&lt;/b&gt;&lt;br&gt;&lt;br&gt;时刻区分被动安抚&lt;br&gt;与主动强化" vertex="1">
+          <mxGeometry height="90" width="140" x="1200" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="pillar_n2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b&gt;【锚定系统】&lt;/b&gt;&lt;br&gt;&lt;br&gt;精准定位微小动作&lt;br&gt;消除结果焦虑" vertex="1">
+          <mxGeometry height="90" width="140" x="1200" y="400" as="geometry" />
+        </mxCell>
+        <mxCell id="pillar_n3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b&gt;【体验系统】&lt;/b&gt;&lt;br&gt;&lt;br&gt;将意志力消耗转为&lt;br&gt;无痛闭环反馈体验" vertex="1">
+          <mxGeometry height="90" width="140" x="1200" y="540" as="geometry" />
+        </mxCell>
+        <mxCell id="pillar_tools1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;align=left;spacingLeft=10;" value="&lt;div&gt;&lt;b&gt;Tools List (原理层)&lt;/b&gt;&lt;/div&gt;&lt;br&gt;[记录类]: 行为反馈日记&lt;br&gt;[追踪类]: Loop, Strides&lt;br&gt;(专注打卡执行过程)" vertex="1">
+          <mxGeometry height="110" width="140" x="1200" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="pillar_tools2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;align=left;spacingLeft=10;" value="&lt;div&gt;&lt;b&gt;Tools List (规则层)&lt;/b&gt;&lt;/div&gt;&lt;br&gt;[觉察类]: 每日补偿自检&lt;br&gt;[重塑类]: 非冲突型奖励&lt;br&gt;(梳理个人奖励清单库)" vertex="1">
+          <mxGeometry height="110" width="140" x="1200" y="830" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_pillar1" edge="1" parent="1" source="pillar_n2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=2;endArrow=classic;" target="pillar_n1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_pillar2" edge="1" parent="1" source="pillar_n3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=2;endArrow=classic;" target="pillar_n2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -1,0 +1,35 @@
+{
+  "name": "@local/dsh-study-copilot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI 辅助学习系统：任意格式资料导入 → 读前建构 → 渐构标注与三色注意力 → 知识图谱 → 费曼考核",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "lib/**/*.js",
+    "locale/*.json",
+    "icon.svg",
+    "cordis.patch.yml"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  },
+  "license": "MIT"
+}

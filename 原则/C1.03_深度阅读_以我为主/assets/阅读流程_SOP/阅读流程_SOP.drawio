@@ -1,0 +1,96 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.1 Chrome/142.0.7444.265 Electron/39.8.0 Safari/537.36" version="29.6.1">
+  <diagram name="第 1 页" id="b18xoSqt9gpNd59e4bEj">
+    <mxGraphModel dx="1452" dy="1899" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="start" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#336600;fontColor=#1a3300;strokeWidth=2;" value="&lt;b&gt;开始阅读&lt;/b&gt;" vertex="1">
+          <mxGeometry height="40" width="100" x="385" y="-40" as="geometry" />
+        </mxCell>
+        <mxCell id="p1_scan" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#336600;fontColor=#1a3300;strokeWidth=2;" value="&lt;b&gt;阶段一：检视阅读&lt;/b&gt;&lt;br&gt;（15-30分钟）&lt;br&gt;查阅封面 / 目录 / 序言" vertex="1">
+          <mxGeometry height="60" width="150" x="360" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="decision" parent="1" style="shape=rhombus;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#333333;strokeWidth=2;" value="&lt;b&gt;分诊：书籍评估&lt;/b&gt;&lt;br&gt;它属于哪种类型？" vertex="1">
+          <mxGeometry height="70" width="170" x="350" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="e_start_scan" edge="1" parent="1" source="start" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;strokeColor=#336600;strokeWidth=2;" target="p1_scan">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_scan_dec" edge="1" parent="1" source="p1_scan" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;strokeColor=#336600;strokeWidth=2;" target="decision">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="discard" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#990000;fontColor=#4d0000;strokeWidth=2;" value="&lt;b&gt;烂书 / 不及预期&lt;/b&gt;&lt;br&gt;➡️ 直接弃读，止损" vertex="1">
+          <mxGeometry height="70" width="130" x="40" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="routeA" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#003399;fontColor=#001a4d;strokeWidth=2;" value="&lt;b&gt;路线A：看一部分&lt;/b&gt;&lt;br&gt;（查字典式阅读）&lt;br&gt;按需直达目标章节" vertex="1">
+          <mxGeometry height="70" width="130" x="200" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="routeB" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#b38600;fontColor=#4d3900;strokeWidth=2;" value="&lt;b&gt;路线B：快速理解&lt;/b&gt;&lt;br&gt;（淘金式阅读）&lt;br&gt;跳过废话抓取核心" vertex="1">
+          <mxGeometry height="70" width="130" x="360" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="routeC" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#4d0066;fontColor=#260033;strokeWidth=2;" value="&lt;b&gt;路线C：慢慢咀嚼&lt;/b&gt;&lt;br&gt;（对话式精读）&lt;br&gt;逐字推敲重构逻辑" vertex="1">
+          <mxGeometry height="70" width="130" x="520" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="routeD" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#cc6600;fontColor=#663300;strokeWidth=2;" value="&lt;b&gt;路线D：反复尝试&lt;/b&gt;&lt;br&gt;（螺旋式阅读）&lt;br&gt;读练结合知行循环" vertex="1">
+          <mxGeometry height="70" width="130" x="680" y="300" as="geometry" />
+        </mxCell>
+        <mxCell id="e_dec_discard" edge="1" parent="1" source="decision" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;strokeColor=#990000;strokeWidth=2;fontColor=#990000;labelBackgroundColor=#ffffff;" target="discard" value="无价值">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_dec_A" edge="1" parent="1" source="decision" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;strokeColor=#003399;strokeWidth=2;fontColor=#003399;labelBackgroundColor=#ffffff;" target="routeA" value="工具/参考">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_dec_B" edge="1" parent="1" source="decision" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;strokeColor=#b38600;strokeWidth=2;fontColor=#b38600;labelBackgroundColor=#ffffff;" target="routeB" value="资讯/畅销">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_dec_C" edge="1" parent="1" source="decision" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;strokeColor=#4d0066;strokeWidth=2;fontColor=#4d0066;labelBackgroundColor=#ffffff;" target="routeC" value="经典/理论">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_dec_D" edge="1" parent="1" source="decision" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;strokeColor=#cc6600;strokeWidth=2;fontColor=#cc6600;labelBackgroundColor=#ffffff;" target="routeD" value="实操/心法">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_loop_D" edge="1" parent="1" source="routeD" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;strokeColor=#cc6600;strokeWidth=2;fontColor=#cc6600;labelBackgroundColor=#ffffff;" target="routeD" value="碰壁后重读">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="830" y="335" />
+              <mxPoint x="830" y="270" />
+              <mxPoint x="777" y="270" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="p3_notes" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d0cee2;strokeColor=#56517e;fontColor=#1a1829;strokeWidth=2;" value="&lt;b&gt;阶段三：知识内化（只处理留存的精华）&lt;/b&gt;&lt;br&gt;1. 收集（折角/划线） ➡️ 2. 筛选（丢弃50%） ➡️ 3. 转述（用自己的话写：概念+案例+行动）" vertex="1">
+          <mxGeometry height="70" width="540" x="360" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="e_B_p3" edge="1" parent="1" source="routeB" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;strokeColor=#b38600;strokeWidth=2;" target="p3_notes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_C_p3" edge="1" parent="1" source="routeC" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;strokeColor=#4d0066;strokeWidth=2;" target="p3_notes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_D_p3" edge="1" parent="1" source="routeD" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;strokeColor=#cc6600;strokeWidth=2;" target="p3_notes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="p4_action" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cce5ff;strokeColor=#003366;fontColor=#001a33;strokeWidth=2;" value="&lt;b&gt;阶段四：行动与闭环 (阅读的最终目的)&lt;/b&gt;&lt;br&gt;【微小行动 MVP】：写下1个明天就能做的极简动作&lt;br&gt;【费曼输出】：将收获讲给别人听（社交媒体/朋友分享）" vertex="1">
+          <mxGeometry height="70" width="610" x="200" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="e_A_p4" edge="1" parent="1" source="routeA" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;strokeColor=#003399;strokeWidth=2;fontColor=#003399;labelBackgroundColor=#ffffff;" target="p4_action" value="忽略无关，直接实操">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="265" y="530" />
+              <mxPoint x="505" y="530" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="e_p3_p4" edge="1" parent="1" source="p3_notes" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;strokeColor=#56517e;strokeWidth=2;" target="p4_action">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="end" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#336600;fontColor=#1a3300;strokeWidth=2;" value="&lt;b&gt;知识资产沉淀&lt;/b&gt;" vertex="1">
+          <mxGeometry height="40" width="100" x="455" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="e_p4_end" edge="1" parent="1" source="p4_action" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;strokeColor=#003366;strokeWidth=2;" target="end">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

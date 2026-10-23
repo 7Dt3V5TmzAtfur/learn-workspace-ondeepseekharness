@@ -1,0 +1,183 @@
+<mxfile host="Electron" agent="Obsidian">
+  <diagram name="Page-1" id="0">
+    <mxGraphModel dx="3658" dy="1676" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="465" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#2E7D32;strokeWidth=1.5;fontColor=#1B5E20;align=center;" value="&lt;b style=&quot;font-size:26px&quot;&gt;《新生》极简实操版：从最小行动到财富涌现的“排雷与升级”全景图&lt;/b&gt;&lt;br&gt;&lt;span style=&quot;font-size:14px&quot;&gt;核心要义：摒弃虚无缥缈的口号，把大脑当机器，用【刚性输入→真金白银检验→打补丁重构】完成肉身与财富的进阶。&lt;/span&gt;" vertex="1">
+          <mxGeometry height="60" width="1360" x="360" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=none;strokeColor=#555555;" value="#行动清单 #容错反馈 #实战变现" vertex="1">
+          <mxGeometry height="30" width="200" x="380" y="205" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;dashed=1;fillColor=none;align=left;spacingLeft=10;" value="&lt;div style=&quot;line-height: 140%;&quot;&gt;参考：1.《新生：七年就是一辈子》行动提炼&lt;br&gt;参考：2. 投资理财、学习方法的具体实操细节&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="280" x="1440" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-4" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#555555;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="220" width="960" x="530" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFF3E0;strokeColor=#555555;strokeWidth=1.5;fontColor=#E65100;align=center;" value="&lt;b style=&quot;font-size:16px&quot;&gt;里程碑&lt;br&gt;&lt;br&gt;涌&lt;br&gt;现&lt;br&gt;与&lt;br&gt;变&lt;br&gt;现&lt;/b&gt;" vertex="1">
+          <mxGeometry height="220" width="100" x="410" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-6" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#E65100;fontStyle=1;" value="【终极检验目标】能力必须通过跨界变现与睡后收入来证实，所有不以“产出实际价值”为目的的努力都是自我欺骗。" vertex="1">
+          <mxGeometry height="25" width="900" x="560" y="275" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-7" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#E65100;fontStyle=1;fillColor=#FFE0B2;" value="【实操检验标准】你的闲暇时间是否在产生利润？你是否买得起、并在用最好的生产力工具？" vertex="1">
+          <mxGeometry height="30" width="920" x="550" y="450" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-8" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#555555;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="220" width="960" x="530" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-9" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E3F2FD;strokeColor=#555555;strokeWidth=1.5;fontColor=#1565C0;align=center;" value="&lt;b style=&quot;font-size:16px&quot;&gt;修正层&lt;br&gt;&lt;br&gt;重&lt;br&gt;构&lt;br&gt;与&lt;br&gt;打&lt;br&gt;丁&lt;/b&gt;" vertex="1">
+          <mxGeometry height="220" width="100" x="410" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-10" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#1565C0;fontStyle=1;" value="【修正准则】犯错是必然的，关键是能否像程序员修Bug一样，无情绪地更改自己的底层概念和响应模式。" vertex="1">
+          <mxGeometry height="25" width="900" x="560" y="525" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-11" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#1565C0;fontStyle=1;fillColor=#BBDEFB;" value="【实操检验标准】遇到新麻烦时，第一反应是发怒抱怨，还是立刻切换到“苍蝇模式”或开启“多任务处理”？" vertex="1">
+          <mxGeometry height="30" width="920" x="550" y="700" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-12" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#555555;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="220" width="960" x="530" y="770" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-13" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F3E5F5;strokeColor=#555555;strokeWidth=1.5;fontColor=#4A148C;align=center;" value="&lt;b style=&quot;font-size:16px&quot;&gt;反馈层&lt;br&gt;&lt;br&gt;真&lt;br&gt;实&lt;br&gt;世&lt;br&gt;界&lt;br&gt;检&lt;br&gt;验&lt;/b&gt;" vertex="1">
+          <mxGeometry height="220" width="100" x="410" y="770" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-14" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#4A148C;fontStyle=1;" value="【反馈准则】免费的赞美全是幻觉。你的能力和认知，必须在商业交易、人际冲突和投资风险中遭受真实毒打。" vertex="1">
+          <mxGeometry height="25" width="900" x="560" y="775" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-15" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#4A148C;fontStyle=1;fillColor=#E1BEE7;" value="【实操检验标准】是否有人愿意花钱买你的东西？你是否定期复盘自己的蠢事？是否果断拉黑了消耗你的人？" vertex="1">
+          <mxGeometry height="30" width="920" x="550" y="950" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-16" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#555555;strokeWidth=1.5;" vertex="1">
+          <mxGeometry height="220" width="960" x="530" y="1020" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-17" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FCE4EC;strokeColor=#555555;strokeWidth=1.5;fontColor=#880E4F;align=center;" value="&lt;b style=&quot;font-size:16px&quot;&gt;动作层&lt;br&gt;&lt;br&gt;每&lt;br&gt;日&lt;br&gt;刚&lt;br&gt;性&lt;br&gt;执&lt;br&gt;行&lt;/b&gt;" vertex="1">
+          <mxGeometry height="220" width="100" x="410" y="1020" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-18" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#880E4F;fontStyle=1;" value="【执行准则】行动是唯一的硬通货！没有输入输出的日常，就是一具未经启动的死尸。" vertex="1">
+          <mxGeometry height="25" width="900" x="560" y="1025" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-19" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#880E4F;fontStyle=1;fillColor=#F8BBD0;" value="【实操检验标准】今天是否用正确的方法搜了资料？是否硬着头皮读了非虚构好书？是否写下了反思？" vertex="1">
+          <mxGeometry height="30" width="920" x="550" y="1200" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-20" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;溯源式硬核检索&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;&lt;b&gt;只用&lt;/b&gt;：Google/NCR&lt;br&gt;&lt;b&gt;必用&lt;/b&gt;：英文关键字、加减号、引号精确匹配&lt;br&gt;&lt;b&gt;戒除&lt;/b&gt;：“连不上网怎么办”的巨婴提问" vertex="1">
+          <mxGeometry height="90" width="200" x="550" y="1085" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-21" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;啃读非虚构读物&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;&lt;b&gt;放弃&lt;/b&gt;：小说、标题党、碎片化网文&lt;br&gt;&lt;b&gt;直击&lt;/b&gt;：多版次高印数专著，先扫目录，建立预期，反复死磕，强行理解" vertex="1">
+          <mxGeometry height="90" width="200" x="780" y="1085" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-22" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;通过“教与写”来学&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;&lt;b&gt;动作&lt;/b&gt;：把学到的概念用自己语言讲给别人/写文章。&lt;br&gt;&lt;b&gt;收益&lt;/b&gt;：逼迫大脑结构化，且分享成本为0，获益无上限" vertex="1">
+          <mxGeometry height="90" width="200" x="1010" y="1085" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-23" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;直接切断无用耗损&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;&lt;b&gt;坚决&lt;/b&gt;：不争辩，遇傻逼直接拉黑&lt;br&gt;&lt;b&gt;坚决&lt;/b&gt;：群聊设为免打扰&lt;br&gt;&lt;b&gt;核心&lt;/b&gt;：把省下的生命时间用来打磨自己的手艺" vertex="1">
+          <mxGeometry height="90" width="200" x="1240" y="1085" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-24" edge="1" parent="1" source="UO7uAtX1WqEGF_7-64Dm-20" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=1.5;endArrow=block;" target="UO7uAtX1WqEGF_7-64Dm-21">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-25" edge="1" parent="1" source="UO7uAtX1WqEGF_7-64Dm-21" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=1.5;endArrow=block;" target="UO7uAtX1WqEGF_7-64Dm-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-26" edge="1" parent="1" source="UO7uAtX1WqEGF_7-64Dm-22" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=1.5;endArrow=block;" target="UO7uAtX1WqEGF_7-64Dm-23">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-27" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F8F9FA;strokeColor=#388E3C;strokeWidth=2;" vertex="1">
+          <mxGeometry height="970" width="200" x="1530" y="270" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-28" parent="1" style="text;html=1;align=center;verticalAlign=top;whiteSpace=wrap;fontColor=#1B5E20;fontStyle=1;" value="&lt;br&gt;&lt;b style=&quot;font-size:18px&quot;&gt;【个人OS进化总线】&lt;/b&gt;&lt;br&gt;&lt;br&gt;贯穿一生的安全绳与加速器&lt;br&gt;&lt;br&gt;&lt;b style=&quot;font-size:16px;color:#D32F2F&quot;&gt;财富 = 能力 × 周期&lt;sup&gt;执行&lt;/sup&gt;&lt;/b&gt;" vertex="1">
+          <mxGeometry height="140" width="200" x="1530" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-29" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#388E3C;strokeWidth=1.5;shadow=1;" value="&lt;b&gt;保持进取型人格&lt;/b&gt;&lt;br&gt;&lt;hr style=&quot;border-color:#388E3C&quot;&gt;不为“别人眼光”要面子&lt;br&gt;只为“明天的自己更强”&lt;br&gt;接受当下的笨拙与弱小" vertex="1">
+          <mxGeometry height="100" width="160" x="1550" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-30" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#388E3C;strokeWidth=1.5;shadow=1;" value="&lt;b&gt;做周期穿越者&lt;/b&gt;&lt;br&gt;&lt;hr style=&quot;border-color:#388E3C&quot;&gt;永远不All-in赌博&lt;br&gt;保证现金流/活得足够久&lt;br&gt;在正确方向等待复利拐点" vertex="1">
+          <mxGeometry height="100" width="160" x="1550" y="590" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-31" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#388E3C;strokeWidth=1.5;shadow=1;" value="&lt;b&gt;建立资本护城河&lt;/b&gt;&lt;br&gt;&lt;hr style=&quot;border-color:#388E3C&quot;&gt;锻炼身体(硬件升级)&lt;br&gt;尽早强制储蓄与投资&lt;br&gt;远离消费借贷陷阱" vertex="1">
+          <mxGeometry height="100" width="160" x="1550" y="740" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-32" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E8F5E9;strokeColor=#388E3C;strokeWidth=1.5;shadow=1;align=left;spacingLeft=10;spacingTop=5;spacingBottom=5;" value="&lt;div style=&quot;&quot;&gt;&lt;b style=&quot;color:#1B5E20;font-size:14px&quot;&gt;🛠️ 极简实操工具包&lt;/b&gt;&lt;/div&gt;&lt;hr style=&quot;border-color:#388E3C&quot;&gt;&lt;b&gt;[查]&lt;/b&gt; Google site/filetype语法&lt;br&gt;&lt;b&gt;[记]&lt;/b&gt; 昂贵的“错题本/防蠢本”&lt;br&gt;&lt;b&gt;[防]&lt;/b&gt; 微信免打扰/果断拉黑键&lt;br&gt;&lt;b&gt;[用]&lt;/b&gt; 博客/公众号写作输出&lt;br&gt;&lt;b&gt;[护]&lt;/b&gt; 健身房私教/医疗保险&lt;br&gt;&lt;b&gt;[理]&lt;/b&gt; 强制定投/切断瘾性消费" vertex="1">
+          <mxGeometry height="220" width="170" x="1545" y="890" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-33" edge="1" parent="1" source="UO7uAtX1WqEGF_7-64Dm-29" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#388E3C;strokeWidth=2;endArrow=classic;" target="UO7uAtX1WqEGF_7-64Dm-30">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-34" edge="1" parent="1" source="UO7uAtX1WqEGF_7-64Dm-30" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#388E3C;strokeWidth=2;endArrow=classic;" target="UO7uAtX1WqEGF_7-64Dm-31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-35" edge="1" parent="1" source="UO7uAtX1WqEGF_7-64Dm-31" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#388E3C;strokeWidth=2;endArrow=classic;" target="UO7uAtX1WqEGF_7-64Dm-32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-36" edge="1" parent="1" style="edgeStyle=none;html=1;strokeWidth=12;strokeColor=#E65100;fontColor=#E65100;endArrow=block;endFill=1;endSize=10;labelBackgroundColor=default;verticalAlign=middle;align=center;textDirection=vertical-lr;spacing=20;fontFamily=微软雅黑;labelBorderColor=none;textShadow=0;" value="&lt;div style=&quot;&quot;&gt;&lt;b style=&quot;font-size: 18px; color: #E65100;&quot;&gt;&lt;font&gt;真实行动产生真实反馈，打碎幻觉，向上跃迁&lt;/font&gt;&lt;/b&gt;&lt;/div&gt;">
+          <mxGeometry relative="1" x="-0.0222" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="380" y="1220" as="sourcePoint" />
+            <mxPoint x="380" y="270" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-37" edge="1" parent="1" style="edgeStyle=none;html=1;strokeWidth=12;strokeColor=#1565C0;fontColor=#1565C0;endArrow=block;endFill=1;endSize=10;labelBackgroundColor=#FFFFFF;verticalAlign=middle;align=center;textDirection=vertical-lr;spacingTop=0;spacing=18;fontFamily=微软雅黑;" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;&lt;b&gt;&lt;font&gt;顶层心法强制向下兼容，形成肌肉记忆与刚性约束&lt;/font&gt;&lt;/b&gt;&lt;/span&gt;">
+          <mxGeometry relative="1" x="-0.0201" as="geometry">
+            <mxPoint as="offset" />
+            <mxPoint x="1506" y="270" as="sourcePoint" />
+            <mxPoint x="1506" y="1220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-38" connectable="0" parent="1" style="group" value="" vertex="1">
+          <mxGeometry height="615" width="920" x="550" y="330" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-39" parent="UO7uAtX1WqEGF_7-64Dm-38" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;构造“睡后收入”&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;&lt;b&gt;行动&lt;/b&gt;：写书、写代码、投资定投&lt;br&gt;&lt;b&gt;检验&lt;/b&gt;：哪怕睡觉时也有利息/版税入账&lt;br&gt;&lt;b&gt;避坑&lt;/b&gt;：绝不借钱消费，只为生产借贷" vertex="1">
+          <mxGeometry height="90" width="262.85714285714283" x="11.948051948051948" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-40" parent="UO7uAtX1WqEGF_7-64Dm-38" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;舍得投资生产力硬件&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;&lt;b&gt;行动&lt;/b&gt;：买正版软件、27寸显示器等&lt;br&gt;&lt;b&gt;检验&lt;/b&gt;：工作效率是否大幅提升&lt;br&gt;&lt;b&gt;避坑&lt;/b&gt;：图便宜买劣质工具是“屌丝”行为" vertex="1">
+          <mxGeometry height="90" width="262.85714285714283" x="334.54545454545456" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-41" parent="UO7uAtX1WqEGF_7-64Dm-38" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;迎接跨界Serendipity&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;&lt;b&gt;行动&lt;/b&gt;：同时开启多个技能进程&lt;br&gt;&lt;b&gt;检验&lt;/b&gt;：在无关领域突然用上原有技能&lt;br&gt;&lt;b&gt;避坑&lt;/b&gt;：防守单一技能会被时代轻易淘汰" vertex="1">
+          <mxGeometry height="90" width="262.85714285714283" x="657.1428571428571" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-42" parent="UO7uAtX1WqEGF_7-64Dm-38" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#555555;strokeWidth=1;dashed=1;" vertex="1">
+          <mxGeometry height="145" width="896.1038961038961" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-43" parent="UO7uAtX1WqEGF_7-64Dm-38" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#1565C0;fontStyle=1;spacingLeft=10;" value="[系统补丁库：遇到障碍时的强制操作程序]" vertex="1">
+          <mxGeometry height="25" width="489.87012987012986" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-44" parent="UO7uAtX1WqEGF_7-64Dm-38" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;切换“苍蝇/蜜蜂”模式&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;&lt;b&gt;触发条件&lt;/b&gt;：进入完全陌生新领域时&lt;br&gt;&lt;b&gt;执行动作&lt;/b&gt;：先像苍蝇一样乱撞找突破口，一旦找到规律，立刻切为蜜蜂定向深耕。" vertex="1">
+          <mxGeometry height="90" width="262.85714285714283" x="11.948051948051948" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-45" parent="UO7uAtX1WqEGF_7-64Dm-38" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;剔除“毒性概念”&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;&lt;b&gt;触发条件&lt;/b&gt;：说出“我没天分/基因”时&lt;br&gt;&lt;b&gt;执行动作&lt;/b&gt;：强制替换为“我只是练习不够/没找到正确方法”，拉长周期继续做。" vertex="1">
+          <mxGeometry height="90" width="262.85714285714283" x="310.64935064935065" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-46" parent="UO7uAtX1WqEGF_7-64Dm-38" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;强行多任务统筹&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;&lt;b&gt;触发条件&lt;/b&gt;：觉得“我一次只能做一件事”&lt;br&gt;&lt;b&gt;执行动作&lt;/b&gt;：强迫自己跑步听课、工作间隙思考，把大脑当作多任务OS进行压测。" vertex="1">
+          <mxGeometry height="90" width="262.85714285714283" x="609.3506493506493" y="255" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-47" edge="1" parent="UO7uAtX1WqEGF_7-64Dm-38" source="UO7uAtX1WqEGF_7-64Dm-44" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=1.5;endArrow=block;" target="UO7uAtX1WqEGF_7-64Dm-45">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-48" edge="1" parent="UO7uAtX1WqEGF_7-64Dm-38" source="UO7uAtX1WqEGF_7-64Dm-45" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=1.5;endArrow=block;" target="UO7uAtX1WqEGF_7-64Dm-46">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-49" parent="UO7uAtX1WqEGF_7-64Dm-38" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#555555;strokeWidth=1;dashed=1;" vertex="1">
+          <mxGeometry height="145" width="896.1038961038961" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-50" parent="UO7uAtX1WqEGF_7-64Dm-38" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;fontColor=#4A148C;fontStyle=1;spacingLeft=10;" value="[市场与社交的烈火淬炼]" vertex="1">
+          <mxGeometry height="25" width="489.87012987012986" y="470" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-51" parent="UO7uAtX1WqEGF_7-64Dm-38" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;商业化硬核检验&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;&lt;b&gt;别免费&lt;/b&gt;：收一分钱也会招来真实的骂声。&lt;br&gt;&lt;b&gt;做实绩&lt;/b&gt;：被骂是好事，说明反馈真实，据此修改产品，直到好到不用推销。" vertex="1">
+          <mxGeometry height="90" width="262.85714285714283" x="11.948051948051948" y="505" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-52" parent="UO7uAtX1WqEGF_7-64Dm-38" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;记录“愚蠢账本”&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;&lt;b&gt;直面黑历史&lt;/b&gt;：用昂贵的本子记下犯过的蠢事。&lt;br&gt;&lt;b&gt;排毒效应&lt;/b&gt;：形成参照系，再产生自欺欺人想法时，大脑会自动拦截过滤。" vertex="1">
+          <mxGeometry height="90" width="262.85714285714283" x="310.64935064935065" y="505" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-53" parent="UO7uAtX1WqEGF_7-64Dm-38" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#555555;strokeWidth=1;shadow=1;" value="&lt;b style=&quot;font-size:14px&quot;&gt;对抗“反向塑造”&lt;/b&gt;&lt;hr style=&quot;border-color:#555555;margin:5px 0&quot;&gt;&lt;b&gt;警惕环境&lt;/b&gt;：烂客户/差学生会把你塑造成烂人。&lt;br&gt;&lt;b&gt;断舍离&lt;/b&gt;：远离烂人、爱面子的人，强行结交有“一技之长且持续进步”的战友。" vertex="1">
+          <mxGeometry height="90" width="262.85714285714283" x="609.3506493506493" y="505" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-54" edge="1" parent="UO7uAtX1WqEGF_7-64Dm-38" source="UO7uAtX1WqEGF_7-64Dm-51" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=1.5;endArrow=block;" target="UO7uAtX1WqEGF_7-64Dm-52">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="UO7uAtX1WqEGF_7-64Dm-55" edge="1" parent="UO7uAtX1WqEGF_7-64Dm-38" source="UO7uAtX1WqEGF_7-64Dm-52" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;strokeColor=#555555;strokeWidth=1.5;endArrow=block;" target="UO7uAtX1WqEGF_7-64Dm-53">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

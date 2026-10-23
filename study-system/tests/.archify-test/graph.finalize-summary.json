@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "command": "finalize",
+  "status": "fail",
+  "type": "architecture",
+  "quality": "standard",
+  "specification": {
+    "path": "D:\\learn\\study-system\\tests\\.archify-test\\candidate.json",
+    "sha256": "1211981e4acff45062e59153c209ecc69d021bf68323141727853bba8daab314",
+    "bytes": 17925
+  },
+  "artifact": {
+    "path": "D:\\learn\\study-system\\tests\\.archify-test\\graph.html",
+    "sha256": "3917a67a9186a760efd1ff84971a8343ce3528d0faa7a4b0f9ef91d5f8e58dda",
+    "bytes": 874722
+  },
+  "gates": {
+    "validate": "pass",
+    "deliver": "pass",
+    "check": "pass",
+    "browser-check": "fail"
+  },
+  "failedStage": "browser-check",
+  "diagnostics": [
+    {
+      "code": "viewer/evidence-path-conflict",
+      "severity": "error",
+      "message": "browser-check will not replace the existing unowned evidence path \"D:\\learn\\study-system\\tests\\.archify-test\\graph.browser-check.json\".",
+      "subject": {
+        "artifact": "D:\\learn\\study-system\\tests\\.archify-test\\graph.html",
+        "evidencePath": "D:\\learn\\study-system\\tests\\.archify-test\\graph.browser-check.json"
+      },
+      "evidence": {
+        "reason": {
+          "code": "ownership-artifact-mismatch"
+        }
+      },
+      "supportedFixes": [
+        "move the conflicting file aside, or choose a separate --out-dir, then rerun browser-check"
+      ]
+    }
+  ],
+  "diagnosticSummary": {
+    "total": 1,
+    "shown": 1,
+    "truncated": false
+  },
+  "evidence": {
+    "receipt": "D:\\learn\\study-system\\tests\\.archify-test\\graph.finalize.json",
+    "summaryReceipt": "D:\\learn\\study-system\\tests\\.archify-test\\graph.finalize-summary.json",
+    "browserCheckReceipt": "D:\\learn\\study-system\\tests\\.archify-test\\graph.browser-check.json"
+  },
+  "update": {
+    "status": "current",
+    "installedVersion": "3.2.0",
+    "availableVersion": "3.2.0",
+    "releaseNotes": null,
+    "checkedAt": "2026-10-22T15:49:57.281Z",
+    "source": "cache",
+    "noticeRequired": false,
+    "noticeText": null
+  },
+  "visualReview": "not-requested",
+  "durationMs": 1046,
+  "browserCheck": {
+    "requested": true,
+    "ran": false
+  }
+}
