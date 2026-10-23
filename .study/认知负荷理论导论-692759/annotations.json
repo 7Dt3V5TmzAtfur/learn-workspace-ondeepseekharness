@@ -1,0 +1,52 @@
+{
+  "items": [
+    {
+      "label": "d",
+      "note": "标题段，字数最少，作为全篇骨架标记",
+      "segmentId": "¶1",
+      "title": "主题：认知负荷理论",
+      "tier": "core"
+    },
+    {
+      "label": "e",
+      "segmentId": "¶6",
+      "title": "七个符号",
+      "tier": "ref"
+    },
+    {
+      "label": "t",
+      "segmentId": "¶9",
+      "title": "迁移到写作",
+      "tier": "ref"
+    },
+    {
+      "label": "c",
+      "keyword": "边界",
+      "segmentId": "¶10",
+      "title": "理论适用边界",
+      "tier": "ref"
+    }
+  ],
+  "stats": {
+    "total": 4,
+    "byTier": {
+      "core": 1,
+      "hard": 0,
+      "ref": 3
+    },
+    "highlightedChars": 10,
+    "totalChars": 794,
+    "ratio": 0.0126,
+    "labelCounts": {
+      "d": 1,
+      "e": 1,
+      "q": 0,
+      "s": 0,
+      "t": 1,
+      "c": 1,
+      "v": 0
+    }
+  },
+  "issues": [],
+  "savedAt": "2026-10-23T17:59:10.655Z"
+}

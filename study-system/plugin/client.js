@@ -741,27 +741,49 @@ body[data-ds-dark-theme] .sc-root{
         }
       }, [answer?.pending, answer?.word, project.id, workspace])
 
+      // 语音识别的实例要留住，否则"聆听中"无法停止，用户只能等它自己超时
+      const recRef = useRef(null)
+
+      const stopVoice = () => {
+        try {
+          recRef.current?.stop()
+        } catch {
+          /* 已经停了 */
+        }
+        recRef.current = null
+        setListening(false)
+      }
+
       const startVoice = () => {
         const Ctor = window.SpeechRecognition || window.webkitSpeechRecognition
         if (!Ctor) return
         const rec = new Ctor()
+        recRef.current = rec
         rec.lang = 'zh-CN'
         rec.interimResults = false
         rec.maxAlternatives = 1
         rec.onresult = (e) => {
           const said = String(e.results?.[0]?.[0]?.transcript ?? '').trim()
           setListening(false)
+          recRef.current = null
           if (said) {
             setSelText(said)
             if (sel) doAsk(said, sel.seg.id)
           }
         }
-        rec.onerror = () => setListening(false)
-        rec.onend = () => setListening(false)
+        rec.onerror = () => {
+          recRef.current = null
+          setListening(false)
+        }
+        rec.onend = () => {
+          recRef.current = null
+          setListening(false)
+        }
         setListening(true)
         try {
           rec.start()
         } catch {
+          recRef.current = null
           setListening(false)
         }
       }
@@ -771,12 +793,13 @@ body[data-ds-dark-theme] .sc-root{
         { style: { position: 'relative' } },
 
         // ---- 顶部图例：三色语义 + 预算进度 ----
+        // 颜色必须跟 CSS 里的 --sc-*-line 一致，否则用户看到的图例和正文对不上
         h(
           'div',
           { className: 'sc-legend' },
-          h('span', null, h('i', { style: { background: '#4f8ff7' } }), '核心 ≤10%'),
-          h('span', null, h('i', { style: { background: '#e5484d' } }), '攻坚 ≤8%'),
-          h('span', null, h('i', { style: { background: '#30a46c' } }), '参考 不限'),
+          h('span', null, h('i', { style: { background: 'var(--sc-core-line)' } }), '核心 ≤10%'),
+          h('span', null, h('i', { style: { background: 'var(--sc-hard-line)' } }), '攻坚 ≤8%'),
+          h('span', null, h('i', { style: { background: 'var(--sc-ref-line)' } }), '参考 不限'),
           stats
             ? h(
                 'span',
@@ -800,9 +823,16 @@ body[data-ds-dark-theme] .sc-root{
         h(IssueList, { issues }),
 
         // ---- 正文：直接用宿主的 annotatedHtml，高亮已在原文位置上 ----
+        // 选中词有两种触发方式：mouseup（鼠标拖选）与 selectionchange
+        // （键盘 shift+方向键、以及触屏长按）。只监听 mouseup 会漏掉后两种。
         h(
           'div',
-          { className: 'sc-md', onMouseUp: () => setSelText(readSelection()) },
+          {
+            className: 'sc-md',
+            onMouseUp: () => setSelText(readSelection()),
+            onTouchEnd: () => setSelText(readSelection()),
+            onKeyUp: () => setSelText(readSelection()),
+          },
           shown.map((seg) => {
             const a = byId.get(seg.id)
             const inner = htmlBySeg.get(seg.id)
@@ -812,9 +842,12 @@ body[data-ds-dark-theme] .sc-root{
                 key: seg.id,
                 className: 'sc-seg',
                 'data-seg': seg.id,
-                style: { cursor: 'pointer' },
                 onClick: () => {
-                  setSelText(readSelection())
+                  // 只有真的选中了词才弹追问层。
+                  // 原来点空白处也会弹，读文章时经常误触。
+                  const picked = readSelection()
+                  if (!picked) return
+                  setSelText(picked)
                   setSel({ seg })
                   setAnswer(null)
                 },
@@ -874,10 +907,19 @@ body[data-ds-dark-theme] .sc-root{
                 canVoice
                   ? h(
                       'button',
-                      { className: `sc-btn ${listening ? 'sc-btn-primary' : ''}`, disabled: listening || asking, onClick: startVoice },
-                      listening ? '🎙 聆听中…' : '🎙 语音提问',
+                      {
+                        className: `sc-btn ${listening ? 'sc-btn-primary' : ''}`,
+                        onClick: listening ? stopVoice : startVoice,
+                        title: listening ? '点一下停止聆听' : '用麦克风说你要问的词',
+                      },
+                      listening ? '🎙 聆听中…（点击停止）' : '🎙 语音提问',
                     )
-                  : null,
+                  : h(
+                      // 不支持语音时不留一个点了没反应的按钮，直接说明原因
+                      'span',
+                      { className: 'sc-muted', title: '当前浏览器不支持语音识别，可用 Chrome 或 Edge' },
+                      '（此浏览器不支持语音）',
+                    ),
                 h(
                   'button',
                   {
@@ -945,19 +987,6 @@ body[data-ds-dark-theme] .sc-root{
 
     /* -------------------------------------------------------- 图谱面板 */
 
-    const KIND_COLOR = {
-      concept: '#4f8ff7',
-      premise: '#ab7aef',
-      principle: '#30a46c',
-      method: '#30a46c',
-      problem: '#e5484d',
-      'anti-pattern': '#e5484d',
-      risk: '#e5484d',
-      example: '#ffb86c',
-      taxonomy: '#00a0a0',
-      protocol: '#00a0a0',
-      'tool-type': '#00a0a0',
-    }
 
 
     /** 按节点像素宽度折行，中英混排各自计宽。 */

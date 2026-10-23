@@ -1,0 +1,635 @@
+{
+  "nodes": [
+    {
+      "id": "aci",
+      "kind": "concept",
+      "label": "ACI：工具对应 Agent 的目标"
+    },
+    {
+      "id": "agent-goal",
+      "kind": "premise",
+      "label": "Agent 的目标（而非底层 API 操作）"
+    },
+    {
+      "id": "form-spectrum",
+      "kind": "concept",
+      "label": "能力形态谱系：专用工具↔通用执行器↔Skill"
+    },
+    {
+      "id": "gen-default",
+      "kind": "principle",
+      "label": "默认取向：通用优于专用"
+    },
+    {
+      "id": "dedicated-cases",
+      "kind": "principle",
+      "label": "退回专用的四种情况"
+    },
+    {
+      "id": "granularity",
+      "kind": "principle",
+      "label": "粒度偏向整合而非细分"
+    },
+    {
+      "id": "read-document",
+      "kind": "example",
+      "label": "read_document 取代 extract_pdf_text 等"
+    },
+    {
+      "id": "four-dims",
+      "kind": "method",
+      "label": "四个决策维度"
+    },
+    {
+      "id": "skill-4dims",
+      "kind": "method",
+      "label": "四维度如何得出形态"
+    },
+    {
+      "id": "tool-description",
+      "kind": "method",
+      "label": "工具描述：说清“何时用”"
+    },
+    {
+      "id": "silent-conversion",
+      "kind": "anti-pattern",
+      "label": "静默输入转换（反模式）"
+    },
+    {
+      "id": "disclosure",
+      "kind": "concept",
+      "label": "披露策略：一次让模型看见多少"
+    },
+    {
+      "id": "tool-explosion",
+      "kind": "problem",
+      "label": "工具爆炸：准确率下降 + 占上下文 + 击穿 KV Cache"
+    },
+    {
+      "id": "lazy-index",
+      "kind": "method",
+      "label": "层次化组织与按需加载（只暴露索引）"
+    },
+    {
+      "id": "retrieval-prefilter",
+      "kind": "method",
+      "label": "检索式预筛选"
+    },
+    {
+      "id": "active-discovery",
+      "kind": "method",
+      "label": "主动工具发现"
+    },
+    {
+      "id": "skill-as-doc",
+      "kind": "method",
+      "label": "Skills：把工具当参考资料"
+    },
+    {
+      "id": "proxy-tool",
+      "kind": "method",
+      "label": "代理工具（约 200 token，搜索→查定义→调用）"
+    },
+    {
+      "id": "mcp",
+      "kind": "protocol",
+      "label": "MCP 协议"
+    },
+    {
+      "id": "skill-hub",
+      "kind": "protocol",
+      "label": "Skill Hub（包管理器分发 SKILL.md）"
+    },
+    {
+      "id": "trust-boundary",
+      "kind": "risk",
+      "label": "信任边界：审查描述与版本、隔离凭证、参数一致"
+    },
+    {
+      "id": "five-types",
+      "kind": "taxonomy",
+      "label": "五类工具（感知/执行/协作/事件触发/用户沟通）"
+    },
+    {
+      "id": "perception",
+      "kind": "tool-type",
+      "label": "感知工具"
+    },
+    {
+      "id": "smart-summary",
+      "kind": "method",
+      "label": "上下文感知的智能总结与显式截断"
+    },
+    {
+      "id": "execution",
+      "kind": "tool-type",
+      "label": "执行工具"
+    },
+    {
+      "id": "proposer-reviewer",
+      "kind": "method",
+      "label": "提议者-审核者（事前审批/事后验证）"
+    },
+    {
+      "id": "sidecar",
+      "kind": "method",
+      "label": "Sidecar（与主模型流式输出并行审查）"
+    },
+    {
+      "id": "exec-verify-loop",
+      "kind": "method",
+      "label": "执行-验证-反馈闭环"
+    },
+    {
+      "id": "side-effect-unknown",
+      "kind": "problem",
+      "label": "取消或超时后副作用是否发生"
+    },
+    {
+      "id": "collaboration",
+      "kind": "tool-type",
+      "label": "协作工具"
+    },
+    {
+      "id": "lifecycle-primitives",
+      "kind": "method",
+      "label": "生命周期原语：创建/消息/取消/发现"
+    },
+    {
+      "id": "hitl",
+      "kind": "method",
+      "label": "HITL 人在回路"
+    },
+    {
+      "id": "hitl-timeout",
+      "kind": "method",
+      "label": "HITL 超时与降级策略"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "aci",
+      "relation": "prerequisite",
+      "to": "form-spectrum",
+      "quote": null,
+      "segmentId": null,
+      "evidence": "inference",
+      "why": "本章按\"先讲概念再讲用法\"的顺序组织，从行文顺序推出前者是后者的前提；原文没有明说这种依赖。"
+    },
+    {
+      "id": "e2",
+      "from": "agent-goal",
+      "relation": "cause",
+      "to": "aci",
+      "quote": "penClaw 等通用 Agent 已经基本实现了《Her》中 Samantha 所",
+      "segmentId": "¶2"
+    },
+    {
+      "id": "e3",
+      "from": "form-spectrum",
+      "relation": "prerequisite",
+      "to": "gen-default",
+      "quote": null,
+      "segmentId": null,
+      "evidence": "inference",
+      "why": "本章按\"先讲概念再讲用法\"的顺序组织，从行文顺序推出前者是后者的前提；原文没有明说这种依赖。"
+    },
+    {
+      "id": "e4",
+      "from": "gen-default",
+      "relation": "prerequisite",
+      "to": "dedicated-cases",
+      "quote": "默认取向：通用工具优于专用工具，除非存在明确的安全、权限或性",
+      "segmentId": "¶21"
+    },
+    {
+      "id": "e5",
+      "from": "dedicated-cases",
+      "relation": "contrast",
+      "to": "gen-default",
+      "quote": null,
+      "segmentId": null,
+      "evidence": "inference",
+      "why": "两者在文中被分章对照讨论，据此推出对立关系；原文没有直接说\"二者对比\"。"
+    },
+    {
+      "id": "e6",
+      "from": "granularity",
+      "relation": "part-of",
+      "to": "form-spectrum",
+      "quote": null,
+      "segmentId": null,
+      "evidence": "inference",
+      "why": "后者是前者的一个维度（章节标题体现的从属），原文未逐句点明包含关系。"
+    },
+    {
+      "id": "e7",
+      "from": "granularity",
+      "relation": "cause",
+      "to": "read-document",
+      "quote": null,
+      "segmentId": null,
+      "evidence": "inference",
+      "why": "前者是后者的成因链上一环，由论证逻辑推出；原文未用因果连词明示。"
+    },
+    {
+      "id": "e8",
+      "from": "four-dims",
+      "relation": "application",
+      "to": "form-spectrum",
+      "quote": "四个决策维度。 综合起来，一项能力究竟该做成哪种形态，取决于",
+      "segmentId": "¶26"
+    },
+    {
+      "id": "e9",
+      "from": "four-dims",
+      "relation": "application",
+      "to": "dedicated-cases",
+      "quote": "四个决策维度。 综合起来，一项能力究竟该做成哪种形态，取决于",
+      "segmentId": "¶26"
+    },
+    {
+      "id": "e10",
+      "from": "skill-4dims",
+      "label": "变更频率高、参数简单 → 选 Skill",
+      "relation": "application",
+      "to": "four-dims",
+      "quote": null,
+      "segmentId": null,
+      "evidence": "inference",
+      "why": "前者是原则、后者是它的一个落地场景，由\"原则→实践\"的论述推出。"
+    },
+    {
+      "id": "e11",
+      "from": "form-spectrum",
+      "label": "两个独立决策之一",
+      "relation": "contrast",
+      "to": "disclosure",
+      "quote": null,
+      "segmentId": null,
+      "evidence": "inference",
+      "why": "两者在文中被分章对照讨论，据此推出对立关系；原文没有直接说\"二者对比\"。"
+    },
+    {
+      "id": "e12",
+      "from": "disclosure",
+      "relation": "prerequisite",
+      "to": "tool-explosion",
+      "quote": null,
+      "segmentId": null,
+      "evidence": "inference",
+      "why": "本章按\"先讲概念再讲用法\"的顺序组织，从行文顺序推出前者是后者的前提；原文没有明说这种依赖。"
+    },
+    {
+      "id": "e13",
+      "from": "tool-explosion",
+      "relation": "cause",
+      "to": "lazy-index",
+      "quote": null,
+      "segmentId": null,
+      "evidence": "inference",
+      "why": "前者是后者的成因链上一环，由论证逻辑推出；原文未用因果连词明示。"
+    },
+    {
+      "id": "e14",
+      "from": "lazy-index",
+      "relation": "prerequisite",
+      "to": "retrieval-prefilter",
+      "quote": "工具太多怎么办：层次化组织与主动工具发现",
+      "segmentId": "¶60"
+    },
+    {
+      "id": "e15",
+      "from": "retrieval-prefilter",
+      "relation": "prerequisite",
+      "to": "active-discovery",
+      "quote": "检索式预筛选。 更进一步的方案是不把全部工具定义一次性注入上",
+      "segmentId": "¶70"
+    },
+    {
+      "id": "e16",
+      "from": "active-discovery",
+      "relation": "prerequisite",
+      "to": "skill-as-doc",
+      "quote": "再进一步是主动工具发现：Agent 在执行过程中意识到能力缺口，主动声明需求，由系统动态匹配并注入。最轻量的一层是 Skills：干脆不把工具当成需要注册、检索、注入的正式定义",
+      "segmentId": "¶62"
+    },
+    {
+      "id": "e17",
+      "from": "proxy-tool",
+      "relation": "example-of",
+      "to": "lazy-index",
+      "quote": null,
+      "segmentId": null,
+      "evidence": "inference",
+      "why": "后者是前者的具体实例，属分类归属推断。"
+    },
+    {
+      "id": "e18",
+      "from": "proxy-tool",
+      "relation": "application",
+      "to": "active-discovery",
+      "quote": null,
+      "segmentId": null,
+      "evidence": "inference",
+      "why": "前者是原则、后者是它的一个落地场景，由\"原则→实践\"的论述推出。"
+    },
+    {
+      "id": "e19",
+      "from": "retrieval-prefilter",
+      "label": "一次性匹配，无法预见多步需求",
+      "relation": "contrast",
+      "to": "active-discovery",
+      "quote": "检索式预筛选。 更进一步的方案是不把全部工具定义一次性注入上",
+      "segmentId": "¶70"
+    },
+    {
+      "id": "e20",
+      "from": "aci",
+      "relation": "prerequisite",
+      "to": "five-types",
+      "quote": null,
+      "segmentId": null,
+      "evidence": "inference",
+      "why": "本章按\"先讲概念再讲用法\"的顺序组织，从行文顺序推出前者是后者的前提；原文没有明说这种依赖。"
+    },
+    {
+      "id": "e21",
+      "from": "five-types",
+      "relation": "prerequisite",
+      "to": "perception",
+      "quote": "章介绍了 Agent 的五类工具（感知、执行、协作、事件触发、用户沟通）。为了帮助理",
+      "segmentId": "¶5"
+    },
+    {
+      "id": "e22",
+      "from": "five-types",
+      "relation": "prerequisite",
+      "to": "execution",
+      "quote": "章介绍了 Agent 的五类工具（感知、执行、协作、事件触发、用户沟通）。为了帮助理",
+      "segmentId": "¶5"
+    },
+    {
+      "id": "e23",
+      "from": "five-types",
+      "relation": "prerequisite",
+      "to": "collaboration",
+      "quote": "章介绍了 Agent 的五类工具（感知、执行、协作、事件触发、用户沟通）。为了帮助理",
+      "segmentId": "¶5"
+    },
+    {
+      "id": "e24",
+      "from": "perception",
+      "label": "设计目标相反：一个控信息量、一个控后果",
+      "relation": "contrast",
+      "to": "execution",
+      "quote": "感知工具  Agent 主动调用  获取信息 \n 执行工具  Agent 主动调用  改变世界",
+      "segmentId": "¶7"
+    },
+    {
+      "id": "e25",
+      "from": "perception",
+      "relation": "prerequisite",
+      "to": "smart-summary",
+      "quote": "- 感知工具：关键在于粒度权衡、上下文感知的智能总结，以及分页与显式截断等接口设计",
+      "segmentId": "¶178"
+    },
+    {
+      "id": "e26",
+      "from": "execution",
+      "relation": "prerequisite",
+      "to": "proposer-reviewer",
+      "quote": "- 执行工具：关键在于层次化的安全防护、提议者-审核者审查（事前审批与事后验证）与 Sidecar",
+      "segmentId": "¶178"
+    },
+    {
+      "id": "e27",
+      "from": "execution",
+      "relation": "prerequisite",
+      "to": "sidecar",
+      "quote": "- 执行工具：关键在于层次化的安全防护、提议者-审核者审查（事前审批与事后验证）与 Sidecar 机制",
+      "segmentId": "¶178"
+    },
+    {
+      "id": "e28",
+      "from": "proposer-reviewer",
+      "label": "都引入第二视角，但时机不同",
+      "relation": "contrast",
+      "to": "sidecar",
+      "quote": "提议者-审核者机制解决的是“操作执行前审批或操作完成后验证”的问题，而 Sidecar 机制解决的是另一个问题：“操作执行时如何实时",
+      "segmentId": "¶128"
+    },
+    {
+      "id": "e29",
+      "from": "sidecar",
+      "relation": "prerequisite",
+      "to": "exec-verify-loop",
+      "quote": "运行时层面，本章后文的 Sidecar 机制提供了最后一道防线：独立的安全审查模型只",
+      "segmentId": "¶58"
+    },
+    {
+      "id": "e30",
+      "from": "execution",
+      "relation": "prerequisite",
+      "to": "side-effect-unknown",
+      "quote": "动调用  获取信息 \n 执行工具  Agent 主动调用  改变世界 \n 协作工",
+      "segmentId": "¶7"
+    },
+    {
+      "id": "e31",
+      "from": "collaboration",
+      "relation": "prerequisite",
+      "to": "lifecycle-primitives",
+      "quote": "- 协作工具：关键在于子 Agent 的生命周期原语（创建、消息、取消、发现）和人工介入的学习闭环",
+      "segmentId": "¶178"
+    },
+    {
+      "id": "e32",
+      "from": "collaboration",
+      "relation": "prerequisite",
+      "to": "hitl",
+      "quote": "动调用  改变世界 \n 协作工具  Agent 主动调用  驱动其他 Agent",
+      "segmentId": "¶7"
+    },
+    {
+      "id": "e33",
+      "from": "hitl",
+      "relation": "prerequisite",
+      "to": "hitl-timeout",
+      "quote": null,
+      "segmentId": null,
+      "evidence": "inference",
+      "why": "本章按\"先讲概念再讲用法\"的顺序组织，从行文顺序推出前者是后者的前提；原文没有明说这种依赖。"
+    },
+    {
+      "id": "e34",
+      "from": "five-types",
+      "relation": "prerequisite",
+      "to": "mcp",
+      "quote": "章介绍了 Agent 的五类工具（感知、执行、协作、事件触发、用户沟通）。为了帮助理",
+      "segmentId": "¶5"
+    },
+    {
+      "id": "e35",
+      "from": "five-types",
+      "relation": "prerequisite",
+      "to": "skill-hub",
+      "quote": "章介绍了 Agent 的五类工具（感知、执行、协作、事件触发、用户沟通）。为了帮助理",
+      "segmentId": "¶5"
+    },
+    {
+      "id": "e36",
+      "from": "mcp",
+      "label": "都把接入压到一条命令，也都扩大信任边界",
+      "relation": "analogy",
+      "to": "skill-hub",
+      "quote": "用设计原则，以及工具生态用哪两条渠道分发能力——MCP 协议与 Skill Hub",
+      "segmentId": "¶3"
+    },
+    {
+      "id": "e37",
+      "from": "mcp",
+      "relation": "prerequisite",
+      "to": "trust-boundary",
+      "quote": "用哪两条渠道分发能力——MCP 协议与 Skill Hub；再回答一个横跨所有工具的",
+      "segmentId": "¶3"
+    },
+    {
+      "id": "e38",
+      "from": "skill-hub",
+      "relation": "prerequisite",
+      "to": "trust-boundary",
+      "quote": "能力——MCP 协议与 Skill Hub；再回答一个横跨所有工具的共同问题：当工具",
+      "segmentId": "¶3"
+    },
+    {
+      "id": "e39",
+      "from": "tool-description",
+      "relation": "application",
+      "to": "silent-conversion",
+      "quote": null,
+      "segmentId": null,
+      "evidence": "inference",
+      "why": "前者是原则、后者是它的一个落地场景，由\"原则→实践\"的论述推出。"
+    },
+    {
+      "id": "e40",
+      "from": "tool-description",
+      "relation": "contrast",
+      "to": "silent-conversion",
+      "quote": null,
+      "segmentId": null,
+      "evidence": "inference",
+      "why": "两者在文中被分章对照讨论，据此推出对立关系；原文没有直接说\"二者对比\"。"
+    }
+  ],
+  "direction": "TD",
+  "check": {
+    "ok": true,
+    "issues": [],
+    "stats": {
+      "nodes": 33,
+      "edges": 40,
+      "relationCounts": {
+        "prerequisite": 23,
+        "part-of": 1,
+        "contrast": 6,
+        "cause": 3,
+        "example-of": 1,
+        "application": 5,
+        "sequence": 0,
+        "analogy": 1
+      }
+    }
+  },
+  "savedAt": "2026-10-23T20:34:39.815Z",
+  "relationReview": {
+    "prerequisite": {
+      "status": "mapped",
+      "edgeIds": [
+        "e1",
+        "e3",
+        "e4",
+        "e12",
+        "e14",
+        "e15",
+        "e16",
+        "e20",
+        "e21",
+        "e22",
+        "e23",
+        "e25",
+        "e26",
+        "e27",
+        "e29",
+        "e30",
+        "e31",
+        "e32",
+        "e33",
+        "e34",
+        "e35",
+        "e37",
+        "e38"
+      ],
+      "why": "本章主线是一条决策链：先掌握形态谱系，才能决定用通用工具还是专用工具，最后才轮到披露策略。"
+    },
+    "part-of": {
+      "status": "mapped",
+      "edgeIds": [
+        "e6"
+      ],
+      "why": "章节结构本身就是「总—分」：五类工具是 Agent 能力面的一个划分，每一类下再分子类。"
+    },
+    "contrast": {
+      "status": "mapped",
+      "edgeIds": [
+        "e5",
+        "e11",
+        "e19",
+        "e24",
+        "e28",
+        "e40"
+      ],
+      "why": "通用工具与专用工具是两端对立，本章反复用「什么时候不该用」来划线。"
+    },
+    "cause": {
+      "status": "mapped",
+      "edgeIds": [
+        "e2",
+        "e7",
+        "e13"
+      ],
+      "why": "默认通用工具导致上下文膨胀，进而引出专用工具与按需加载。"
+    },
+    "example-of": {
+      "status": "mapped",
+      "edgeIds": [
+        "e17"
+      ],
+      "why": "具体工具（网络搜索、文件读写、Skill）是各抽象类别的实例。"
+    },
+    "application": {
+      "status": "mapped",
+      "edgeIds": [
+        "e8",
+        "e9",
+        "e10",
+        "e18",
+        "e39"
+      ],
+      "why": "每个原则都落到了「什么时候用」的实操判断上。"
+    },
+    "sequence": {
+      "status": "unsupported",
+      "why": "次序：材料按主题分节而非按时间推进，没有严格的时间顺序关系。"
+    },
+    "analogy": {
+      "status": "mapped",
+      "edgeIds": [
+        "e36"
+      ],
+      "why": "文中把工具描述之于 LLM 类比于说明书之于人，属修辞性类比而非结构关系。"
+    }
+  }
+}

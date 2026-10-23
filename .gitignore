@@ -1,6 +1,29 @@
-# 学习项目数据（个人资料，不入库）
-.study/
-**/.study/
+# 学习项目数据。
+#
+# 原始材料与抽取正文不入库：体积大，且属个人资料。
+# 但"我的加工成果"必须入库 —— 2026-10-23 就出过事：terms.jsonl 被写成
+# JSON 数组，22 条追问记录丢了 20 条，因为 .study/ 在 git 之外，无法恢复。
+#
+# git 的规则是：父目录一旦被忽略，就不再往里看，所以先忽略"目录里的全部"，
+# 再用 ! 逐个把要留的文件捞回来。不能只写 `!.study/**/`，那样不生效。
+
+.study/**
+**/.study/**
+
+# 加工成果：这些是花时间做出来的，丢了就等于白读
+!**/.study/**/
+!.study/**/
+!.study/**/annotations.json
+!.study/**/relations.json
+!.study/**/preflight.json
+!.study/**/quiz.json
+!.study/**/refs.json
+!.study/**/qa.json
+!.study/**/terms.jsonl
+!.study/**/drills.jsonl
+!.study/**/meta.json
+!.study/**/vocabulary.json
+
 # 测试临时产物
 **/tests/.archify-test/
 **/tests/_graph.json

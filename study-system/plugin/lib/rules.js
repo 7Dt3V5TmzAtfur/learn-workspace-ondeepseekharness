@@ -19,10 +19,18 @@ export const ROLE_LABELS = Object.freeze({
 })
 
 /** 三色注意力档位（七色语义收敛为三档，见 DESIGN.md 第 3 节）。 */
+/**
+ * 三档注意力的语义与预算。
+ *
+ * token 名与 client.js 的 CSS 变量一一对应：--sc-core-line / -bg / -fg。
+ * 早期这里写的是 blue/red/green（跟 DSH 状态色撞了），
+ * 后来换成橙/品红/青，所以这里也跟着改成 token 名，
+ * 免得读代码的人以为界面还是蓝红绿。
+ */
 export const ATTENTION_TIERS = Object.freeze({
-  core: { zh: '核心', color: 'blue', labels: ['d', 's'], budget: 0.10, why: '必须能复述的骨架' },
-  hard: { zh: '攻坚', color: 'red', labels: ['q', 'v'], budget: 0.08, why: '必须停下来想的地方' },
-  ref: { zh: '参考', color: 'green', labels: ['e', 't', 'c'], budget: null, why: '需要时回查' },
+  core: { zh: '核心', token: 'core', labels: ['d', 's'], budget: 0.10, why: '必须能复述的骨架' },
+  hard: { zh: '攻坚', token: 'hard', labels: ['q', 'v'], budget: 0.08, why: '必须停下来想的地方' },
+  ref: { zh: '参考', token: 'ref', labels: ['e', 't', 'c'], budget: null, why: '需要时回查' },
 })
 
 export const TOTAL_HIGHLIGHT_BUDGET = 0.20

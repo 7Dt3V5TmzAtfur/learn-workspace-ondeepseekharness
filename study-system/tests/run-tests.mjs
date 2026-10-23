@@ -884,6 +884,54 @@ await test('status().counts.coverage 带分母', async () => {
   assert.match(st.counts.coverage, /^\d+\/\d+（[\d.]+%）$/, `覆盖率格式应带分母，实际 ${st.counts.coverage}`)
 })
 
+/* ---- 需求⑥：原则目录里的学习规律必须真的落到代码里 ---- */
+
+section('9b. 学习规律的实现（原则/ 目录）')
+
+await test('三档注意力预算与七类标签对得上', async () => {
+  // 七类标签必须全部有归属，否则标注时会出现"没档位"的角色
+  const byLabel = {}
+  for (const [tier, def] of Object.entries(rules.ATTENTION_TIERS)) {
+    for (const l of def.labels) byLabel[l] = tier
+  }
+  const all = Object.keys(rules.ROLE_LABELS).sort()
+  assert.equal(all.length, 7, `七类标签，实际 ${all.length}`)
+  for (const l of all) assert.ok(byLabel[l], `标签 #${l} 没有归到任何档位`)
+})
+
+await test('档位预算符合二八法则：核心≤10% 攻坚≤8% 合计≤20%', async () => {
+  assert.equal(rules.ATTENTION_TIERS.core.budget, 0.1)
+  assert.equal(rules.ATTENTION_TIERS.hard.budget, 0.08)
+  assert.equal(rules.ATTENTION_TIERS.ref.budget, null, '参考档不设上限')
+  assert.equal(rules.TOTAL_HIGHLIGHT_BUDGET, 0.2)
+})
+
+await test('四档掌握度各自有可观察动词', async () => {
+  const levels = ['了解', '理解', '掌握', '熟练掌握']
+  for (const lv of levels) {
+    assert.ok(Array.isArray(rules.MASTERY_LEVELS[lv]), `缺「${lv}」`)
+    assert.ok(rules.MASTERY_LEVELS[lv].length >= 3, `「${lv}」的动词太少`)
+  }
+})
+
+await test('六段式规定的段落标题齐全且顺序固定', async () => {
+  // 顺序必须与需求一致：摘要 → 帮助与目标 → 重点难点 → 考核方式与知识点 → 思考题 → 参考资料
+  const keys = rules.PREFLIGHT_SECTIONS.map((s) => s.key)
+  assert.deepEqual(
+    keys,
+    ['summary', 'goals', 'difficulty', 'assessment', 'exercises', 'references'],
+    `六段顺序不对：${keys.join(' → ')}`,
+  )
+  for (const s of rules.PREFLIGHT_SECTIONS) {
+    assert.equal(s.required, true, `第 ${s.index} 段应标为必需`)
+    assert.ok(s.title, `第 ${s.index} 段缺标题`)
+  }
+})
+
+await test('八种关系类型齐全', async () => {
+  assert.equal(Object.keys(rules.RELATION_TYPES).length, 8)
+})
+
 /* ------------------------------------------------------------ 9. 汇总 */
 
 section('8. 工具返回值必须是无损 JSON')

@@ -1,0 +1,207 @@
+{
+  "direction": "TD",
+  "edges": [
+    {
+      "from": "wm-limited",
+      "label": "地基",
+      "relation": "prerequisite",
+      "to": "intrinsic"
+    },
+    {
+      "from": "wm-limited",
+      "relation": "prerequisite",
+      "to": "extraneous"
+    },
+    {
+      "from": "wm-limited",
+      "relation": "prerequisite",
+      "to": "germane"
+    },
+    {
+      "from": "interactivity",
+      "relation": "cause",
+      "to": "intrinsic"
+    },
+    {
+      "from": "schema-auto",
+      "relation": "cause",
+      "to": "intrinsic"
+    },
+    {
+      "from": "bad-design",
+      "relation": "cause",
+      "to": "extraneous"
+    },
+    {
+      "from": "intrinsic",
+      "label": "都是工作记忆里的负荷，靠是否在建图式区分",
+      "relation": "contrast",
+      "to": "germane"
+    },
+    {
+      "from": "extraneous",
+      "label": "一贬一褒但都占总量",
+      "relation": "contrast",
+      "to": "germane"
+    },
+    {
+      "from": "intrinsic",
+      "relation": "part-of",
+      "to": "three-loads"
+    },
+    {
+      "from": "extraneous",
+      "relation": "part-of",
+      "to": "three-loads"
+    },
+    {
+      "from": "germane",
+      "relation": "part-of",
+      "to": "three-loads"
+    },
+    {
+      "from": "seven-symbols",
+      "relation": "example-of",
+      "to": "extraneous"
+    },
+    {
+      "from": "three-loads",
+      "relation": "prerequisite",
+      "to": "principles"
+    },
+    {
+      "from": "principles",
+      "label": "具体形态：解释紧贴对象",
+      "relation": "application",
+      "to": "integrated-layout"
+    },
+    {
+      "from": "integrated-layout",
+      "relation": "example-of",
+      "to": "principles"
+    },
+    {
+      "from": "transfer-test",
+      "relation": "application",
+      "to": "extraneous"
+    },
+    {
+      "from": "principles",
+      "relation": "application",
+      "to": "doc-writing"
+    },
+    {
+      "from": "doc-writing",
+      "relation": "cause",
+      "to": "explain-distance"
+    },
+    {
+      "from": "explain-distance",
+      "label": "长文档里距离越大越致命",
+      "relation": "cause",
+      "to": "doc-writing"
+    },
+    {
+      "from": "boundary",
+      "label": "限定：不解释动机与先前知识",
+      "relation": "contrast",
+      "to": "three-loads"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "wm-limited",
+      "kind": "premise",
+      "label": "工作记忆容量有限"
+    },
+    {
+      "id": "interactivity",
+      "kind": "concept",
+      "label": "元素交互复杂度"
+    },
+    {
+      "id": "schema-auto",
+      "kind": "concept",
+      "label": "图式自动化"
+    },
+    {
+      "id": "three-loads",
+      "kind": "concept",
+      "label": "三类负荷"
+    },
+    {
+      "id": "intrinsic",
+      "kind": "concept",
+      "label": "内在负荷"
+    },
+    {
+      "id": "extraneous",
+      "kind": "concept",
+      "label": "外在负荷"
+    },
+    {
+      "id": "germane",
+      "kind": "concept",
+      "label": "相关负荷"
+    },
+    {
+      "id": "bad-design",
+      "kind": "cause",
+      "label": "不当教学设计"
+    },
+    {
+      "id": "seven-symbols",
+      "kind": "example",
+      "label": "七个符号的例子"
+    },
+    {
+      "id": "principles",
+      "kind": "principle",
+      "label": "三条设计原则"
+    },
+    {
+      "id": "integrated-layout",
+      "kind": "method",
+      "label": "整合式排版"
+    },
+    {
+      "id": "transfer-test",
+      "kind": "method",
+      "label": "迁移测试"
+    },
+    {
+      "id": "doc-writing",
+      "kind": "application",
+      "label": "文档写作迁移"
+    },
+    {
+      "id": "explain-distance",
+      "kind": "concept",
+      "label": "解释距离"
+    },
+    {
+      "id": "boundary",
+      "kind": "boundary",
+      "label": "理论边界：不解释动机"
+    }
+  ],
+  "check": {
+    "ok": true,
+    "issues": [],
+    "stats": {
+      "nodes": 15,
+      "edges": 20,
+      "relationCounts": {
+        "prerequisite": 4,
+        "part-of": 3,
+        "contrast": 3,
+        "cause": 5,
+        "example-of": 2,
+        "application": 3,
+        "sequence": 0,
+        "analogy": 0
+      }
+    }
+  },
+  "savedAt": "2026-10-23T17:59:16.986Z"
+}

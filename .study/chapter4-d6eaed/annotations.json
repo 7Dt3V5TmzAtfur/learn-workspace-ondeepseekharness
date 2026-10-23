@@ -1,0 +1,1490 @@
+{
+  "items": [
+    {
+      "segmentId": "¶1",
+      "label": "c",
+      "title": "开篇",
+      "quote": "工具",
+      "note": "本章主题：Agent 如何用工具改变世界",
+      "keyword": "开篇",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶2",
+      "label": "e",
+      "title": "《Her》里的 Samantha",
+      "quote": "她拥有强大的",
+      "note": "用电影开场说明：智能之所以动人，是因为有工具",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶3",
+      "label": "t",
+      "title": "本章路线图",
+      "quote": "本章首先给出五类工具的分类总览",
+      "note": "分类 → 通用原则 → 生态 → 规模问题 → 逐类展开",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶4",
+      "label": "c",
+      "title": "分类",
+      "quote": "工具的分类",
+      "note": "五类工具的划分",
+      "keyword": "分类",
+      "tier": "ref"
+    },
+    {
+      "label": "d",
+      "note": "全章地基：两个审视特征",
+      "segmentId": "¶5",
+      "title": "五类工具的审视特征",
+      "tier": "core",
+      "quote": "作用对象"
+    },
+    {
+      "segmentId": "¶6",
+      "label": "c",
+      "title": "表格",
+      "quote": "调用方向与作用对象",
+      "note": "两个审视特征的对照表",
+      "keyword": "表格",
+      "tier": "ref"
+    },
+    {
+      "label": "e",
+      "note": "五类工具的对照表",
+      "segmentId": "¶7",
+      "title": "表4-1 五类工具对照",
+      "tier": "ref",
+      "quote": "| 工具类型 | 调用方向 | 作用对象 |"
+    },
+    {
+      "segmentId": "¶8",
+      "label": "d",
+      "title": "感知工具：主动获取信息",
+      "quote": "是 Agent 主动获取信息、感知世界的方式",
+      "note": "web_search / knowledge_base_search / fetch_url",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶9",
+      "label": "d",
+      "title": "执行工具：改变外部世界",
+      "quote": "是 Agent 改变外部世界的方式",
+      "note": "shell_exec / code_interpreter / write_file",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶10",
+      "label": "d",
+      "title": "协作工具：与其他 Agent 和人类协作",
+      "quote": "是 Agent 与其他 Agent 及人类协作的方式",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶11",
+      "label": "d",
+      "title": "用户沟通工具：主动传递信息",
+      "quote": "是 Agent 主动向用户传递信息的方式",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶12",
+      "label": "d",
+      "title": "事件触发工具：外部驱动",
+      "quote": "是外部世界驱动 Agent 行动的方式",
+      "note": "设置定时器、监控后台任务、连接事件源",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶13",
+      "label": "t",
+      "title": "后两类为什么放进第六章",
+      "quote": "两者的设计都离不开事件驱动的异步运行时",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶14",
+      "label": "c",
+      "title": "原则",
+      "quote": "工具设计的通用原则",
+      "note": "下面三节分别讲表达形式、描述、参数保真",
+      "keyword": "原则",
+      "tier": "ref"
+    },
+    {
+      "label": "d",
+      "note": "ACI 是统摄全章的概念，后面三条原则都是它的展开",
+      "segmentId": "¶15",
+      "title": "ACI：工具应对应 Agent 的目标",
+      "tier": "core",
+      "quote": "工具设计的早期形态是直接的 API 封装——把每"
+    },
+    {
+      "segmentId": "¶16",
+      "label": "c",
+      "title": "形式",
+      "quote": "能力的表达形式：专用工具、通用执行器与 Skill",
+      "note": "同一个能力有多种形态，选哪个",
+      "keyword": "形式",
+      "tier": "ref"
+    },
+    {
+      "label": "q",
+      "note": "这里把“形态”与“披露”正式切开，全章最关键的区分",
+      "segmentId": "¶17",
+      "title": "形态与数量是两个独立问题",
+      "tier": "hard",
+      "quote": "部署应用"
+    },
+    {
+      "segmentId": "¶18",
+      "label": "d",
+      "title": "三种形态的取舍",
+      "quote": "结构化的函数调用，确定性高、可测试、参数受 schema 约束",
+      "note": "专用工具占 token 但确定；Skill 写起来快但有歧义",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶19",
+      "label": "e",
+      "title": "“部署应用”写成 Skill 的样子",
+      "quote": "运行 npm run build 构建项目",
+      "tier": "ref"
+    },
+    {
+      "label": "s",
+      "note": "反向强调：本节只答形态，规模问题后置。容易漏掉的一句",
+      "segmentId": "¶20",
+      "title": "本节问的是形态不是数量",
+      "tier": "core",
+      "quote": "一次让模型看见多少条能力"
+    },
+    {
+      "label": "e",
+      "note": "计算器 vs code_interpreter 的例子",
+      "segmentId": "¶21",
+      "title": "通用优于专用的例子",
+      "tier": "ref",
+      "quote": "元能力"
+    },
+    {
+      "segmentId": "¶22",
+      "label": "d",
+      "title": "粒度应偏向整合",
+      "quote": "判断是否应该整合的核心标准是",
+      "note": "太细增加选择负担，太粗单个工具过于复杂",
+      "tier": "core"
+    },
+    {
+      "label": "q",
+      "note": "四种例外，容易只记住前两个",
+      "segmentId": "¶23",
+      "title": "何时该退回专用工具（四种情况）",
+      "tier": "hard",
+      "quote": "**什么时候该退回专用工具"
+    },
+    {
+      "segmentId": "¶24",
+      "label": "v",
+      "title": "参数复杂度为什么格外重要",
+      "quote": "模型原生工具用 JSON 格式规定了每个工具的输入、输出格式",
+      "note": "格式越复杂，模型越容易生成非法调用",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶25",
+      "label": "d",
+      "title": "Skill 的优点：对人类友好",
+      "quote": "无论是否会编程，人们都可以编写和修改 Skill",
+      "tier": "core"
+    },
+    {
+      "label": "t",
+      "note": "从四维度自然过渡到决策清单",
+      "segmentId": "¶26",
+      "title": "四个决策维度",
+      "tier": "ref",
+      "quote": "**四个决策维度"
+    },
+    {
+      "label": "c",
+      "keyword": "维度",
+      "note": "这段就是可直接拿去用的检查表",
+      "segmentId": "¶27",
+      "title": "四维度的具体内容",
+      "tier": "ref",
+      "quote": "- **安全与权限**：需要精细授权、审计留痕，"
+    },
+    {
+      "segmentId": "¶28",
+      "label": "t",
+      "title": "这个选择会反复出现",
+      "quote": "同样的选择",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶29",
+      "label": "e",
+      "title": "让代码来编排工具调用",
+      "quote": "它让模型可以用代码",
+      "note": "串联多个工具，而不是把中间结果都搬进上下文",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶30",
+      "label": "c",
+      "title": "描述",
+      "quote": "工具描述的艺术",
+      "note": "描述质量直接决定使用准确性",
+      "keyword": "描述",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶31",
+      "label": "d",
+      "title": "描述决定准确性",
+      "quote": "使用工具的准确性",
+      "tier": "core"
+    },
+    {
+      "label": "t",
+      "note": "描述关注“何时用”而非“能做什么”",
+      "segmentId": "¶32",
+      "title": "工具描述的核心",
+      "tier": "ref",
+      "quote": "什么时候用"
+    },
+    {
+      "segmentId": "¶33",
+      "label": "v",
+      "title": "边界比能力更重要",
+      "quote": "往往比描述能力本身更重要",
+      "note": "不说清\"做不到什么\"，LLM 就会自己猜",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶34",
+      "label": "e",
+      "title": "参数描述要用具体例子",
+      "quote": "比单写",
+      "note": "给一个真实的时间戳例子，胜过只说格式名",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶35",
+      "label": "e",
+      "title": "返回值也要描述",
+      "quote": "这类说明能减少后续解析时出错",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶36",
+      "label": "e",
+      "title": "附 1-5 个真实调用示例",
+      "quote": "为每个工具附带 1-5 个真实的调用示例",
+      "note": "JSON Schema 只能描述类型，表达不了调用方式",
+      "tier": "ref"
+    },
+    {
+      "label": "t",
+      "note": "很实用的调试顺序",
+      "segmentId": "¶37",
+      "title": "选错工具先查描述",
+      "tier": "ref",
+      "quote": "这里有一条实用的调试原则：当 Agent 频繁选"
+    },
+    {
+      "segmentId": "¶38",
+      "label": "s",
+      "title": "这一节也适用于 Skill",
+      "quote": "不管工具使用何种表达方式，都需要清晰的描述文档",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶39",
+      "label": "c",
+      "title": "保真",
+      "quote": "参数传递的保真性",
+      "note": "模型看到的和工具实际收到的必须一致",
+      "keyword": "保真",
+      "tier": "ref"
+    },
+    {
+      "label": "v",
+      "note": "可验证性最强的一个设计陷阱",
+      "segmentId": "¶40",
+      "title": "静默输入转换是最隐蔽的反模式",
+      "tier": "hard",
+      "quote": "修正"
+    },
+    {
+      "segmentId": "¶41",
+      "label": "e",
+      "title": "Cursor 静默替换弯引号",
+      "quote": "工具的参数传递层会将中文弯引号",
+      "note": "读方向：模型以为匹配到了，其实没有",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶42",
+      "label": "e",
+      "title": "写方向同样被篡改",
+      "quote": "参数传递层却将其静默替换为直引号",
+      "note": "模型以为写对了，文件里其实是另一回事",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶43",
+      "label": "v",
+      "title": "静默参数注入",
+      "quote": "工具在模型不知情的情况下向命令追加额外的参数",
+      "note": "在 git commit 上偷偷加参数",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶44",
+      "label": "d",
+      "title": "根本原则：不能有系统性偏差",
+      "quote": "模型感知到的世界与工具操作的世界之间，不能存在系统性的偏差",
+      "note": "要规范化就必须显式说明，不能偷偷改",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶45",
+      "label": "c",
+      "title": "生态",
+      "quote": "工具生态：MCP 与 Skill Hub",
+      "note": "能力怎么分发出去",
+      "keyword": "生态",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶46",
+      "label": "q",
+      "title": "每个框架工具格式都不一样",
+      "quote": "每个 Agent 框架定义工具的方式都不一样",
+      "tier": "hard"
+    },
+    {
+      "label": "e",
+      "note": "MCP 架构的最小定义",
+      "segmentId": "¶47",
+      "title": "MCP 客户端-服务器架构",
+      "tier": "ref",
+      "quote": "MCP 采用客户端-服务器架构：**MCP 服务"
+    },
+    {
+      "label": "e",
+      "note": "标准化描述格式是互操作的前提",
+      "segmentId": "¶48",
+      "title": "JSON Schema 工具描述",
+      "tier": "ref",
+      "quote": "**标准化的工具描述格式**"
+    },
+    {
+      "segmentId": "¶49",
+      "label": "e",
+      "title": "MCP 传输层灵活",
+      "quote": "本地传输采用 stdio",
+      "note": "本地 stdio，远程 Streamable HTTP",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶50",
+      "label": "d",
+      "title": "资源与工具分离",
+      "quote": "这种分离使 Agent 能够区分",
+      "note": "获取信息 vs 执行操作，两种不同性质的动作",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶51",
+      "label": "c",
+      "title": "图示",
+      "quote": "图4-1 MCP 协议交互时序",
+      "note": "配图索引",
+      "keyword": "图示",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶52",
+      "label": "s",
+      "title": "MCP 的生态价值：一次开发处处可用",
+      "quote": "一个 MCP 服务器可以同时被 Cursor、Claude Desktop、OpenClaw 等任何兼容的客户端使用",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶53",
+      "label": "d",
+      "title": "Skill Hub：不需要协议",
+      "quote": "一个 skill 就是一个装着",
+      "note": "skill 就是一个文件夹，天然可分发给各种客户端",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶54",
+      "label": "c",
+      "title": "出处",
+      "quote": "Introducing skills, the open agent skills ecosystem",
+      "note": "Vercel 官方公告，可回查",
+      "keyword": "出处",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶55",
+      "label": "v",
+      "title": "两者的 token 成本不同",
+      "quote": "接入一个 MCP 服务器，是在运行时建立一条连接",
+      "note": "MCP 是连接后 tools/list；Skill 是读文件",
+      "tier": "hard"
+    },
+    {
+      "label": "c",
+      "keyword": "信任",
+      "note": "两条渠道的共同风险，全章收束点",
+      "segmentId": "¶56",
+      "title": "第三方能力的信任边界",
+      "tier": "ref",
+      "quote": "**第三方能力的安全风险**"
+    },
+    {
+      "segmentId": "¶57",
+      "label": "q",
+      "title": "工具的供应链风险",
+      "quote": "工具描述投毒",
+      "note": "description 会原样进入上下文，等于可执行指令",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶58",
+      "label": "d",
+      "title": "怎么防：把 description 当不可信输入",
+      "quote": "把 description 当作不可信输入来审计",
+      "note": "锁版本、最小权限，就是软件供应链安全那一套",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶59",
+      "label": "v",
+      "title": "带脚本的 Skill 多一类风险",
+      "quote": "带脚本的 Skill 比只暴露工具描述的远程 MCP 服务器多出一整类风险",
+      "note": "脚本可能跑在用户电脑上",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶60",
+      "label": "c",
+      "title": "规模",
+      "quote": "工具太多怎么办：层次化组织与主动工具发现",
+      "note": "三个方案的递进",
+      "keyword": "规模",
+      "tier": "ref"
+    },
+    {
+      "label": "d",
+      "note": "两个独立问题的对照句，全章枢纽",
+      "segmentId": "¶61",
+      "title": "这一节问的是：一次该看见多少",
+      "tier": "core",
+      "quote": "能力的表达形式"
+    },
+    {
+      "label": "s",
+      "note": "四层应对手段的纲领句，背下这四层",
+      "segmentId": "¶62",
+      "title": "四层应对手段总纲",
+      "tier": "core",
+      "quote": "按需"
+    },
+    {
+      "segmentId": "¶63",
+      "label": "c",
+      "title": "分层",
+      "quote": "层次化组织与按需加载",
+      "note": "第一种方案：先分组再检索",
+      "keyword": "分层",
+      "tier": "ref"
+    },
+    {
+      "label": "e",
+      "note": "46.9% 这个数字的出处",
+      "segmentId": "¶64",
+      "title": "Cursor 只暴露索引的实测",
+      "tier": "ref",
+      "quote": "**按需加载：只暴露索引"
+    },
+    {
+      "label": "e",
+      "note": "最实用的工程折中，值得单独记",
+      "segmentId": "¶65",
+      "title": "Pi 的代理工具方案",
+      "tier": "ref",
+      "quote": "搜索→查看定义→调用"
+    },
+    {
+      "segmentId": "¶66",
+      "label": "c",
+      "title": "出处",
+      "quote": "Pi Coding Agent",
+      "note": "反 MCP 的一个实践观点，可回查",
+      "keyword": "出处",
+      "tier": "ref"
+    },
+    {
+      "label": "t",
+      "note": "按信息源性质分类的具体分法",
+      "segmentId": "¶67",
+      "title": "层次化组织：按信息源分类",
+      "tier": "ref",
+      "quote": "**层次化组织"
+    },
+    {
+      "segmentId": "¶68",
+      "label": "e",
+      "title": "按动作类型分组",
+      "quote": "搜索工具",
+      "note": "搜索/读取/解析三类，按动作而非业务划分",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶69",
+      "label": "t",
+      "title": "分类结构要写进系统提示词",
+      "quote": "可以帮助 LLM 快速定位到相关的工具组",
+      "tier": "ref"
+    },
+    {
+      "label": "v",
+      "note": "49%→74% 的实验数据",
+      "segmentId": "¶70",
+      "title": "检索式预筛的实测提升",
+      "tier": "hard",
+      "quote": "**检索式预筛选"
+    },
+    {
+      "segmentId": "¶71",
+      "label": "c",
+      "title": "主动",
+      "quote": "模型原生的主动工具发现",
+      "note": "从\"被动选择\"走到\"主动声明缺口\"",
+      "keyword": "主动",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶72",
+      "label": "q",
+      "title": "一次性检索的局限",
+      "quote": "它按用户的初始查询做",
+      "note": "任务开始时预见不到所有需求",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶73",
+      "label": "d",
+      "tier": "core",
+      "title": "从被动选择到主动发现",
+      "quote": "让 Agent 从被动接受者变为主动发现者",
+      "note": "执行中意识到能力缺口时，用自然语言声明需要什么能力，系统再动态匹配注入"
+    },
+    {
+      "segmentId": "¶74",
+      "label": "e",
+      "title": "工程上的等价做法",
+      "quote": "工具搜索工具",
+      "note": "只留基础工具 + 一个搜索工具；Claude 的 Tool Search Tool 即此类",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶75",
+      "label": "c",
+      "title": "出处",
+      "quote": "MCP-Zero: Active Tool Discovery",
+      "note": "论文出处，可回查",
+      "keyword": "出处",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶76",
+      "label": "c",
+      "title": "图示",
+      "quote": "层次化工具匹配（服务器级→工具级两层语义搜索）",
+      "note": "配图索引",
+      "keyword": "图示",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶77",
+      "label": "d",
+      "title": "两层匹配把搜索空间压下来",
+      "quote": "把搜索空间从 “数千个工具” 缩小为 “数十个服务器 × 每个服务器数十个工具”",
+      "note": "关键在于工具组织本身有层次；两层都低于阈值就该明确返回\"未找到\"",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶78",
+      "label": "s",
+      "title": "schema 固定后前缀仍可复用",
+      "quote": "首次加载后的 schema 固定在轨迹原位置",
+      "note": "这是后面 KV Cache 优化的前提",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶79",
+      "label": "c",
+      "title": "图示",
+      "quote": "工具动态加载的 KV Cache 优化",
+      "note": "配图索引",
+      "keyword": "图示",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶80",
+      "label": "d",
+      "title": "动态加载的代价：破坏 KV Cache",
+      "quote": "主动发现有一个微妙的工程代价",
+      "note": "破解：新 schema 追加到末尾，静态前缀不动，状态栏只留工具名列表",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶81",
+      "label": "v",
+      "title": "真正导致重算的只有两种情况",
+      "quote": "真正会导致重算的只有两种情况",
+      "note": "TTL 过期（全体重算）与修改/移除/重排已加载工具集",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶82",
+      "label": "c",
+      "title": "图示",
+      "quote": "动态发现后的上下文结构",
+      "note": "工具 schema 散落在轨迹各处",
+      "keyword": "图示",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶83",
+      "label": "s",
+      "title": "“工具定义必须在最前面”不再是铁律",
+      "quote": "工具定义必须在上下文最前面",
+      "note": "前缀依然静态只增不改，只是工具定义能按需进入轨迹",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶84",
+      "label": "t",
+      "title": "这套机制很有效但很繁琐",
+      "quote": "工程上却相当繁琐",
+      "note": "前提是把工具当成\"面向模型的正式定义\"；下一节 Skills 换更轻的思路",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶85",
+      "label": "e",
+      "title": "实验 4-1：主动工具发现",
+      "quote": "通过对比验证主动工具发现对小参数量模型的显著价值",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶86",
+      "label": "c",
+      "title": "技能",
+      "quote": "Skills：把工具发现变成“按需查阅”",
+      "note": "换个角度：Skill 就是一种工具发现范式",
+      "keyword": "技能",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶87",
+      "label": "d",
+      "title": "Skill 也是一种工具发现范式",
+      "quote": "把它看作一种工具发现范式",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶88",
+      "label": "d",
+      "title": "渐进式披露在工具侧的变体",
+      "quote": "这是第一章命名的渐进式披露模式在工具侧的变体",
+      "note": "先只给名字和一句话，需要时再读全文",
+      "tier": "core"
+    },
+    {
+      "label": "e",
+      "note": "极好的类比，用来说明 Skill 的使用方式",
+      "segmentId": "¶89",
+      "title": "Skill 像查工具书而不是通读",
+      "tier": "ref",
+      "quote": "Skill 更接近人使用参考资料的方式"
+    },
+    {
+      "segmentId": "¶90",
+      "label": "v",
+      "title": "专用工具要达到同样效果，得另建一层",
+      "quote": "专用工具要达到同样的渐进式披露，必须在工具之外另建一层",
+      "note": "嵌入索引、检索元工具、命名空间，全是额外基础设施",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶91",
+      "label": "t",
+      "title": "两条渠道正在合流",
+      "quote": "MCP 官方已经在推动 skill 经由 MCP 被发现和传递",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶92",
+      "label": "c",
+      "title": "出处",
+      "quote": "Build an MCP server with Agent Skills",
+      "note": "MCP 官方文档，可回查",
+      "keyword": "出处",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶93",
+      "label": "s",
+      "title": "通用问题讲完，转入逐类设计",
+      "quote": "以上都是所有工具共通的问题",
+      "note": "接下来：能力形态/描述/参数/协议/规模 → 逐类展开",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶94",
+      "label": "c",
+      "title": "感知",
+      "quote": "感知工具",
+      "note": "第一个逐类展开的类别",
+      "keyword": "感知",
+      "tier": "ref"
+    },
+    {
+      "label": "d",
+      "note": "感知工具的设计目标一句话说清",
+      "segmentId": "¶95",
+      "title": "感知工具的定位",
+      "tier": "core",
+      "quote": "感知工具是 Agent 获取外部信息的主要渠道，"
+    },
+    {
+      "segmentId": "¶96",
+      "label": "d",
+      "title": "感知工具的通病：返回太多",
+      "quote": "它常常面临返回信息量远超 Agent 处理能力的挑战",
+      "note": "通用做法是在工具层集成上下文感知的截断",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶97",
+      "label": "d",
+      "title": "搜索类：返回候选列表而非全文",
+      "quote": "让 Agent 先浏览候选，再决定深入读取哪一条",
+      "note": "结果多时要给分页或游标",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶98",
+      "label": "d",
+      "title": "读取类：offset/limit 与截断",
+      "quote": "read 类工具应支持 offset/limit 参数",
+      "note": "截断必须显式告知省略了多少、怎么读剩余",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶99",
+      "label": "t",
+      "title": "只读带来的工程红利",
+      "quote": "感知工具不改变外部世界，这一只读特性带来两个天然优势",
+      "note": "可缓存、可重试；但缓存键要含用户身份与授权",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶100",
+      "label": "q",
+      "title": "多模态输出该给图还是给文本",
+      "quote": "直接返回图像交给具备视觉能力的模型，还是先用 OCR、图表解析等手段转成文本",
+      "note": "前者保细节费 token，后者省 token 丢布局",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶101",
+      "label": "e",
+      "title": "实验 4-2：感知工具",
+      "quote": "本实验构建一套感知工具 MCP 服务器",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶102",
+      "label": "c",
+      "title": "多模态",
+      "quote": "多模态感知",
+      "note": "三条技术路线",
+      "keyword": "多模",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶103",
+      "label": "d",
+      "title": "多模态感知的三条路径",
+      "quote": "有三条路径可以实现多模态感知",
+      "note": "原生多模态 / 提取为文本 / 工具化分析",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶104",
+      "label": "c",
+      "title": "原生",
+      "quote": "原生多模态处理",
+      "note": "能力上限最高，代价也最大",
+      "keyword": "原生",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶105",
+      "label": "d",
+      "title": "原生多模态的原理",
+      "quote": "通过专门的编码器将不同类型的数据全部映射到统一的高维语义空间",
+      "note": "图像经视觉编码器进入同一语义空间",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶106",
+      "label": "c",
+      "title": "转文本",
+      "quote": "提取为文本",
+      "note": "主模型不支持多模态时的变通",
+      "keyword": "文本",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶107",
+      "label": "d",
+      "title": "提取为文本是两阶段过程",
+      "quote": "这是一个两阶段过程",
+      "note": "先提取成文本，再交给主模型处理",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶108",
+      "label": "v",
+      "title": "文本类 PDF 提取更省 token",
+      "quote": "一页 PDF 的截图往往需要上千个 token",
+      "note": "但提取会丢版面信息，纯图表页就不划算",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶109",
+      "label": "c",
+      "title": "工具化",
+      "quote": "工具化多模态分析",
+      "note": "把多模态能力做成工具",
+      "keyword": "工具",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶110",
+      "label": "d",
+      "title": "工具化分析优于提取为文本",
+      "quote": "将多模态分析作为工具",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶111",
+      "label": "s",
+      "title": "工具化只留问题与结果",
+      "quote": "仅在上下文中保留简短的问题和分析结果",
+      "note": "避免图片视频的大量 token 占满上下文",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶112",
+      "label": "e",
+      "title": "实验 4-3：三种范式对比",
+      "quote": "在统一框架内对三种策略进行系统比较和评估",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶113",
+      "label": "d",
+      "title": "执行工具这一节讲什么",
+      "quote": "执行工具",
+      "note": "与感知工具相对：感知是读，执行是写，写就不可逆",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶114",
+      "label": "d",
+      "title": "执行工具的错误代价极高",
+      "quote": "误删的文件无法恢复，错误的系统命令可能导致服务中断",
+      "note": "所以要在能力开放与安全约束之间取得平衡",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶115",
+      "label": "c",
+      "title": "层次",
+      "quote": "安全机制的层次化设计",
+      "note": "引出下面的多层防护",
+      "keyword": "层次",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶116",
+      "label": "d",
+      "title": "为什么不能只靠一层",
+      "quote": "多层防护体系",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶117",
+      "label": "d",
+      "title": "第一层：输入验证",
+      "quote": "检查所有参数的合法性",
+      "note": "关键是快速失败：发现异常立即拒绝，不做\"智能\"修正",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶118",
+      "label": "d",
+      "title": "第二层：权限控制",
+      "quote": "黑名单只是最基础的防护层，不应作为唯一手段",
+      "note": "攻击者可用变形命令绕过字符串匹配",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶119",
+      "label": "c",
+      "title": "范式",
+      "quote": "提议者-审核者：独立模型的安全审查",
+      "note": "引出下面的双模型互审",
+      "keyword": "范式",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶120",
+      "label": "d",
+      "title": "提议者-审核者范式",
+      "quote": "用独立的第二视角检验第一视角的产出",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶121",
+      "label": "e",
+      "title": "事前审批像银行双签",
+      "quote": "一个模型负责提议行动",
+      "note": "经办+审核双签，转两道签字才生效",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶122",
+      "label": "v",
+      "title": "模型选择的三个条件",
+      "quote": "提议模型和审批模型应来自不同的家族",
+      "note": "能力相近但训练偏好不同：同家族会同错，差距过大审查者跟不上",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶123",
+      "label": "d",
+      "title": "提示词：规则同、关注点异",
+      "quote": "两个模型的底层规则和约束必须完全一致",
+      "note": "但提议者强调行动导向，审批者强调风险控制",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶124",
+      "label": "t",
+      "title": "拒绝理由要回流轨迹",
+      "quote": "将拒绝理由作为工具调用结果加入 Agent 的轨迹",
+      "note": "把审批失败当成普通工具失败，Agent 本来就会处理",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶125",
+      "label": "s",
+      "title": "事前审批的适用范围",
+      "quote": "不可逆的、影响重大的操作",
+      "note": "收费、发通知、改关键配置、建外部资源",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶126",
+      "label": "d",
+      "title": "事后验证的要诀：模态切换",
+      "quote": "而是在不同的模态下检验结果",
+      "note": "同模态重审会陷进同一个盲区",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶127",
+      "label": "c",
+      "title": "边车",
+      "quote": "Sidecar 机制：与主思考并行的安全校验",
+      "note": "边车模式：独立运行但伴随主体",
+      "keyword": "边车",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶128",
+      "label": "d",
+      "title": "Sidecar 解决的是另一个问题",
+      "quote": "操作执行时如何实时校验安全性和可靠性",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶129",
+      "label": "e",
+      "title": "Claude Code 自动模式案例",
+      "quote": "一个独立的轻量级 LLM 调用会被触发来判断",
+      "note": "旁路检查，不拖慢主 Agent",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶130",
+      "label": "v",
+      "title": "Sidecar 起门控作用",
+      "quote": "对被审查的那次工具调用而言，Sidecar 起",
+      "note": "与流式输出并行，危险操作被拦住",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶131",
+      "label": "v",
+      "title": "只读结构化字段防注入",
+      "quote": "只读结构化字段就堵住了这条话术通道",
+      "note": "若读自由文本，用户输入里的话术就能骗过它",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶132",
+      "label": "q",
+      "title": "为什么轻量模型就够",
+      "quote": "关键在于审查对象不同",
+      "note": "开放思考要能力相近；分类问题轻量模型够用",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶133",
+      "label": "d",
+      "title": "拒绝熔断器",
+      "quote": "当分类器连续多次拒绝操作时，系统不应无限重试",
+      "note": "否则浪费资源还可能死循环，应转人工",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶134",
+      "label": "t",
+      "title": "展示与放行拆开并行",
+      "quote": "把 “展示” 和 “放行” 两件事拆开并行",
+      "note": "安全性不以牺牲体验为代价",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶135",
+      "label": "t",
+      "title": "两个机制要对照着看",
+      "quote": "但二者的执行时机和审查对象不同",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶136",
+      "label": "c",
+      "title": "对比",
+      "quote": "提议者-审核者机制与 Sidecar 机制对比",
+      "keyword": "对比",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶137",
+      "label": "c",
+      "title": "表格",
+      "quote": "维度",
+      "note": "提议者-审核者 vs Sidecar 的对照表",
+      "keyword": "表格",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶138",
+      "label": "e",
+      "title": "Sidecar 的另一类用途",
+      "quote": "构造和补充上下文",
+      "note": "并行筛记忆、摘要长输出、取最新信息",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶139",
+      "label": "c",
+      "title": "验证",
+      "quote": "自动验证与反馈闭环",
+      "note": "引出下面的 linter 检查",
+      "keyword": "验证",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶140",
+      "label": "d",
+      "title": "可验证就该自动验证",
+      "quote": "如果操作结果可以被验证，就应该自动验证",
+      "note": "写文件后立即跑 linter，把错误作为返回值的一部分",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶141",
+      "label": "s",
+      "title": "执行-验证-反馈成闭环",
+      "quote": "这就创建了一个",
+      "note": "语法错误下一轮就能被看到并修正",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶142",
+      "label": "q",
+      "title": "长输出怎么办",
+      "quote": "长输出的截断与持久化",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶143",
+      "label": "d",
+      "title": "超过阈值就只写头尾",
+      "quote": "当检测到输出超过阈值",
+      "note": "完整结果落临时文件",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶144",
+      "label": "s",
+      "title": "头尾各留 50 行",
+      "quote": "头部保留",
+      "note": "头尾保留 + 中间提示 + 文件引导",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶145",
+      "label": "c",
+      "title": "沙盒",
+      "quote": "执行环境的隔离与沙盒",
+      "note": "引出下面三级隔离",
+      "keyword": "沙盒",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶146",
+      "label": "v",
+      "title": "venv 不是沙盒",
+      "quote": "Python 虚拟环境（venv）不是沙盒",
+      "note": "常见误区：只隔离依赖，不隔离文件/网络/进程",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶147",
+      "label": "d",
+      "title": "隔离强度递增",
+      "quote": "按隔离强度递增排列",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶148",
+      "label": "e",
+      "title": "三级隔离的具体形态",
+      "quote": "microVM 提供带独立内核的硬件级隔离",
+      "note": "进程级 → 容器 → microVM，逃逸风险递减",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶149",
+      "label": "t",
+      "title": "隔离还要限资源",
+      "quote": "防止恶意或失控的代码耗尽所有资源",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶150",
+      "label": "s",
+      "title": "按输入可信度选层级",
+      "quote": "根据部署环境和安全需求选择隔离层级",
+      "note": "输入不可信就要升级到容器乃至 microVM",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶151",
+      "label": "c",
+      "title": "观测",
+      "quote": "工具执行的可观测性",
+      "note": "引出下面四项内容",
+      "keyword": "观测",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶152",
+      "label": "d",
+      "title": "可观测性四项内容",
+      "quote": "用于监控、审计和调试 Agent 的执行行为",
+      "note": "日志、审计、指标、告警",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶153",
+      "label": "q",
+      "title": "超时与打断怎么办",
+      "quote": "幂等性与取消语义",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶154",
+      "label": "q",
+      "title": "取消/超时后副作用发生了吗",
+      "quote": "当一次调用被取消或超时时，它的副作用到底发生了没有",
+      "note": "转账超时：钱可能已转出，也可能没有；盲目重试就出事",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶155",
+      "label": "d",
+      "title": "幂等性的两种做法",
+      "quote": "同一个操作执行一次和执行多次，对外部世界的影响完全相同",
+      "note": "唯一标识去重 / 先查询后变更",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶156",
+      "label": "v",
+      "title": "不可幂等的操作要两段式",
+      "quote": "每执行一次就产生一个不可撤销的真实世界事件",
+      "note": "邮件/电话/转账只能用\"预检-确认\"两段式",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶157",
+      "label": "e",
+      "title": "实验 4-4 的实验要求",
+      "quote": "为这些执行工具添加完整的安全和验证体系",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶158",
+      "label": "c",
+      "title": "协作",
+      "quote": "协作工具",
+      "note": "任务超出单 Agent 边界时的解法",
+      "keyword": "协作",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶159",
+      "label": "d",
+      "title": "协作工具解决什么",
+      "quote": "当任务超出单个 Agent 的能力边界时",
+      "note": "委托子任务给其他 Agent 或人类，再整合结果",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶160",
+      "label": "c",
+      "title": "设计",
+      "quote": "子 Agent 的设计哲学",
+      "note": "引出下面提示词与协作机制两段",
+      "keyword": "设计",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶161",
+      "label": "d",
+      "title": "子 Agent 的核心价值是专业化分工",
+      "quote": "与其构建一个",
+      "note": "一组专精 Agent 优于一个全能 Agent",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶162",
+      "label": "d",
+      "title": "子 Agent 提示词的四个要素",
+      "quote": "子 Agent 提示词的关键要素",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶163",
+      "label": "e",
+      "title": "要素一：角色定义要清晰",
+      "quote": "开门见山说明",
+      "note": "别让子 Agent 猜自己是谁",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶164",
+      "label": "v",
+      "title": "要素二：来源必须标注",
+      "quote": "这种标注可以防止子 Agent 混淆信息来源",
+      "note": "不标来源就等于给提示注入开门",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶165",
+      "label": "e",
+      "title": "要素三：任务边界要明确",
+      "quote": "什么在职责范围内，什么需要转交或上报",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶166",
+      "label": "e",
+      "title": "要素四：输出格式要标准化",
+      "quote": "降低主 Agent 的解析负担",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶167",
+      "label": "c",
+      "title": "机制",
+      "quote": "Agent 间的协作机制",
+      "note": "引出下面三组原语",
+      "keyword": "机制",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶168",
+      "label": "d",
+      "title": "协作的三组原语",
+      "quote": "协作工具的接口可以归纳为三组原语",
+      "note": "启动与取消、消息传递、发现",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶169",
+      "label": "t",
+      "title": "原语之上承载四种协作形态",
+      "quote": "同步调用",
+      "note": "同步/异步/流式/多轮；拓扑与分工见第十章",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶170",
+      "label": "c",
+      "title": "人工",
+      "quote": "人工介入的艺术",
+      "note": "引出 HITL 的超时与反馈循环",
+      "keyword": "人工",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶171",
+      "label": "d",
+      "title": "为什么还需要人",
+      "quote": "有些判断本质上需要人类的价值观或领域专业知识",
+      "tier": "core"
+    },
+    {
+      "segmentId": "¶172",
+      "label": "q",
+      "title": "HITL 没人响应怎么办",
+      "quote": "超时和降级策略",
+      "note": "要设阈值与默认行为，还要分优先级队列",
+      "tier": "hard"
+    },
+    {
+      "segmentId": "¶173",
+      "label": "t",
+      "title": "HITL 要形成学习循环",
+      "quote": "HITL 不应是一次性的交互，而应形成学习循环",
+      "note": "批准/拒绝及理由是带证据的反馈数据",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶174",
+      "label": "e",
+      "title": "实验 4-5 的实验要求",
+      "quote": "为子 Agent 实现至少两种上下文传递方式并对比效果",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶175",
+      "label": "c",
+      "title": "小结",
+      "quote": "本章小结",
+      "note": "三类主动调用的工具",
+      "keyword": "小结",
+      "tier": "ref"
+    },
+    {
+      "label": "s",
+      "note": "全章收束段，适合拿来做复述提纲",
+      "segmentId": "¶176",
+      "title": "本章小结：两个决策 + 两条渠道",
+      "tier": "core",
+      "quote": "一次让模型看见多少条能力"
+    },
+    {
+      "segmentId": "¶177",
+      "label": "s",
+      "title": "本章只讲了三类",
+      "quote": "由 Agent 主动调用的三类",
+      "tier": "core"
+    },
+    {
+      "label": "s",
+      "note": "三类工具设计关键的汇总，适合对照复习",
+      "segmentId": "¶178",
+      "title": "三类工具的设计关键汇总",
+      "tier": "core",
+      "quote": "- **感知工具**：关键在于粒度权衡、上下文感"
+    },
+    {
+      "segmentId": "¶179",
+      "label": "t",
+      "title": "另两类留给第六章",
+      "quote": "由外部事件驱动，或需要在用户不一定在线时跨渠道异步触达",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶180",
+      "label": "t",
+      "title": "章间过渡：工具能被创造吗",
+      "quote": "Agent 能不能通过写代码来",
+      "note": "下一章：代码作为创造工具的手段",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶181",
+      "label": "c",
+      "title": "思考",
+      "quote": "思考题",
+      "note": "读完自测用",
+      "keyword": "思考",
+      "tier": "ref"
+    },
+    {
+      "segmentId": "¶182",
+      "label": "q",
+      "title": "MCP 最该扩展什么能力",
+      "quote": "你认为 MCP 未来最需要扩展的能力是什么",
+      "note": "标准化与复杂交互模式之间的矛盾",
+      "tier": "hard"
+    }
+  ],
+  "stats": {
+    "total": 182,
+    "byTier": {
+      "ref": 90,
+      "core": 64,
+      "hard": 28
+    },
+    "highlightedChars": 2953,
+    "totalChars": 29831,
+    "ratio": 0.1106,
+    "labelCounts": {
+      "c": 41,
+      "e": 30,
+      "t": 19,
+      "d": 49,
+      "q": 12,
+      "s": 15,
+      "v": 16
+    }
+  },
+  "issues": [],
+  "savedAt": "2026-10-23T19:15:08.817Z",
+  "backfilledAt": "2026-10-23T20:34:36.189Z",
+  "backfillNote": "quote 由脚本从原文机械回填，建议让模型重新精标"
+}

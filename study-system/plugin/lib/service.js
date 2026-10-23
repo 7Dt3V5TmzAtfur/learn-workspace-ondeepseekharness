@@ -71,7 +71,8 @@ export class StudyService {
       attentionTiers: Object.entries(ATTENTION_TIERS).map(([key, v]) => ({
         key,
         zh: v.zh,
-        color: v.color,
+        // token 名对应界面的 CSS 变量 --sc-<token>-line，不再是旧的颜色名
+        token: v.token,
         labels: v.labels,
         budget: v.budget,
         why: v.why,

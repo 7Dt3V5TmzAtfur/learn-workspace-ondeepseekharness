@@ -254,6 +254,34 @@ for (const cls of ['sc-hl-core', 'sc-hl-hard', 'sc-hl-ref', 'sc-md', 'sc-table']
   check(`CSS 定义了 .${cls}`, clientSrc.includes(`.${cls}`))
 }
 
+/* ---------------------------------------------- 6. 追问与语音 */
+
+console.log('\n6. 需求④⑤：选中词解释与语音提问')
+
+check('选中词用 mouseup 捕获', /onMouseUp/.test(clientSrc), '拖选后无法取到选中的词')
+check('键盘/触屏也能选词', /onKeyUp|selectionchange/.test(clientSrc), '只能鼠标拖选，shift+方向键会漏')
+check(
+  '点空白处不会误弹追问层',
+  /const picked = readSelection\(\)[\s\S]{0,80}if \(!picked\) return/.test(clientSrc),
+  '整段点击就弹层会干扰阅读',
+)
+check('追问答案在面板内显示（不靠复制剪贴板）', /terms-pending/.test(clientSrc), '必须轮询等 Agent 回填')
+check('剪贴板只作兜底', /clipboard/.test(clientSrc), '宿主没响应时用户还能自己发')
+check('语音用中文识别', /lang = 'zh-CN'/.test(clientSrc), '不设中文会识别成英文')
+check('语音可以停止', /stopVoice|\.stop\(\)/.test(clientSrc), '"聆听中"点不了，只能等它超时')
+check('浏览器不支持时给说明而不是空按钮', /不支持语音/.test(clientSrc), '留个点不动的按钮最糟')
+check(
+  '图例颜色与 CSS 变量一致',
+  // 去掉注释行再查：设计说明里会提到旧配色（解释为什么不用它），那是合理的
+  /--sc-core-line/.test(
+    clientSrc
+      .split('\n')
+      .filter((l) => !/^\s*(\*|\/\/|\/\*)/.test(l))
+      .join('\n'),
+  ) && !/#4f8ff7/.test(clientSrc.split('\n').filter((l) => !/^\s*(\*|\/\/|\/\*)/.test(l)).join('\n')),
+  '图例写死旧配色会和正文对不上',
+)
+
 /* ---------------------------------------------- 汇总 */
 
 console.log(`\n${'─'.repeat(62)}`)
