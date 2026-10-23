@@ -866,6 +866,46 @@ export class StudyService {
     return `已经拿到 ${bits.join('、')}。`
   }
 
+  /**
+   * 单元清单 —— 这份资料分几块、每块讲什么、现在读到哪。
+   *
+   * 为什么需要：之前 182 段是平铺的，用户看不到结构；
+   * preflight 的 parts 是模型自己编的切法，跟原文小节没有 ID 关联。
+   * 单元把「原文小节 → 段落 → 核心要点」串成一条线，
+   * 界面左侧就能列出"这章有 25 块"，而且每块都能点回原文。
+   *
+   * 数据来自 units.json（由 tests/build-units.mjs 生成并校验不重不漏）。
+   * 没生成过就返回 null —— 老项目不该因为缺这个文件而报错。
+   */
+  async units(docId) {
+    const raw = await this.store.artifact(docId, 'units.json').catch(() => null)
+    if (!raw?.units?.length) return null
+    const done = new Set(
+      ((await this.store.artifact(docId, 'annotations.json').catch(() => null))?.items ?? []).map(
+        (a) => a.segmentId,
+      ),
+    )
+    // 每个单元算一下"碰过没有"：有标注就算碰过。
+    // 刻意不用百分比 —— 用户要的是"哪块还没看"，不是"完成度 68%"。
+    const units = raw.units.map((u, i) => {
+      const touched = u.segmentIds.filter((id) => done.has(id)).length
+      return {
+        index: i + 1,
+        id: u.id,
+        title: u.title,
+        level: u.level,
+        segmentCount: u.segmentCount,
+        chars: u.chars,
+        keyPointCount: u.keyPoints?.length ?? 0,
+        sourceRange: u.sourceRange,
+        subsections: u.subsections ?? [],
+        touched,
+        done: touched >= u.segmentIds.length,
+      }
+    })
+    return { totalUnits: units.length, totalSegments: raw.totalSegments, units }
+  }
+
   async status(docId) {
     const meta = await this.store.meta(docId)
     const progress = await this.store.progressOf(docId)

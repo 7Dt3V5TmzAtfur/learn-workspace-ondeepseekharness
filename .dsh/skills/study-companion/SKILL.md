@@ -45,12 +45,37 @@ study_status            # 不传 docId → 列出工作区全部学习项目
 | 阶段 | 技能 | 交付物 | 完成判定 |
 |---|---|---|---|
 | 导入 | （工具） | `source.md` + `segments.json` | `study_ingest` 返回 segmentCount > 0 |
+| **切块** | **（见下）** | **`units.json`** | **不重不漏覆盖全部段落** |
 | 读前 | `study-preflight` | `preflight.json` 六段式 | `study_save kind=preflight` 校验 ok |
 | 读中 | `study-annotate` | `annotations.json` + 每条的 `quote` | 校验 ok 且三色预算未超 |
 | 图谱 | `study-map` | `relations.json` + archify HTML | 前置关系无环，figures 全部 ok |
 | 自测 | `study-recall` | `qa.json`（每条 ≤100 字）+ 最小行动 | QA 已存且条数 6–12 |
-| 考核 | `study-feynman` | `quiz.md` + `drills.jsonl` | 用户真的复述过并被判卷 |
+| 考核 | `study-feynman` | `quiz.md` + `drills.jsonl` | 用户真的复述过了并被判卷 |
 | 追问 | `study-explain-term` | `terms.jsonl` | 每次回答都带 ¶N 上下文 |
+
+### 导入之后先切块，再写读前
+
+`units.json` 是整份资料的组织骨架：把原文小节切成"块"，
+每块带段范围（`sourceRange`）和要点（`keyPoints`）。
+界面左侧的"这份资料分 N 块"就是它。
+
+**为什么必须在读前之前做**：不切块的话，六段式的"每一部分"
+就是模型自己编的切法，跟原文小节没有任何 ID 关联 ——
+用户点开一个知识点，无法跳回原文那一句。
+
+切法：
+
+1. 认两种小标题。Markdown `## 标题` 和加粗单独成段 `**小标题。**` 都算。
+   只认第一种会得到很少但大小极不均衡的块（一块 45 段、另一块 2 段）。
+2. 大标题下面几乎是空的（不足 300 字）→ 把紧跟的加粗小节并进来，
+   否则左侧会出现一个点进去什么都没有的条目。
+3. 合起来超过 2500 字 → 不合并，让各小节能独立成块。
+4. 标题去掉末尾句号。原文 `**安全机制的层次化设计。**` 直接拿来
+   会变成列表里一排"…设计。"。
+5. 切完必须自检：不重、不漏、无空块、每块有原文范围。
+
+做不到切块时，宁可**不做这一步**，也不要编一份假的 `units.json`。
+界面会显示"还没切分"，这比显示错的强。
 
 ## 四条不可违反的规则
 

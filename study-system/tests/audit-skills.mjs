@@ -165,8 +165,32 @@ check(
   '关系类型不全，图谱就只剩"相关"一种关系',
 )
 
+// ---- study-companion 单元切块 ----
+console.log('\n8. study-companion：切块是读前之前的一步')
+check(
+  '流程里有切块阶段',
+  has('study-companion', /units\.json/),
+  '不切块，六段式的"每一部分"就是模型编的切法，跟原文小节无 ID 关联',
+)
+check(
+  '说明为什么要认两种小标题',
+  has('study-companion', /加粗单独成段|小标题/),
+  '只认 Markdown 标题会切出 45 段和 2 段并存的不均衡块',
+)
+check(
+  '说明切完要自检不重不漏',
+  has('study-companion', /不重|不漏/),
+  '漏了用户找不到那段，重了进度算两次',
+)
+check(
+  '说明做不到时宁可不做也不造假',
+  has('study-companion', /宁可.*不做|不要编/),
+  '假的 units.json 比没有更糟：用户会以为结构是对的',
+)
+
 console.log(`\n${'─'.repeat(60)}`)
 console.log(`通过 ${pass}　失败 ${fails.length}`)
+
 if (fails.length) {
   console.log('\n需要修复：')
   fails.forEach((f, i) => console.log(`${i + 1}. ${f.name}\n   ${f.why}`))

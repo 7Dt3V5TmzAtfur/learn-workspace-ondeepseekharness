@@ -381,6 +381,36 @@ check(
   '只能用鼠标点的折叠区，键盘用户打不开',
 )
 
+/* ---------------------------------------------- 10. 单元骨架 */
+
+console.log('\n10. 单元骨架：这份资料分几块（借鉴 learn-from-materials 的内容组织）')
+
+check(
+  '界面有单元目录',
+  /sc-units-list/.test(clientSrc) && /unitList/.test(clientSrc),
+  '182 段平铺，用户不知道这份资料分几块、自己在哪',
+)
+check(
+  '目录主文案是"分几块"而不是"标了几段"',
+  /这份资料分 \$\{unitList\.totalUnits\} 块/.test(clientSrc),
+  '按段落数是完成主义口径，按块数才是用户能感知的结构',
+)
+check(
+  '每块带段数与要点数',
+  /sc-unit-meta/.test(clientSrc) && /keyPointCount/.test(clientSrc),
+  '只给标题用户不知道这块有多大、值不值得现在读',
+)
+check(
+  '单元目录默认收起',
+  /<details[\s\S]{0,80}className: 'sc-units'/.test(clientSrc) || /className: 'sc-units'/.test(clientSrc),
+  '想直接读的人不该被目录挡路',
+)
+check(
+  '宿主能返回单元清单且老项目不报错',
+  /\/units\//.test(readFileSync(join('D:', 'learn', 'study-system', 'plugin', 'index.js'), 'utf8')),
+  '没有 units.json 的项目应返回 null 而不是 500',
+)
+
 /* ---------------------------------------------- 汇总 */
 
 console.log(`\n${'─'.repeat(62)}`)

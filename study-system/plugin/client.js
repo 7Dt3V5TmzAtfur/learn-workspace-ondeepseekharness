@@ -301,6 +301,30 @@ body[data-ds-dark-theme] .sc-root{
   color:var(--dsw-alias-label-secondary);line-height:1.6}
 .sc-harvest-where{flex:none;font-variant-numeric:tabular-nums;font-size:var(--sc-fs-xs);
   color:var(--dsw-alias-label-secondary);opacity:.75;min-width:38px}
+/* 单元目录：这份资料分几块。
+   默认收起，因为"想直接读"的人不该被目录挡路；
+   展开后一行一块，带段数与要点数，点一下定位到那块。 */
+.sc-units{margin-bottom:var(--sc-sp-3);border:1px solid var(--dsw-alias-border-l1);
+  border-radius:var(--sc-r-md);padding:var(--sc-sp-2) var(--sc-sp-3);
+  background:var(--dsw-alias-bg-layer-1)}
+.sc-units>summary{cursor:pointer;list-style:none;font-size:var(--sc-fs-sm);font-weight:600;
+  color:var(--dsw-alias-label-primary);display:flex;align-items:center;gap:6px;user-select:none}
+.sc-units>summary::-webkit-details-marker{display:none}
+.sc-units>summary::before{content:'▸';display:inline-block;font-size:10px;
+  transition:transform .15s ease;color:var(--dsw-alias-label-secondary)}
+.sc-units[open]>summary::before{transform:rotate(90deg)}
+.sc-units>summary:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}
+.sc-units-list{margin:var(--sc-sp-2) 0 0;padding:0;list-style:none;
+  display:flex;flex-direction:column;gap:1px}
+.sc-unit{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  padding:5px 8px;border-radius:var(--sc-r-sm);cursor:pointer;line-height:1.5;
+  border-left:2px solid transparent}
+.sc-unit:hover{background:var(--dsw-alias-bg-layer-2)}
+.sc-unit.is-active{background:var(--dsw-alias-bg-layer-2);border-left-color:var(--dsw-alias-brand-primary)}
+.sc-unit-title{font-size:var(--sc-fs-sm);color:var(--dsw-alias-label-primary)}
+.sc-unit-meta{flex:none;font-size:var(--sc-fs-xs);color:var(--dsw-alias-label-secondary);
+  font-variant-numeric:tabular-nums;opacity:.8}
+@media (prefers-reduced-motion:reduce){.sc-units>summary::before{transition:none}}
 @media (prefers-reduced-motion:reduce){.sc-fold>summary::before{transition:none}}
 /* 档位标签：了解/理解/掌握/熟练掌握 四档用同一强调色的 4 级不透明度 */
 .sc-lv{display:inline-block;font-size:var(--sc-fs-xs);line-height:16px;padding:0 6px;border-radius:var(--sc-r-sm);
@@ -658,6 +682,8 @@ body[data-ds-dark-theme] .sc-root{
       const [asking, setAsking] = useState(false)
       const [answer, setAnswer] = useState(null)
       const [listening, setListening] = useState(false)
+      const [unitList, setUnitList] = useState(null)
+      const [activeUnit, setActiveUnit] = useState(null)
 
       // 暂停回顾：读到核心/攻坚段落时先盖住，强制回想一遍再翻看。
       // 依据 原则/C1.02.a_高效学习策略/暂停回顾策略.md：
@@ -684,6 +710,18 @@ body[data-ds-dark-theme] .sc-root{
       }, [project.annotatedHtml])
 
       const shown = onlyAnnotated ? segments.filter((s) => byId.has(s.id)) : segments
+
+      // 单元清单：这份资料分几块。
+      // 之前 182 段是平铺的，用户不知道自己在哪、还有多少块没看。
+      useEffect(() => {
+        let alive = true
+        api(`/units/${encodeURIComponent(project.id)}`)
+          .then((d) => alive && setUnitList(d?.units ?? null))
+          .catch(() => {})
+        return () => {
+          alive = false
+        }
+      }, [project.id])
 
       // 进面板时，把核心档（必须能复述的骨架）先盖上。
       // 只盖 core 不盖 hard：攻坚档多是提问句，盖住反而看不出在问什么；
@@ -851,6 +889,45 @@ body[data-ds-dark-theme] .sc-root{
         'div',
         { style: { position: 'relative' } },
 
+        // ---- 单元目录：这份资料分几块 ----
+        // 放在正文之前，因为用户最先要回答的问题是"这章讲几件事"。
+        // 默认收起：不想看结构的人直接读正文，想看的人一次展开 25 行。
+        unitList
+          ? h(
+              'details',
+              { className: 'sc-units' },
+              h(
+                'summary',
+                null,
+                `这份资料分 ${unitList.totalUnits} 块 · ${unitList.totalSegments} 段`,
+              ),
+              h(
+                'ol',
+                { className: 'sc-units-list' },
+                unitList.units.map((u) =>
+                  h(
+                    'li',
+                    {
+                      key: u.id,
+                      className: 'sc-unit' + (activeUnit === u.id ? ' is-active' : ''),
+                      onClick: () => {
+                        setActiveUnit(u.id)
+                        onLocate?.(u.id)
+                      },
+                    },
+                    h('span', { className: 'sc-unit-title' }, u.title),
+                    h(
+                      'span',
+                      { className: 'sc-unit-meta' },
+                      `${u.segmentCount} 段`,
+                      u.keyPointCount ? ` · ${u.keyPointCount} 个要点` : '',
+                      u.done ? ' ✓' : '',
+                    ),
+                  ),
+                ),
+              ),
+            )
+          : null,
         // ---- 顶部图例：三色语义 + 预算进度 ----
         // 颜色必须跟 CSS 里的 --sc-*-line 一致，否则用户看到的图例和正文对不上
         h(
@@ -862,8 +939,10 @@ body[data-ds-dark-theme] .sc-root{
           stats
             ? h(
                 'span',
-                { title: '高亮字数 / 全文总字数' },
-                `已标 ${stats.total}/${segments.length} 段 · 高亮 ${stats.highlightedChars}/${stats.totalChars} 字（${pct(stats.ratio)}）`,
+                { title: stats && `${stats.highlightedChars}/${stats.totalChars} 字被高亮` },
+                unitList
+                  ? `这份资料分 ${unitList.totalUnits} 块，${unitList.units.filter((u) => u.done).length} 块已看过`
+                  : `已标 ${stats.total}/${segments.length} 段`,
               )
             : h('span', { className: 'sc-muted' }, '还没有标注'),
           h(

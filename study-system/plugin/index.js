@@ -615,6 +615,14 @@ export function apply(ctx, config = {}) {
             const docId = decodeURIComponent(route.slice('/harvested/'.length))
             return send(res, 200, await svcOf(url).harvested(docId))
           }
+          // 单元清单：这份资料分几块（左侧目录用）
+          if (req.method === 'GET' && route.startsWith('/units/')) {
+            const docId = decodeURIComponent(route.slice('/units/'.length))
+            const data = await svcOf(url).units(docId)
+            // 老项目还没生成过单元，返回 200 + null 而不是 404：
+            // 界面据此显示"还没切分"，不当成错误
+            return send(res, 200, { units: data ?? null })
+          }
           // 复习到期清单（界面顶部提醒用）
           if (req.method === 'GET' && route === '/review') {
             return send(res, 200, await svcOf(url).reviewDue())

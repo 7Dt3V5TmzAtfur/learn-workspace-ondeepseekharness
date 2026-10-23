@@ -1603,6 +1603,54 @@ await test('没有任何成果时给的是引导而不是 0%', async () => {
   assert.match(sentence, /先读一段|还没/, `空状态应是引导语气：${sentence}`)
 })
 
+section('18. 单元骨架（借鉴 learn-from-materials 的内容组织）')
+
+/**
+ * 单元数据在测试里现场造，不读 .study/ 里的真实文件。
+ * 理由：单元切分是 study_save 之外的一次性生成步骤，
+ * 让它成为测试的隐含依赖，会让测试在别的机器上莫名失败。
+ *
+ * 但"真实数据切得对不对"必须验 —— 那部分放在 build-units.mjs 的自校验里
+ * （不重不漏、无空单元、有原文范围），生成时就已经断言过了。
+ */
+const unitsFixture = {
+  totalUnits: 3,
+  totalSegments: 6,
+  units: [
+    { id: '¶1', title: '甲块', segmentIds: ['¶1', '¶2'], segmentCount: 2, chars: 400, keyPoints: [], sourceRange: { from: '¶1', to: '¶2' } },
+    { id: '¶3', title: '乙块', segmentIds: ['¶3', '¶4'], segmentCount: 2, chars: 600, keyPoints: [], sourceRange: { from: '¶3', to: '¶4' } },
+    { id: '¶5', title: '丙块', segmentIds: ['¶5', '¶6'], segmentCount: 2, chars: 500, keyPoints: [], sourceRange: { from: '¶5', to: '¶6' } },
+  ],
+}
+
+await test('单元清单能读出来，且每个单元带原文范围', async () => {
+  const store = { artifact: async (id, name) => (name === 'units.json' ? unitsFixture : null) }
+  const svc = new StudyService(tmpdir())
+  svc.store = store
+  const u = await svc.units(DOC_ID)
+  assert.ok(u, 'units.json 存在时应返回数据')
+  assert.equal(u.totalUnits, 3)
+  for (const x of u.units) {
+    assert.ok(x.sourceRange?.from && x.sourceRange?.to, `单元「${x.title}」没有原文范围`)
+  }
+})
+
+await test('没有 units.json 时返回 null，不抛错', async () => {
+  // 老项目不该因为缺这个文件而 500
+  const store = { artifact: async () => null }
+  const svc = new StudyService(tmpdir())
+  svc.store = store
+  const u = await svc.units(DOC_ID)
+  assert.equal(u, null, '缺文件应返回 null')
+})
+
+await test('单元清单不重不漏', async () => {
+  // 漏了用户找不到那段，重了进度会算两次
+  const flat = unitsFixture.units.flatMap((x) => x.segmentIds)
+  assert.equal(new Set(flat).size, flat.length, '有段被多个单元收进去')
+  assert.equal(flat.length, unitsFixture.totalSegments, '有段不属于任何单元')
+})
+
 console.log(`\n${'─'.repeat(52)}`)
 console.log(`通过 ${passed}　失败 ${failed}`)
 
