@@ -159,6 +159,15 @@ body[data-ds-dark-theme] .sc-root{
 /* 复习到期横幅：只在真的到期时出现 */
 .sc-review{display:flex;flex-direction:column;gap:6px;padding:var(--sc-sp-3);margin-bottom:var(--sc-sp-3);border:1px solid var(--sc-core-line);border-radius:var(--sc-r-md);background:var(--sc-core-bg)}
 .sc-review-title{font-size:var(--sc-fs-sm);font-weight:700;color:var(--sc-core-fg)}
+        /* 暂停回顾：盖住原文后给一块写回想的地方，视觉上要明显"这里停了" */
+        .sc-pause{border:1px dashed var(--sc-core-line);border-radius:var(--sc-r-md);
+          background:var(--sc-core-bg);padding:10px 12px;margin:4px 0}
+        .sc-pause-q{font-size:var(--sc-fs-sm);font-weight:700;color:var(--sc-core-fg);margin-bottom:6px}
+        .sc-pause-in{width:100%;box-sizing:border-box;font:inherit;font-size:var(--sc-fs-sm);
+          line-height:var(--sc-lh-body);padding:6px 8px;border-radius:var(--sc-r-sm);
+          border:1px solid var(--sc-core-line);background:var(--dsw-alias-bg-base);
+          color:var(--dsw-alias-label-primary);resize:vertical}
+        .sc-pause-in:focus{outline:2px solid var(--sc-core-line);outline-offset:1px}
 .sc-review-item{display:flex;align-items:center;gap:var(--sc-sp-2);font-size:var(--sc-fs-sm);flex-wrap:wrap}
 .sc-review-name{font-weight:600;max-width:32ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* 追问等待中的转圈：没有它的话，用户点了按钮只看到一行字，会以为没反应 */
@@ -626,6 +635,14 @@ body[data-ds-dark-theme] .sc-root{
       const [answer, setAnswer] = useState(null)
       const [listening, setListening] = useState(false)
 
+      // 暂停回顾：读到核心/攻坚段落时先盖住，强制回想一遍再翻看。
+      // 依据 原则/C1.02.a_高效学习策略/暂停回顾策略.md：
+      // "阅读时的核心动作不是读，而是停" —— 切断视觉提示做提取练习，
+      // 才能把瞬时记忆固化。只划高亮而不停下回想，就是它说的"虚假勤奋"。
+      const [paused, setPaused] = useState({}) // segId → true 表示当前盖着
+      const [recalls, setRecalls] = useState({}) // segId → 用户回想时敲的字
+      const [pauseOn, setPauseOn] = useState(true)
+
       const items = project.annotations?.items ?? []
       const stats = project.annotations?.stats
       const issues = project.annotations?.issues
@@ -643,6 +660,24 @@ body[data-ds-dark-theme] .sc-root{
       }, [project.annotatedHtml])
 
       const shown = onlyAnnotated ? segments.filter((s) => byId.has(s.id)) : segments
+
+      // 进面板时，把核心档（必须能复述的骨架）先盖上。
+      // 只盖 core 不盖 hard：攻坚档多是提问句，盖住反而看不出在问什么；
+      // 参考档全是例子和出处，盖住纯属打扰。
+      useEffect(() => {
+        if (!pauseOn) return
+        const next = {}
+        for (const s of segments) {
+          const a = byId.get(s.id)
+          if (a?.tier === 'core') next[s.id] = true
+        }
+        setPaused((prev) => {
+          // 已经展开过的别再盖回去，否则用户每切一次页签都要重写一遍
+          const merged = { ...next }
+          for (const [id, v] of Object.entries(prev)) if (v === false) delete merged[id]
+          return merged
+        })
+      }, [segments.length, pauseOn]) // eslint-disable-line react-hooks/exhaustive-deps
 
       /** 读当前选中的文字（Selection 必须 toString() 才是文字） */
       const readSelection = () => {
@@ -818,6 +853,23 @@ body[data-ds-dark-theme] .sc-root{
             }),
             '只看已标注',
           ),
+          h(
+            'label',
+            {
+              style: { marginLeft: 12, cursor: 'pointer', userSelect: 'none' },
+              title: '核心段落先盖住，逼自己回想一遍再对照原文',
+            },
+            h('input', {
+              type: 'checkbox',
+              checked: pauseOn,
+              onChange: (e) => {
+                setPauseOn(e.target.checked)
+                if (!e.target.checked) setPaused({})
+              },
+              style: { verticalAlign: '-2px', marginRight: 4 },
+            }),
+            '暂停回顾',
+          ),
         ),
 
         h(IssueList, { issues }),
@@ -862,9 +914,47 @@ body[data-ds-dark-theme] .sc-root{
                 h('span', { className: 'sc-muted', style: { marginLeft: 'auto' } }, `${seg.chars} 字`),
               ),
               // 有宿主渲染的高亮版就用它；否则退回纯文本 Markdown
-              inner !== undefined
-                ? h('div', { dangerouslySetInnerHTML: { __html: inner } })
-                : h('div', { dangerouslySetInnerHTML: { __html: seg.html || '' } }),
+              //
+              // 暂停回顾：核心/攻坚档的段落在"看过的第一眼"之后会被盖上，
+              // 要用户先打一句自己的理解才允许翻看原文。这样高亮不会变成
+              // 一眼扫过的装饰，而是真的触发一次提取。
+              paused[seg.id] && pauseOn
+                ? h(
+                    'div',
+                    { className: 'sc-pause' },
+                    h('div', { className: 'sc-pause-q' }, '这段在说什么？先不看书，用一句话写下来。'),
+                    h('textarea', {
+                      className: 'sc-pause-in',
+                      rows: 2,
+                      value: recalls[seg.id] ?? '',
+                      placeholder: '想不起来就写"想不起来"，也算一次诚实的提取',
+                      onChange: (e) => setRecalls((v) => ({ ...v, [seg.id]: e.target.value })),
+                    }),
+                    h(
+                      'div',
+                      { style: { display: 'flex', gap: 8, marginTop: 6 } },
+                      h(
+                        'button',
+                        {
+                          className: 'sc-btn sc-btn-primary',
+                          onClick: () => setPaused((v) => ({ ...v, [seg.id]: false })),
+                        },
+                        '写完了，对照原文',
+                      ),
+                      h(
+                        'button',
+                        {
+                          className: 'sc-btn',
+                          title: '如果这段你已经很熟，可以直接展开',
+                          onClick: () => setPaused((v) => ({ ...v, [seg.id]: false })),
+                        },
+                        '跳过',
+                      ),
+                    ),
+                  )
+                : inner !== undefined
+                  ? h('div', { dangerouslySetInnerHTML: { __html: inner } })
+                  : h('div', { dangerouslySetInnerHTML: { __html: seg.html || '' } }),
             )
           }),
         ),
