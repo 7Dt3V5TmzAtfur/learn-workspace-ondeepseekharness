@@ -8,7 +8,7 @@ const LIB = join('D:', 'learn', 'study-system', 'plugin', 'lib')
 const { StudyService } = await import(`file://${join(LIB, 'service.js')}`)
 
 const svc = new StudyService(WS)
-const project = await svc.project(DOC, { width: 1400 })
+const project = await svc.project(DOC, { width: 1400, withLayout: true })
 const g = project.graphLayout
 if (!g) {
   console.error('该项目没有 relations，无法检查图谱布局')

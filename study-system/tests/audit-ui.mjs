@@ -145,107 +145,34 @@ check(
   `仍有 ${countOut(/\*\*[^*\n]+\*\*/g)} 处字面星号残留`,
 )
 
-/* ---------------------------------------------- 3. 图谱可视化 */
+/* ---------------------------------------------- 3. 图谱可视化（archify） */
 
-console.log('\n3. 知识图谱：是否真的能画出图')
+console.log('\n3. 知识图谱：archify 生成的 HTML 是否可用')
 
-const layout = project.graphLayout
-check('提供 graphLayout（含坐标）', Boolean(layout), '缺它界面只能退化成文字列表')
-if (layout) {
+// 用户明确要求：知识图谱子页面必须嵌入 archify 技能生成的 HTML 文件，
+// 不是 Mermaid、也不是手搓 SVG。所以这里检查的是 figures 能不能真的打开。
+const figures = project.figures ?? []
+const relNodeCount = project.relations?.nodes?.length ?? 0
+check('有关系图就应有 archify 生成的 HTML', relNodeCount < 2 || figures.length > 0, '图谱页会空白')
+
+for (const f of figures) {
+  check(`第 ${f.index} 张图有产物文件`, Boolean(f.url), `缺 url 字段`)
+  check(`第 ${f.index} 张图通过 archify 四道门`, f.ok === true, '门禁没过说明有版面问题')
   check(
-    '布局节点数等于 relations 节点数',
-    layout.nodes.length === (project.relations?.nodes ?? []).length,
-    `${layout.nodes.length} vs ${project.relations?.nodes?.length}`,
+    `第 ${f.index} 张图节点数适合阅读`,
+    f.nodeCount > 0 && f.nodeCount <= 18,
+    `节点 ${f.nodeCount} 个，超过 18 会字号过小`,
   )
-  check(
-    '布局边数等于 relations 边数',
-    layout.edges.length === (project.relations?.edges ?? []).length,
-    `${layout.edges.length} vs ${project.relations?.edges?.length}`,
-  )
-  const bad = layout.nodes.filter(
-    (n) => !Number.isFinite(n.x) || !Number.isFinite(n.y) || !Number.isFinite(n.w) || !Number.isFinite(n.h),
-  )
-  check('所有节点坐标都是有效数字', bad.length === 0, `${bad.length} 个节点坐标非法`)
+}
 
-  // 重叠检测：同层节点矩形不应相交
-  let overlaps = 0
-  for (let i = 0; i < layout.nodes.length; i += 1) {
-    for (let k = i + 1; k < layout.nodes.length; k += 1) {
-      const a = layout.nodes[i]
-      const b = layout.nodes[k]
-      if (a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h) overlaps += 1
-    }
-  }
-  check('节点矩形互不重叠', overlaps === 0, `${overlaps} 处重叠，图会糊成一团`)
-
-  const outOfCanvas = layout.edges.filter((e) => {
-    const pts = e.points ?? [
-      [e.x1, e.y1],
-      [e.x2, e.y2],
-    ]
-    return pts.some(
-      ([x, y]) =>
-        !Number.isFinite(x) || !Number.isFinite(y) || x < -2 || x > layout.width + 2 || y < -2 || y > layout.height + 2,
-    )
-  })
-  check('所有走线拐点都落在画布内', outOfCanvas.length === 0, `${outOfCanvas.length} 条边的拐点超出画布，箭头会被裁掉`)
-
-  const noPoints = layout.edges.filter((e) => !Array.isArray(e.points) || e.points.length < 2)
-  check('每条边都有折线拐点', noPoints.length === 0, `${noPoints.length} 条边缺少 points`)
-
-  // 走线不得穿过其他节点：这是"图能不能看"的核心指标
-  const sample = (e) => {
-    const pts = e.points ?? []
-    const out = []
-    for (let k = 1; k < pts.length; k += 1) {
-      const [x1, y1] = pts[k - 1]
-      const [x2, y2] = pts[k]
-      for (let t = 0; t <= 1; t += 0.04) out.push([x1 + (x2 - x1) * t, y1 + (y2 - y1) * t])
-    }
-    return out
-  }
-  let crossings = 0
-  for (const e of layout.edges) {
-    const pts = sample(e)
-    for (const n of layout.nodes) {
-      if (n.id === e.from || n.id === e.to) continue
-      if (pts.some(([x, y]) => x >= n.x + 5 && x <= n.x + n.w - 5 && y >= n.y + 5 && y <= n.y + n.h - 5)) {
-        crossings += 1
-        break
-      }
-    }
-  }
-  check('走线不穿过其他节点', crossings === 0, `${crossings} 条边从别的节点身上穿过，图会糊成一团`)
-
-  // 标签必须能放进节点
-  const widthOf = (ch) => (/[\u4e00-\u9fa5\u3000-\u303f\uff00-\uffef]/.test(ch) ? 11.5 : 11.5 * 0.56)
-  const wrap3 = (text, px, maxLines = 3) => {
-    const lines = []
-    let cur = ''
-    let curW = 0
-    for (const ch of text) {
-      const w = widthOf(ch)
-      if (curW + w > px && cur) {
-        lines.push(cur)
-        cur = ch
-        curW = w
-        if (lines.length === maxLines) break
-      } else {
-        cur += ch
-        curW += w
-      }
-    }
-    if (cur && lines.length < maxLines) lines.push(cur)
-    return lines
-  }
-  const overflow = layout.nodes.filter((n) => {
-    const lines = wrap3(n.label, n.w - 20)
-    return lines.some((l) => [...l].reduce((a, c) => a + widthOf(c), 0) > n.w - 10)
-  })
-  check('节点标签折行后放得下', overflow.length === 0, `${overflow.length} 个节点的标签会溢出`)
-
-  const layers = new Set(layout.nodes.map((n) => n.layer))
-  check('做了分层（layer 数 > 1）', layers.size > 1, '全挤在一层就不是逻辑图')
+// 界面必须用 iframe 嵌 archify 的 HTML，不能自己画
+const uiSrc = readFileSync(join('D:', 'learn', 'study-system', 'plugin', 'client.js'), 'utf8')
+const gpStart = uiSrc.indexOf('function GraphPane')
+const gpEnd = uiSrc.indexOf('function QuizPane')
+if (gpStart >= 0 && gpEnd > gpStart) {
+  const graphPaneCode = uiSrc.slice(gpStart, gpEnd)
+  check('图谱页用 iframe 嵌入 archify HTML', /iframe/.test(graphPaneCode), '必须嵌 archify 生成的页面')
+  check('图谱页不再自己画 SVG', !/createElementNS/.test(graphPaneCode), '手搓 SVG 的方案已被用户否决')
 }
 
 /* ---------------------------------------------- 4. 资源可达性 */
@@ -312,11 +239,18 @@ check(
   '若仍逐行 <p> 输出，粗体/表格/图片都显示不出来',
 )
 
-check('图谱有 SVG 渲染', /<svg|'svg'/.test(clientSrc), '没有 svg 元素就不是可视化')
-check('图谱支持节点聚焦', /setSelNode|data-sel/.test(clientSrc), '缺少交互，图只是静态图片')
-check('图谱支持悬停提示', /onMouseEnter|sc-gtip/.test(clientSrc), '看不到节点的完整定义')
+// 图谱必须是 archify 生成的 HTML 内嵌，不是自己画的 SVG。
+// 这段曾经断言 /<svg/ —— 那是旧方案的残留，用户已明确否决手搓 SVG。
+check(
+  '图谱用 iframe 嵌入 archify 的 HTML（不是自绘 SVG）',
+  /iframe/.test(clientSrc) && !/createElementNS/.test(clientSrc),
+  '手搓 SVG 的方案已被用户否决，必须嵌 archify 生成的 HTML',
+)
+check('图谱支持在多张 archify 图之间切换', /setActive|figures\.map/.test(clientSrc), '节点多时会拆成多张图，必须能切')
+check('图谱可以新窗口打开原图', /target:\s*['"]_blank['"]/.test(clientSrc), '嵌入看不清时要能单独打开')
 
-for (const cls of ['sc-hl-core', 'sc-hl-hard', 'sc-hl-ref', 'sc-md', 'sc-table', 'sc-gnode', 'sc-gedge']) {
+// 只检查还在用的 class。sc-gnode / sc-gedge 已随手搓 SVG 方案一起删除。
+for (const cls of ['sc-hl-core', 'sc-hl-hard', 'sc-hl-ref', 'sc-md', 'sc-table']) {
   check(`CSS 定义了 .${cls}`, clientSrc.includes(`.${cls}`))
 }
 

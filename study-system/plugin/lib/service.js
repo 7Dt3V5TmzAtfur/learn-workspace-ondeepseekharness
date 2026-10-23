@@ -8,7 +8,10 @@ import { existsSync } from 'node:fs'
 import { extractDocument, segmentText } from './extract.js'
 import { StudyStore, slugify, STUDY_DIR_NAME } from './store.js'
 import { buildArchifyFigures } from './archify-figures.js'
-import { renderMarkdown, layoutGraph } from './markdown.js'
+import { renderMarkdown, layoutGraph, escapeHtml as escHtml } from './markdown.js'
+
+/** 属性值转义：比正文转义多挡一层引号，避免属性被提前闭合。 */
+const escAttr = (v) => escHtml(String(v ?? '')).replace(/"/g, '&quot;')
 import {
   validateAnnotation,
   validatePreflight,
@@ -20,6 +23,12 @@ import {
 } from './rules.js'
 
 const STAGE_ORDER = ['ingested', 'planned', 'annotated', 'mapped', 'recalled', 'drilled']
+
+/**
+ * 复习间隔（天）：1 → 3 → 7，之后维持 7 天。
+ * 对应学习科学里的间隔重复：第一次忘得最快，之后拉长。
+ */
+const REVIEW_INTERVALS = [1, 3, 7]
 
 function nextStepOf(progress) {
   if (!progress.ingested) return { stage: 'empty', action: 'study_ingest', message: '先导入一份资料' }
@@ -138,8 +147,11 @@ export class StudyService {
    *  - segments[].text  段落正文（界面不再靠 source 按序切块硬对齐）
    *  - segments[].html  段落正文的 HTML（Markdown 已解析）
    *  - preflightHtml / quizHtml / refsHtml  人读视图
-   *  - mermaid          图谱源（GraphPane 渲染前提）
-   *  - graphLayout      已算好坐标的节点与边（客户端只负责画 SVG）
+   *  - figures          archify 生成的 HTML 图（图谱页直接用 iframe 嵌入）
+   *
+   * 曾经这里还算了一份 graphLayout（手搓 SVG 用的节点坐标，约 11.5 KB），
+   * 但用户明确要求图谱必须用 archify 生成的 HTML，界面从来不读这个字段。
+   * 每打开一次面板就白算一次，所以改成按需生成。
    */
   async project(docId, options = {}) {
     const project = await this.store.fullProject(docId)
@@ -157,9 +169,13 @@ export class StudyService {
       }
     })
 
+    // Mermaid 源：保存时用过、调试脚本也读，随 project 一起返回（很便宜）
     const mermaid = project.relations ? this.toMermaid(project.relations) : null
+
+    // 节点坐标只有显式要才计算（约 11.5 KB 的布局运算）。
+    // 界面用的是 archify 生成的 HTML，从不读 graphLayout。
     let graphLayout = null
-    if (mermaid) {
+    if (options.withLayout && mermaid) {
       try {
         graphLayout = layoutGraph(mermaid, { width: options.width ?? 920 })
       } catch {
@@ -215,9 +231,39 @@ export class StudyService {
     const md = (t) => renderMarkdown(String(t ?? ''))
     const t = (t) => renderMarkdown(String(t ?? ''), { inline: true }) // 行内：不产生 <p>
     const li = (arr) => (arr ?? []).map((x) => `<li>${t(x)}</li>`).join('')
+    const kv = (k, v) => `<div class="sc-kv2"><span class="sc-kv2-k">${k}</span><div class="sc-kv2-v">${v}</div></div>`
 
-    const parts = (plan.parts ?? [])
+    // 标题里去重序号：数据常写成「第一部分 xxx」，再套一层会变成「第 1 部分 第一部分 xxx」
+    const headingOf = (p, i) => {
+      const raw = String(p.title ?? '').trim()
+      const hasOrdinal = /^第\s*[0-9一二三四五六七八九十百]+\s*[部分章节讲]/.test(raw)
+      return hasOrdinal ? t(raw) : `第 ${i + 1} 部分　${t(raw)}`
+    }
+
+    const parts = plan.parts ?? []
+
+    /* ③ 每一部分的目标、要求、重点、难点
+     * 用户的原话是"每一部分的目标、要求、重点、难点"——四个都要有。
+     * 早期版本把这一段和 ④ 混在一起、且没有 ③ 的标题，
+     * 界面上只能看到 ① ② 然后突然是"第一部分/第二部分"，编号断了。 */
+    const partGoals = parts
+      .map(
+        (p, i) => `<section class="sc-part">
+    <h3>${headingOf(p, i)}</h3>
+    ${p.requirements ? `<p class="sc-req">${t(p.requirements)}</p>` : ''}
+    ${kv('目标', p.goal ? t(p.goal) : '<span class="sc-muted">（未单列，见下方考核要求）</span>')}
+    ${kv('重点', `<ul class="sc-kv2-v sc-list">${li(p.keyPoints)}</ul>`)}
+    ${kv('难点', `<ul class="sc-kv2-v sc-list">${li(p.difficulties)}</ul>`)}
+  </section>`,
+      )
+      .join('\n  ')
+
+    /* ④ 每一部分的考核方式（了解/理解/掌握/熟练掌握）+ 知识点、内容、备注
+     * 档位做成带 data-lv 的 chip，四档用同一色的 4 级不透明度，
+     * 这样扫一眼就知道每部分要求到什么程度，不用逐字读。 */
+    const partAssess = parts
       .map((p, i) => {
+        const a = p.assessment ?? {}
         const kps = (p.knowledgePoints ?? [])
           .map(
             (kp, j) => `<div class="sc-kp">
@@ -227,27 +273,11 @@ export class StudyService {
     </div>`,
           )
           .join('\n    ')
-
-        const assess = p.assessment ?? {}
-        // 标题里别重复序号：数据本身常写成“第一部分　xxx”，再套一层就变成
-        // “第 1 部分　第一部分　xxx”。已有“第N部分/章/讲”就原样用。
-        const rawTitle = String(p.title ?? '').trim()
-        const hasOrdinal = /^第\s*[0-9一二三四五六七八九十百]+\s*[部分章节讲]/.test(rawTitle)
-        const heading = hasOrdinal ? t(rawTitle) : `第 ${i + 1} 部分　${t(rawTitle)}`
         return `<section class="sc-part">
-    <h3>${heading}</h3>
-    ${p.requirements ? `<p class="sc-req">${t(p.requirements)}</p>` : ''}
-    <div class="sc-kv2"><span class="sc-kv2-k">重点</span><ul class="sc-kv2-v">${li(p.keyPoints)}</ul></div>
-    <div class="sc-kv2"><span class="sc-kv2-k">难点</span><ul class="sc-kv2-v">${li(p.difficulties)}</ul></div>
-    <div class="sc-kv2">
-      <span class="sc-kv2-k">考核</span>
-      <div class="sc-kv2-v">
-        <span class="sc-lv">${t(assess.level ?? '—')}</span>
-        ${assess.requirement ? `<span class="sc-assessment">${t(assess.requirement)}</span>` : ''}
-        ${assess.purpose ? `<div class="sc-muted">目的：${t(assess.purpose)}</div>` : ''}
-      </div>
-    </div>
-    ${kps}
+    <h3>${headingOf(p, i)}<span class="sc-lv" data-lv="${escAttr(a.level ?? '')}">${t(a.level ?? '—')}</span></h3>
+    ${a.requirement ? `<div class="sc-req">考核要求：${t(a.requirement)}</div>` : ''}
+    ${a.purpose ? `<div class="sc-muted">为什么要考这个：${t(a.purpose)}</div>` : ''}
+    ${kps || '<div class="sc-muted">（这一部分没有单列知识点）</div>'}
   </section>`
       })
       .join('\n  ')
@@ -256,12 +286,12 @@ export class StudyService {
       .map((sg) => {
         const text = typeof sg === 'string' ? sg : sg.text
         const level = typeof sg === 'string' ? '' : sg.level
-        return `<li>${t(text)}${level ? ` <span class="sc-lv">${t(level)}</span>` : ''}</li>`
+        return `<li>${t(text)}${level ? ` <span class="sc-lv" data-lv="${escAttr(level)}">${t(level)}</span>` : ''}</li>`
       })
-      .join('\n      ')
+      .join('\n        ')
 
     const exs = (plan.exercises ?? [])
-      .map((ex, i) => {
+      .map((ex) => {
         const rubric = (ex.rubric ?? []).map((r) => `<li>${t(r)}</li>`).join('')
         return `<li class="sc-ex">
         <div class="sc-ex-q">${md(ex.question)}</div>
@@ -274,35 +304,38 @@ export class StudyService {
 
     const refs = (plan.references ?? [])
       .map((r) => {
-        const title = t(r.title ?? r.name ?? '')
-        const kind = r.kind ? ` <span class="sc-lv">${t(r.kind)}</span>` : ''
-        const note = r.note ? `<div class="sc-muted">${t(r.note)}</div>` : ''
-        return `<li>${title}${kind}${note}</li>`
+        const kind = r.kind ?? '我的知识'
+        const note = r.note ? `<div class="sc-ref-note">${t(r.note)}</div>` : ''
+        const url = r.url
+          ? ` <a href="${escAttr(r.url)}" target="_blank" rel="noopener noreferrer">${escHtml(r.url)}</a>`
+          : ''
+        return `<li class="sc-ref">
+        <span class="sc-ref-kind" data-kind="${escAttr(kind)}">${t(kind)}</span>
+        <div class="sc-ref-body">${t(r.title ?? r.name ?? '')}${url}${note}</div>
+      </li>`
       })
       .join('\n      ')
 
-    const kv = (k, v) => `<div class="sc-kv2"><span class="sc-kv2-k">${k}</span><div class="sc-kv2-v">${v}</div></div>`
+    // ①②③④⑤⑥ 六段连续编号，每段一张卡。缺数据时也要有牌子，不能整段消失，
+    // 否则用户又在界面上找不到第几段了。
+    const sec = (num, title, body) => `<section class="sc-pf-sec">
+    <h3 class="sc-pf-h">${num}　${title}</h3>
+    <div class="sc-pf-body">${body || '<div class="sc-muted">（这一部分还没有内容）</div>'}</div>
+  </section>`
 
     return `<div class="sc-pf">
-  <section class="sc-pf-sec">
-    <h3>① 资料摘要</h3>
-    <div class="sc-pf-body">${md(plan.summary)}</div>
-  </section>
-  <section class="sc-pf-sec">
-    <h3>② 对我的帮助与目标</h3>
-    ${kv('对我的帮助', md(plan.goals?.help))}
-    ${kv('总目标', md(plan.goals?.main))}
-    ${kv('子目标', `<ul class="sc-kv2-list">${subs}</ul>`)}
-  </section>
-  ${parts}
-  <section class="sc-pf-sec">
-    <h3>⑤ 思考题与作业（费曼）</h3>
-    <ol class="sc-ex-list">${exs}</ol>
-  </section>
-  <section class="sc-pf-sec">
-    <h3>⑥ 参考资料</h3>
-    <ol class="sc-ref-list">${refs}</ol>
-  </section>
+  ${sec('①', '资料摘要', md(plan.summary))}
+  ${sec(
+    '②',
+    '对我的帮助与目标',
+    kv('对我的帮助', md(plan.goals?.help)) +
+      kv('总目标', md(plan.goals?.main)) +
+      kv('子目标', `<ul class="sc-list">${subs}</ul>`),
+  )}
+  ${sec('③', '每一部分的目标、要求、重点、难点', partGoals)}
+  ${sec('④', '每一部分的考核方式与知识点', partAssess)}
+  ${sec('⑤', '思考题与作业（费曼）', `<ol class="sc-ex-list">${exs}</ol>`)}
+  ${sec('⑥', '参考资料', `<ol class="sc-ref-list">${refs}</ol>`)}
 </div>`
   }
 
@@ -430,21 +463,174 @@ export class StudyService {
    * 记录一次考核结果：学习者复述了什么、哪些要点达标、下次的最小行动。
    * 这是 drilled 阶段的唯一触发点。
    */
-  async recordDrill(docId, { prompt, answer, rubricHit, verdict, minimalAction } = {}) {
+  /**
+   * 记录一次费曼复述/答题。
+   *
+   * 为什么要设门槛：原来只要 submitted 一段文字就算"考核完成"，
+   * 于是"把原文复制一遍"也能点亮最后一段进度——那不是学会了，
+   * 是搬运。这里加三道检查，全部对照学习科学的"提取练习"研究：
+   *
+   * 1. **合书**：允许开卷，但必须自己声明；开卷的复述不计入掌握度。
+   * 2. **时长**：低于 60 秒的复述通常是"随手打两行"，
+   *    真正把一段论证讲清楚至少需要写 5-10 句。
+   * 3. **抄原文**：与原文的 n-gram 重合度过高 = 复述而不是回忆。
+   *
+   * 注意：这些是"提醒 + 降级"，不是硬拒绝。学习工具不该把人挡在门外，
+   * 但必须让他知道自己这一步算不算数。
+   */
+  async recordDrill(docId, { prompt, answer, rubricHit, verdict, minimalAction, closedBook, durationSec } = {}) {
     const text = String(answer ?? '').trim()
     if (!text) throw new Error('缺少你的复述/作答内容：请先真的用自己的话说一遍')
+
+    const warnings = []
+    const answerChars = [...text].length
+
+    // ---- 1. 合书 ----
+    const isClosed = closedBook === true
+    if (!isClosed) {
+      warnings.push({
+        level: 'warn',
+        code: 'drill-open-book',
+        message: '这次是开卷复述，不计入掌握度。下次试着合上书再讲一遍。',
+      })
+    }
+
+    // ---- 2. 时长 ----
+    let minutes = null
+    if (typeof durationSec === 'number' && Number.isFinite(durationSec) && durationSec >= 0) {
+      minutes = Math.round((durationSec / 60) * 10) / 10
+      if (durationSec < 60) {
+        warnings.push({
+          level: 'warn',
+          code: 'drill-too-fast',
+          message: `只花了 ${durationSec} 秒。讲清楚一段论证通常要几分钟，这次更像随手记录而不是复述。`,
+        })
+      }
+    }
+
+    // ---- 3. 抄原文 ----
+    // 用 8 字滑窗：中文里 8 个字连续相同，就基本可以断定是复制而非转述
+    let copiedRatio = 0
+    let longestRun = 0
+    try {
+      const texts = (await this.store.artifact(docId, 'segment-texts.json').catch(() => null))?.items ?? []
+      const source = texts.map((t) => String(t.text ?? '')).join('\n').replace(/[\s*`#>|]/g, '')
+      const mine = text.replace(/[\s*`#>|]/g, '')
+      if (source.length >= 8 && mine.length >= 8) {
+        const N = 8
+        const grams = new Map()
+        for (let i = 0; i + N <= source.length; i += 1) grams.set(source.slice(i, i + N), true)
+        let hit = 0
+        let total = 0
+        let run = 0
+        let best = 0
+        for (let i = 0; i + N <= mine.length; i += 1) {
+          total += 1
+          if (grams.has(mine.slice(i, i + N))) {
+            hit += 1
+            run += 1
+            if (run > best) best = run
+          } else {
+            run = 0
+          }
+        }
+        copiedRatio = total ? hit / total : 0
+        longestRun = best + (best > 0 ? N - 1 : 0)
+      }
+    } catch {
+      /* 没有原文就不做这项检查 */
+    }
+    if (copiedRatio > 0.3 || longestRun >= 30) {
+      warnings.push({
+        level: 'warn',
+        code: 'drill-copied',
+        message:
+          `有 ${(copiedRatio * 100).toFixed(0)}% 的片段与原文重合（最长连续 ${longestRun} 字）。` +
+          '这更像抄录而不是用自己的话讲——试着合上书，用你记得的版本讲一遍。',
+      })
+    }
+
+    const valid = isClosed && warnings.every((w) => w.code !== 'drill-too-fast' && w.code !== 'drill-copied')
+
     const record = {
       at: new Date().toISOString(),
       prompt: prompt ? String(prompt).slice(0, 500) : null,
       answer: text.slice(0, 4000),
+      answerChars,
       rubricHit: Array.isArray(rubricHit) ? rubricHit.map(String) : [],
       verdict: verdict ? String(verdict) : null,
       minimalAction: minimalAction ? String(minimalAction) : null,
+      closedBook: isClosed,
+      durationSec: typeof durationSec === 'number' ? durationSec : null,
+      minutes,
+      copiedRatio: Math.round(copiedRatio * 1000) / 1000,
+      longestRun,
+      valid,
+      warnings,
     }
     await this.store.appendJsonl(docId, 'drills.jsonl', record)
-    await this.store.saveMeta(docId, { stage: 'drilled' })
+
+    // 只有"有效"的复述才推进到 drilled。无效的照样存下来（是宝贵的记录），
+    // 但进度不动——否则门槛形同虚设。
+    if (valid) await this.store.saveMeta(docId, { stage: 'drilled' })
+
     const progress = await this.store.progressOf(docId)
+
+    // ---- 4. 复习调度 ----
+    // 艾宾浩斯间隔：1 天 → 3 天 → 7 天。这里只登记第一个到期日，
+    // 真正的"今天该复习哪几份"由 reviewDue() 统一算。
+    if (valid) {
+      const now = Date.now()
+      await this.store.saveMeta(docId, {
+        review: { lastDrilledAt: new Date(now).toISOString(), stage: 0, dueAt: new Date(now + 86400000).toISOString() },
+      })
+    }
+
     return { docId, record, progress, next: nextStepOf(progress) }
+  }
+
+  /**
+   * 今天该复习哪些资料。
+   *
+   * 只登记"下次到期日"是不够的——用户打开工作台时需要一个直接的清单，
+   * 而不是自己去比对日期。
+   */
+  async reviewDue() {
+    const docs = await this.list()
+    const now = Date.now()
+    const items = []
+    for (const d of docs) {
+      const meta = await this.store.meta(d.id).catch(() => null)
+      const review = meta?.review
+      if (!review?.dueAt) continue
+      const due = Date.parse(review.dueAt)
+      if (Number.isNaN(due)) continue
+      items.push({
+        docId: d.id,
+        title: d.title,
+        stage: review.stage ?? 0,
+        dueAt: review.dueAt,
+        overdueDays: Math.floor((now - due) / 86400000),
+        isDue: due <= now,
+        nextIntervalDays: REVIEW_INTERVALS[(review.stage ?? 0) + 1] ?? null,
+      })
+    }
+    items.sort((a, b) => a.overdueDays - b.overdueDays)
+    return { due: items.filter((i) => i.isDue), upcoming: items.filter((i) => !i.isDue) }
+  }
+
+  /**
+   * 完成一次复习，推进到下一个间隔。
+   *
+   * 1 天 → 3 天 → 7 天 → 之后固定 7 天（长期维持）。
+   */
+  async completeReview(docId) {
+    const meta = await this.store.meta(docId)
+    const stage = (meta?.review?.stage ?? 0) + 1
+    const days = REVIEW_INTERVALS[stage] ?? 7
+    const dueAt = new Date(Date.now() + days * 86400000).toISOString()
+    await this.store.saveMeta(docId, { review: { ...(meta?.review ?? {}), stage, dueAt } })
+    return { docId, stage, dueAt, intervalDays: days }
   }
 
   async drills(docId) {
@@ -538,6 +724,74 @@ export class StudyService {
    * 「做到哪一步了、下一步干什么、有哪些校验问题」。
    * 让模型读 222 KB 换一句话的结论，是纯粹的上下文浪费。
    */
+  /**
+   * 覆盖审计：哪些段落还没加工。
+   *
+   * 之前的进度只有"已标注 37 段"，没有分母，用户看不出还有 145 段没碰。
+   * 逆向核对（reverse coverage）是关键：不是问"我标了几段"，
+   * 而是问"哪些段还空着"，逐段列出来。
+   *
+   * 参考项目的教训是审计体量会超过知识体量，所以这里只做一件事：
+   * 列出没加工的段 id + 它们所在的小节标题，不做 10 种报表。
+   */
+  async coverage(docId) {
+    const segs = await this.store.segments(docId)
+    const texts = new Map(
+      ((await this.store.artifact(docId, 'segment-texts.json').catch(() => null))?.items ?? []).map((t) => [
+        t.id,
+        String(t.text ?? ''),
+      ]),
+    )
+    const annotations = (await this.store.artifact(docId, 'annotations.json').catch(() => null))?.items ?? []
+    const done = new Set(annotations.map((a) => a.segmentId))
+
+    // 段的 heading 字段并不存在（段落只有 chapter），所以按"最近一个 Markdown 标题"
+    // 往前走查真实小节名。否则所有段都会落在"（无标题段落）"里，分组没意义。
+    const headingOf = new Map()
+    let current = '开篇'
+    for (const s of segs) {
+      const text = texts.get(s.id) ?? s.lead ?? ''
+      const m = /^#{1,6}\s+(.{1,60})/.exec(String(text).trim())
+      if (m) current = m[1].replace(/[*`]/g, '').trim()
+      headingOf.set(s.id, current)
+    }
+
+    const skipped = segs
+      .filter((s) => !done.has(s.id))
+      .map((s) => ({
+        id: s.id,
+        chars: s.chars ?? [...(texts.get(s.id) ?? '')].length,
+        heading: headingOf.get(s.id) ?? null,
+      }))
+
+    // 按小节聚合，让用户看到"第 3 节整节没标"而不是一串 ¶98,¶99...
+    const byHeading = new Map()
+    for (const s of skipped) {
+      const key = s.heading ?? '（无标题段落）'
+      const cur = byHeading.get(key) ?? { heading: key, count: 0, chars: 0, ids: [] }
+      cur.count += 1
+      cur.chars += s.chars
+      cur.ids.push(s.id)
+      byHeading.set(key, cur)
+    }
+    const groups = [...byHeading.values()].sort((a, b) => b.count - a.count)
+
+    return {
+      total: segs.length,
+      done: segs.length - skipped.length,
+      skippedCount: skipped.length,
+      percent: segs.length ? Math.round(((segs.length - skipped.length) / segs.length) * 1000) / 10 : 0,
+      skipped,
+      groups: groups.map((g) => ({
+        heading: g.heading,
+        count: g.count,
+        chars: g.chars,
+        // 只给前 8 个 id，够定位就行
+        sampleIds: g.ids.slice(0, 8),
+      })),
+    }
+  }
+
   async status(docId) {
     const meta = await this.store.meta(docId)
     const progress = await this.store.progressOf(docId)
@@ -577,6 +831,11 @@ export class StudyService {
       counts: {
         segments: progress.segmentCount,
         annotations: progress.annotatedCount,
+        // 覆盖率必须带分母：只说"已标注 37"没有意义，
+        // 用户看不出还有 145 段没碰。
+        coverage: progress.segmentCount
+          ? `${progress.annotatedCount}/${progress.segmentCount}（${Math.round((progress.annotatedCount / progress.segmentCount) * 1000) / 10}%）`
+          : '0/0',
         nodes: relations?.nodes?.length ?? 0,
         edges: relations?.edges?.length ?? 0,
         figures: (await this.store.artifact(docId, 'figures.json').catch(() => null))?.figures?.length ?? 0,
@@ -601,25 +860,78 @@ export class StudyService {
    * 术语追问：把"词 + 所在段落上下文"落库，回答由模型给出。
    * 界面点词、语音提问都走这里，保证每次都带上上下文。
    */
+  /**
+   * 术语追问：把"词 + 所在段落上下文"落库。
+   *
+   * 两个用途：
+   * - 界面点词/语音提问时先落库（answer 为空），再等 Agent 通过 study_term 回填
+   * - Agent 自己解释时直接带 answer 落库
+   *
+   * 上下文必须按 id 直查 —— 早期这里用 read(docId,{limit:1000})，
+   * 但 read() 内部把 limit 截到 100，导致第 101 段之后的词全部取不到上下文，
+   * 静默变成空串。chapter4 有 182 段，后 82 段的追问全是无上下文的。
+   */
   async askTerm(docId, { term, segmentId, question, answer, source }) {
     const clean = String(term ?? '').trim()
     if (!clean) throw new Error('缺少要追问的词')
     let context = ''
     if (segmentId) {
-      const hit = (await this.read(docId, { offset: 0, limit: 1000 })).segments.find((s) => s.id === segmentId)
+      const texts = (await this.store.artifact(docId, 'segment-texts.json').catch(() => null))?.items ?? []
+      const hit = texts.find((t) => t.id === segmentId)
       context = hit?.text ?? ''
     }
     const record = {
+      id: `t-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
       term: clean,
       segmentId: segmentId ?? null,
       question: String(question ?? `「${clean}」在这里是什么意思？`),
-      context: context.slice(0, 800),
-      answer: answer ?? null,
+      context: context.slice(0, 1200),
+      answer: answer ? String(answer) : null,
       source: source ?? 'ui',
       at: new Date().toISOString(),
     }
     await this.store.appendJsonl(docId, 'terms.jsonl', record)
     return record
+  }
+
+  /**
+   * 回填某个待答术语的答案。
+   *
+   * 界面点词后 `answer` 为 null，需要 Agent 答完再写回来。
+   * 按 term + segmentId 找最近一条还没答的记录，避免把历史已答覆盖掉。
+   */
+  async answerTerm(docId, { term, segmentId, answer }) {
+    const clean = String(term ?? '').trim()
+    const text = String(answer ?? '').trim()
+    if (!clean) throw new Error('缺少 term')
+    if (!text) throw new Error('缺少 answer')
+    const all = (await this.store.artifact(docId, 'terms.jsonl').catch(() => null)) ?? []
+    let idx = -1
+    for (let i = all.length - 1; i >= 0; i -= 1) {
+      const r = all[i]
+      if (r.term !== clean) continue
+      if (segmentId && r.segmentId !== segmentId) continue
+      if (r.answer) continue
+      idx = i
+      break
+    }
+    if (idx < 0) return { updated: false, reason: '没有找到待答的追问记录' }
+    all[idx] = { ...all[idx], answer: text, answeredAt: new Date().toISOString() }
+    // 必须用 writeJsonl：terms.jsonl 是"每行一条"，用 writeArtifact 会被写成 JSON 数组
+    await this.store.writeJsonl(docId, 'terms.jsonl', all)
+    return { updated: true, record: all[idx] }
+  }
+
+  /**
+   * 还没答的追问（界面轮询用）。
+   *
+   * 只认界面点出来的（source=ui）且还没答的：terms.jsonl 里有很多
+   * Agent 早先写下的历史记录，它们answer 为空并不等于"等人回答"，
+   * 全算进来的话界面会永远显示几十条待答。
+   */
+  async pendingTerms(docId) {
+    const all = (await this.store.artifact(docId, 'terms.jsonl').catch(() => null)) ?? []
+    return all.filter((r) => !r.answer && r.source === 'ui')
   }
 
   async searchTerms(docId, term) {

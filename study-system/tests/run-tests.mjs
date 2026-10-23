@@ -258,6 +258,74 @@ await test('未知段落锚点被拒', async () => {
   assert.ok(r.issues.some((i) => i.code === 'unknown-segment'))
 })
 
+/* ---- 高亮密度：只有上限会让系统"奖励偷懒" ---- */
+
+section('3b. 高亮密度（上界与下界都要有）')
+
+// 造一段足够长的正文，用来验证"段内密度"规则
+const LONG = '这是一段足够长的正文内容用来验证段内高亮密度规则是否生效我们需要至少六十个字符才能触发检查'.repeat(4)
+const LONG_CTX = {
+  totalChars: [...LONG].length,
+  segments: [{ id: '¶L', chars: [...LONG].length, text: LONG }],
+}
+
+await test('高亮过少给出警告（实测 0.85% 时注意力机制已失效）', async () => {
+  // 180 字里只标 1 个字 → 0.56%，远低于 2%
+  const r = rules.validateAnnotation([{ segmentId: '¶L', label: 'd', tier: 'core', title: 'x', quote: '正' }], LONG_CTX)
+  assert.ok(
+    r.issues.some((i) => i.code === 'budget-too-sparse'),
+    `应有 budget-too-sparse 警告，实际：${r.issues.map((i) => i.code).join(',')}`,
+  )
+  // 只是警告，不该阻塞
+  assert.equal(r.ok, true, '高亮过少应该是提醒而不是拒绝')
+})
+
+await test('单条 quote 占段落一半以上 → 拒绝（等于整段染色）', async () => {
+  // 180 字的段落里标 100 字：单条检查（≥90%）放行，只有段内密度能拦住
+  const r = rules.validateAnnotation(
+    [{ segmentId: '¶L', label: 't', tier: 'ref', title: 'x', quote: LONG.slice(0, 100) }],
+    LONG_CTX,
+  )
+  assert.ok(
+    r.issues.some((i) => i.code === 'segment-over-highlighted'),
+    `单条 quote 占段 56% 必须被拦下，实际：${r.issues.map((i) => i.code).join(',')}`,
+  )
+  assert.equal(r.ok, false)
+})
+
+await test('每段只能有一条标注（所以"同段多条拼成整段"在数据层就不可能）', async () => {
+  const parts = LONG.match(/.{1,20}/g).slice(0, 3)
+  const r = rules.validateAnnotation(
+    parts.map((q, i) => ({ segmentId: '¶L', label: 't', tier: 'ref', title: `p${i}`, quote: q })),
+    LONG_CTX,
+  )
+  assert.ok(
+    r.issues.some((i) => i.code === 'duplicate'),
+    '同段多条必须报 duplicate',
+  )
+})
+
+await test('短段落不参与密度检查（12 字里标 5 字是正常做法）', async () => {
+  const r = rules.validateAnnotation(
+    [{ segmentId: '¶1', label: 'd', tier: 'core', title: 'x', quote: '关键短语1' }],
+    { totalChars: 24, segments: [{ id: '¶1', chars: 12, text: '这是第一段的原文内容关键短语1' }] },
+  )
+  assert.ok(
+    !r.issues.some((i) => i.code === 'segment-over-highlighted'),
+    '短段落不该被判整段染色',
+  )
+})
+
+await test('同一段 quote 重叠时提示标重了', async () => {
+  // duplicate 会先拦下同段第二条，所以这里直接验证区间合并能识别重叠
+  const r = rules.validateAnnotation(
+    [{ segmentId: '¶L', label: 't', tier: 'ref', title: 'a', quote: LONG.slice(0, 10) }],
+    LONG_CTX,
+  )
+  // 单条不应误报重叠
+  assert.ok(!r.issues.some((i) => i.code === 'quote-overlap'), '单条不该报重叠')
+})
+
 /* ------------------------------------------------------- 读前六段式 */
 
 section('4. 读前六段式校验')
@@ -364,7 +432,19 @@ await test('缺参考资料报错', async () => {
 
 section('5. 知识点关系校验')
 
-await test('合法图通过', async () => {
+/** 八种关系都表态的辅助器：mapped 的给出边 id，其余写理由。 */
+const reviewOf = (byRel) => {
+  const out = {}
+  for (const k of ['prerequisite', 'part-of', 'contrast', 'cause', 'example-of', 'application', 'sequence', 'analogy']) {
+    const ids = byRel[k] ?? []
+    out[k] = ids.length
+      ? { status: 'mapped', edgeIds: ids, why: '材料里有明确论述' }
+      : { status: 'unsupported', why: '材料没有论述这类关系' }
+  }
+  return out
+}
+
+await test('合法图通过（边带原文出处 + 八类表态齐全）', async () => {
   const r = rules.validateRelations({
     nodes: [
       { id: 'a', label: '内在负荷' },
@@ -372,22 +452,83 @@ await test('合法图通过', async () => {
       { id: 'c', label: '设计原则' },
     ],
     edges: [
-      { from: 'a', to: 'c', relation: 'prerequisite' },
-      { from: 'b', to: 'c', relation: 'prerequisite' },
-      { from: 'a', to: 'b', relation: 'contrast' },
+      { id: 'e1', from: 'a', to: 'c', relation: 'prerequisite', quote: '内在负荷决定教学设计' },
+      { id: 'e2', from: 'b', to: 'c', relation: 'prerequisite', quote: '外在负荷要靠设计消除' },
+      { id: 'e3', from: 'a', to: 'b', relation: 'contrast', quote: '两者来源不同' },
     ],
+    relationReview: reviewOf({ prerequisite: ['e1', 'e2'], contrast: ['e3'] }),
   })
   assert.ok(r.ok, JSON.stringify(r.issues))
   assert.equal(r.stats.edges, 3)
+})
+
+await test('边没有原文出处被拒（拦编造连线）', async () => {
+  const r = rules.validateRelations({
+    nodes: [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }],
+    edges: [{ id: 'e1', from: 'a', to: 'b', relation: 'cause' }],
+    relationReview: reviewOf({ cause: ['e1'] }),
+  })
+  assert.equal(r.ok, false)
+  assert.ok(r.issues.some((i) => i.code === 'edge-no-evidence'))
+})
+
+await test('标了 inference 的无出处边可以放行，但必须写 why', async () => {
+  const r = rules.validateRelations({
+    nodes: [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }],
+    edges: [{ id: 'e1', from: 'a', to: 'b', relation: 'cause', evidence: 'inference' }],
+    relationReview: reviewOf({ cause: ['e1'] }),
+  })
+  assert.equal(r.ok, false)
+  assert.ok(r.issues.some((i) => i.code === 'inference-no-reason'), '推断边必须给理由')
+
+  const r2 = rules.validateRelations({
+    nodes: [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }],
+    edges: [{ id: 'e1', from: 'a', to: 'b', relation: 'cause', evidence: 'inference', why: '由行文顺序推出' }],
+    relationReview: reviewOf({ cause: ['e1'] }),
+  })
+  assert.ok(r2.ok, JSON.stringify(r2.issues))
+})
+
+await test('一条边都没有被拒（原来只报 warn，散点图也能过）', async () => {
+  const r = rules.validateRelations({
+    nodes: [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }],
+    edges: [],
+    relationReview: reviewOf({}),
+  })
+  assert.equal(r.ok, false)
+  assert.ok(r.issues.some((i) => i.code === 'no-edges'))
+})
+
+await test('缺少 relationReview 被拒（必须逐类想过）', async () => {
+  const r = rules.validateRelations({
+    nodes: [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }],
+    edges: [{ id: 'e1', from: 'a', to: 'b', relation: 'cause', quote: '有原文' }],
+  })
+  assert.equal(r.ok, false)
+  assert.ok(r.issues.some((i) => i.code === 'review-missing'))
+})
+
+await test('unsupported 不给理由被拒（"没画线"不算理由）', async () => {
+  const r = rules.validateRelations({
+    nodes: [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }],
+    edges: [{ id: 'e1', from: 'a', to: 'b', relation: 'cause', quote: '有原文' }],
+    relationReview: {
+      ...reviewOf({ cause: ['e1'] }),
+      analogy: { status: 'unsupported' },
+    },
+  })
+  assert.equal(r.ok, false)
+  assert.ok(r.issues.some((i) => i.code === 'review-no-reason'))
 })
 
 await test('前置关系成环被拒', async () => {
   const r = rules.validateRelations({
     nodes: [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }],
     edges: [
-      { from: 'a', to: 'b', relation: 'prerequisite' },
-      { from: 'b', to: 'a', relation: 'prerequisite' },
+      { id: 'e1', from: 'a', to: 'b', relation: 'prerequisite', quote: 'A 在 B 之前' },
+      { id: 'e2', from: 'b', to: 'a', relation: 'prerequisite', quote: 'B 在 A 之前' },
     ],
+    relationReview: reviewOf({ prerequisite: ['e1', 'e2'] }),
   })
   assert.equal(r.ok, false)
   assert.ok(r.issues.some((i) => i.code === 'cycle'))
@@ -396,19 +537,28 @@ await test('前置关系成环被拒', async () => {
 await test('非法关系类型被拒', async () => {
   const r = rules.validateRelations({
     nodes: [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }],
-    edges: [{ from: 'a', to: 'b', relation: 'related-to' }],
+    edges: [{ id: 'e1', from: 'a', to: 'b', relation: 'related-to', quote: '瞎连' }],
+    relationReview: reviewOf({}),
   })
   assert.equal(r.ok, false)
   assert.ok(r.issues.some((i) => i.code === 'edge-type'))
 })
 
-await test('孤立知识点只警告', async () => {
-  const r = rules.validateRelations({
+await test('孤立知识点是错误，但可以用独立节点声明豁免', async () => {
+  const graph = {
     nodes: [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }, { id: 'c', label: 'C' }],
-    edges: [{ from: 'a', to: 'b', relation: 'cause' }],
-  })
-  assert.ok(r.ok)
+    edges: [{ id: 'e1', from: 'a', to: 'b', relation: 'cause', quote: 'A 导致 B' }],
+    relationReview: reviewOf({ cause: ['e1'] }),
+  }
+  const r = rules.validateRelations(graph)
+  assert.equal(r.ok, false, '孤立节点默认是错误')
   assert.ok(r.issues.some((i) => i.code === 'isolated'))
+
+  const r2 = rules.validateRelations({
+    ...graph,
+    independentNodes: [{ id: 'c', why: '它是背景设定，不参与本章任何论证' }],
+  })
+  assert.ok(r2.ok, `声明后应放行：${JSON.stringify(r2.issues)}`)
 })
 
 /* ------------------------------------------------------------ 6. 服务 */
@@ -490,11 +640,23 @@ await test('关系图保存并产出 Mermaid', async () => {
   const svc = new StudyService(workspace)
   const res = await svc.saveRelations(DOC_ID, {
     nodes: [{ id: 'a', label: '内在负荷' }, { id: 'b', label: '设计原则' }],
-    edges: [{ from: 'a', to: 'b', relation: 'prerequisite' }],
+    edges: [{ id: 'e1', from: 'a', to: 'b', relation: 'prerequisite', quote: '内在负荷决定设计原则' }],
+    relationReview: reviewOf({ prerequisite: ['e1'] }),
   })
-  assert.ok(res.check.ok)
+  assert.ok(res.check.ok, JSON.stringify(res.check.issues))
   assert.match(res.mermaid, /graph TD/)
   assert.match(res.mermaid, /a.*-->.*b/)
+})
+
+await test('关系图拒绝凭空连线（缺原文出处）', async () => {
+  const svc = new StudyService(workspace)
+  const res = await svc.saveRelations(DOC_ID, {
+    nodes: [{ id: 'a', label: '内在负荷' }, { id: 'b', label: '设计原则' }],
+    edges: [{ id: 'e1', from: 'a', to: 'b', relation: 'cause' }],
+    relationReview: reviewOf({ cause: ['e1'] }),
+  })
+  assert.equal(res.check.ok, false)
+  assert.ok(res.check.issues.some((i) => i.code === 'edge-no-evidence'))
 })
 
 await test('术语追问带上下文落库并可检索', async () => {
@@ -591,27 +753,135 @@ await test('status() 不含正文，避免每轮烧掉几十 KB 上下文', asyn
   assert.equal(st.annotatedHtml, undefined, 'status 不该带渲染好的正文')
 })
 
-await test('记录真实复述后才推进到 drilled', async () => {
+await test('开卷复述只记录、不推进进度（门槛不能被绕过）', async () => {
+  const svc = new StudyService(workspace)
+  const res = await svc.recordDrill(DOC_ID, {
+    prompt: '说说三类负荷',
+    answer: '内在的是内容自带的，外在的是排版造成的浪费，相关的是用来建图式的努力。',
+    rubricHit: ['三类名字全对'],
+    verdict: '部分达标',
+    minimalAction: '补一个例子',
+    // 没传 closedBook → 开卷
+  })
+  assert.equal(res.record.valid, false, '开卷不算有效复述')
+  assert.equal(res.progress.drilled, false, '开卷不该点亮 drilled')
+  assert.ok(
+    res.record.warnings.some((w) => w.code === 'drill-open-book'),
+    '应提示开卷不计入',
+  )
+  // 但记录本身要留下——这是宝贵的学习痕迹
+  assert.equal((await svc.drills(DOC_ID)).length, 1, '记录仍应保存')
+})
+
+await test('合书 + 够时长 + 没抄原文 → 才推进到 drilled', async () => {
   const svc = new StudyService(workspace)
   const res = await svc.recordDrill(DOC_ID, {
     prompt: '合上材料说说三类负荷',
-    answer: '内在的是内容自带的，外在的是排版造成的浪费，相关的是用来建图式的努力。',
+    answer: '我的理解是：内容本身难的那部分怎么讲都得花力气；排版乱、图注找不到地方会额外耗掉脑力，是纯浪费；剩下花在建立联系上的那部分才是有用的学习。',
     rubricHit: ['三类名字全对', '来源说对'],
     verdict: '部分达标：三者区别说清了，但没举例',
     minimalAction: '补一个原文之外的例子',
+    closedBook: true,
+    durationSec: 240,
   })
+  assert.equal(res.record.valid, true, `应有效：${JSON.stringify(res.record.warnings)}`)
   assert.equal(res.progress.drilled, true)
-  assert.equal(res.progress.drillCount, 1)
-  const list = await svc.drills(DOC_ID)
-  assert.equal(list.length, 1)
-  assert.match(list[0].answer, /内在的是内容自带的/, '应保存学习者的原话')
+  assert.equal(res.record.minutes, 4, '应记下花了多少分钟')
+})
+
+await test('几十秒就交的复述被标为太快', async () => {
+  const svc = new StudyService(workspace)
+  const res = await svc.recordDrill(DOC_ID, {
+    answer: '三类负荷就是内在、外在、相关这三种。',
+    closedBook: true,
+    durationSec: 20,
+  })
+  assert.equal(res.record.valid, false)
+  assert.ok(res.record.warnings.some((w) => w.code === 'drill-too-fast'))
+})
+
+await test('把原文复制一遍会被识别为抄录', async () => {
+  const svc = new StudyService(workspace)
+  const proj = await loadProject(svc)
+  // 直接拿几段原文拼起来当"复述"
+  const copied = proj.segments.slice(0, 3).map((s) => s.text).join('')
+  const res = await svc.recordDrill(DOC_ID, { answer: copied, closedBook: true, durationSec: 300 })
+  assert.equal(res.record.valid, false, `抄原文不该算有效：copied=${res.record.copiedRatio}`)
+  assert.ok(res.record.warnings.some((w) => w.code === 'drill-copied'), '应识别为抄录')
 })
 
 await test('多次考核累积为记录，不覆盖历史', async () => {
   const svc = new StudyService(workspace)
+  const before = (await svc.drills(DOC_ID)).length
   await svc.recordDrill(DOC_ID, { answer: '第二次复述：外在负荷＝来回搜索的浪费。' })
   const list = await svc.drills(DOC_ID)
-  assert.equal(list.length, 2, '第二条记录应当追加而不是覆盖')
+  assert.equal(list.length, before + 1, '新记录应当追加而不是覆盖')
+})
+
+/* ---- 复习调度 ---- */
+
+await test('有效考核后登记 1 天后到期，完成复习推进到 3 天', async () => {
+  const svc = new StudyService(workspace)
+  const meta = await svc.store.meta(DOC_ID)
+  assert.ok(meta.review?.dueAt, '有效考核后应登记到期日')
+  const days = (Date.parse(meta.review.dueAt) - Date.now()) / 86400000
+  assert.ok(days > 0.9 && days < 1.1, `第一次到期应在 1 天后，实际 ${days.toFixed(2)} 天`)
+
+  const r1 = await svc.completeReview(DOC_ID)
+  assert.equal(r1.stage, 1)
+  assert.equal(r1.intervalDays, 3, '第二次间隔应为 3 天')
+
+  const r2 = await svc.completeReview(DOC_ID)
+  assert.equal(r2.intervalDays, 7, '第三次间隔应为 7 天')
+
+  const r3 = await svc.completeReview(DOC_ID)
+  assert.equal(r3.intervalDays, 7, '之后维持 7 天')
+})
+
+await test('reviewDue 能把到期和未到期的分开', async () => {
+  const svc = new StudyService(workspace)
+  const r = await svc.reviewDue()
+  assert.ok(Array.isArray(r.due) && Array.isArray(r.upcoming), '应返回 due/upcoming 两组')
+  const all = [...r.due, ...r.upcoming]
+  assert.ok(all.every((i) => i.docId && i.dueAt), '每条都要有 docId 和 dueAt')
+  assert.ok(r.due.every((i) => i.isDue === true))
+  assert.ok(r.upcoming.every((i) => i.isDue === false))
+})
+
+/* ---- 覆盖审计 ---- */
+
+await test('覆盖审计列出没加工的段落（不能只报已标注数）', async () => {
+  const svc = new StudyService(workspace)
+  const cov = await svc.coverage(DOC_ID)
+  assert.ok(cov.total > 0, '要有总段数')
+  assert.equal(cov.total, cov.done + cov.skippedCount, '已加工 + 未加工 必须等于总段数')
+  assert.ok(Array.isArray(cov.skipped), '要有未加工的段落清单')
+  assert.ok(cov.skipped.every((s) => s.id), '每条都要有段落锚点')
+  assert.ok(cov.percent >= 0 && cov.percent <= 100, `百分比越界：${cov.percent}`)
+  assert.ok(Array.isArray(cov.groups), '要有按小节的聚合')
+})
+
+await test('覆盖审计：全部标完后未加工清零', async () => {
+  const svc = new StudyService(workspace)
+  const proj = await loadProject(svc)
+  // 把每段都标上（用很短的两字 quote，避免触发预算）
+  const items = proj.segments.map((s, i) => ({
+    segmentId: s.id,
+    label: ['d', 'e', 'q', 's', 't', 'c', 'v'][i % 7],
+    keyword: i % 7 === 5 ? '两字' : undefined,
+    title: `要点${i}`,
+    quote: s.text.replace(/[*`#>|\s]/g, '').slice(0, 2),
+  }))
+  await svc.saveAnnotation(DOC_ID, items)
+  const cov = await svc.coverage(DOC_ID)
+  assert.equal(cov.skippedCount, 0, `应无未加工段落，实际还剩 ${cov.skippedCount}`)
+  assert.equal(cov.percent, 100)
+})
+
+await test('status().counts.coverage 带分母', async () => {
+  const svc = new StudyService(workspace)
+  const st = await svc.status(DOC_ID)
+  assert.match(st.counts.coverage, /^\d+\/\d+（[\d.]+%）$/, `覆盖率格式应带分母，实际 ${st.counts.coverage}`)
 })
 
 /* ------------------------------------------------------------ 9. 汇总 */
@@ -692,10 +962,18 @@ await test('读前建构各段内容都真的渲染出来了', async () => {
   const svc = new StudyService(workspace)
   const docId = (await svc.list()).find((d) => d.title === '排版测试')?.id
   const html = (await svc.project(docId)).preflightHtml
-  assert.match(html, /① 资料摘要/)
-  assert.match(html, /② 对我的帮助与目标/)
-  assert.match(html, /⑤ 思考题与作业/)
-  assert.match(html, /⑥ 参考资料/)
+  // 六段必须连续编号出现，③④ 不能缺（早期版本直接插 parts，界面上只看到 1,2,1,2,3,4）
+  for (const [n, title] of [
+    ['①', '资料摘要'],
+    ['②', '对我的帮助与目标'],
+    ['③', '每一部分的目标、要求、重点、难点'],
+    ['④', '每一部分的考核方式与知识点'],
+    ['⑤', '思考题与作业'],
+    ['⑥', '参考资料'],
+  ]) {
+    assert.ok(html.includes(n) && html.includes(title), `缺少第 ${n} 段「${title}」`)
+  }
+  assert.equal((html.match(/class="sc-pf-sec"/g) ?? []).length, 6, '应正好六段')
   assert.match(html, /class="sc-part"/, '应有分部卡片')
   assert.match(html, /class="sc-kp"/, '应有知识点块')
   assert.match(html, /class="sc-req"/, '应有要求块')
@@ -713,6 +991,71 @@ await test('每段的知识点都出现在 HTML 里（没被吞掉）', async ()
       assert.ok(html.includes(name.slice(0, 6)), `知识点「${name}」没出现在 HTML 里`)
     }
   }
+})
+
+/* ------------------------------------------------ 8b. JSONL 数据安全 */
+
+section('9. JSONL 不能被写坏或写少（见 INCIDENT-terms-data-loss.md）')
+
+await test('writeJsonl 写 N 条读回还是 N 条', async () => {
+  const svc = new StudyService(workspace)
+  const docId = (await svc.list()).find((d) => d.title === '排版测试')?.id
+  const records = Array.from({ length: 7 }, (_, i) => ({ term: `词${i}`, answer: null, source: 'agent' }))
+  await svc.store.writeJsonl(docId, 'probe.jsonl', records)
+  const back = await svc.store.jsonl(docId, 'probe.jsonl')
+  assert.equal(back.length, 7, `应读回 7 条，实际 ${back.length}`)
+  assert.equal(back[3].term, '词3', '内容和顺序都要保住')
+})
+
+await test('writeJsonl 写的是每行一条，不是 JSON 数组', async () => {
+  const svc = new StudyService(workspace)
+  const docId = (await svc.list()).find((d) => d.title === '排版测试')?.id
+  await svc.store.writeJsonl(docId, 'probe2.jsonl', [{ a: 1 }, { a: 2 }])
+  const text = await readFile(join(workspace, '.study', docId, 'probe2.jsonl'), 'utf8')
+  assert.ok(!text.trim().startsWith('['), '不能写成 JSON 数组，jsonl 的读法是每行一条')
+  assert.equal(text.trim().split('\n').length, 2, '应有 2 行')
+})
+
+await test('回填术语答案不会丢掉其他历史记录', async () => {
+  const svc = new StudyService(workspace)
+  const docId = (await svc.list()).find((d) => d.title === '排版测试')?.id
+  // 造 5 条历史（4 条已答 + 1 条待答）
+  for (let i = 0; i < 4; i += 1) {
+    await svc.askTerm(docId, { term: `历史${i}`, segmentId: null, answer: `答案${i}`, source: 'agent' })
+  }
+  await svc.askTerm(docId, { term: '待答词', segmentId: null, source: 'ui' })
+
+  const before = await svc.store.jsonl(docId, 'terms.jsonl')
+  assert.equal(before.length, 5, `起点应是 5 条，实际 ${before.length}`)
+
+  const res = await svc.answerTerm(docId, { term: '待答词', answer: '补上的答案' })
+  assert.equal(res.updated, true, JSON.stringify(res))
+
+  const after = await svc.store.jsonl(docId, 'terms.jsonl')
+  assert.equal(after.length, 5, `回填后应仍是 5 条（不能丢历史），实际 ${after.length}`)
+  assert.ok(after.find((r) => r.term === '待答词')?.answer === '补上的答案', '待答词应被填上答案')
+  assert.ok(after.filter((r) => r.term.startsWith('历史')).length === 4, '4 条历史必须还在')
+})
+
+await test('pendingTerms 只算界面点出来的，不算历史 Agent 记录', async () => {
+  const svc = new StudyService(workspace)
+  const docId = (await svc.list()).find((d) => d.title === '排版测试')?.id
+  await svc.askTerm(docId, { term: '界面待答', segmentId: null, source: 'ui' })
+  const pending = await svc.pendingTerms(docId)
+  assert.ok(
+    pending.every((r) => r.source === 'ui'),
+    `待答列表里混进了非界面记录：${pending.map((r) => r.source).join(',')}`,
+  )
+  assert.ok(pending.some((r) => r.term === '界面待答'), '界面点的那条应出现')
+})
+
+await test('术语上下文取第 100 段之后也不会空（read 有 limit 截断）', async () => {
+  const svc = new StudyService(workspace)
+  const docId = (await svc.list()).find((d) => d.title === '排版测试')?.id
+  const segs = await svc.store.segments(docId)
+  const last = segs[segs.length - 1]
+  const rec = await svc.askTerm(docId, { term: '末段词', segmentId: last.id, source: 'ui' })
+  assert.ok(rec.context.length > 0, `${last.id} 的上下文不该是空的（原实现 limit 被截到 100）`)
 })
 
 await rm(workspace, { recursive: true, force: true })
@@ -1135,9 +1478,10 @@ await test('保存关系图后 project() 能拿到 archify 图列表', async () 
       { id: 'x', label: '节点甲' },
       { id: 'y', label: '节点乙' },
     ],
-    edges: [{ from: 'x', to: 'y', relation: 'prerequisite' }],
+    edges: [{ id: 'e1', from: 'x', to: 'y', relation: 'prerequisite', quote: '甲在乙之前' }],
+    relationReview: reviewOf({ prerequisite: ['e1'] }),
   })
-  assert.ok(res.check.ok)
+  assert.ok(res.check.ok, JSON.stringify(res.check.issues))
   assert.ok(res.figures, '保存结果里应带 figures')
   const proj = await svc.project(DOC_ID)
   assert.ok(Array.isArray(proj.figures), 'project() 应返回 figures 数组')

@@ -26,6 +26,12 @@ export const ATTENTION_TIERS = Object.freeze({
 })
 
 export const TOTAL_HIGHLIGHT_BUDGET = 0.20
+
+/**
+ * 段内高亮密度的生效门槛：段落至少这么长才检查"这一段是否被整段染色"。
+ * 太短的段落里标一半字是正常做法，密度没有参考意义。
+ */
+export const SEGMENT_DENSITY_MIN_CHARS = 60
 export const SUMMARY_TARGET_CHARS = 300
 export const SUMMARY_TOLERANCE = 0.4
 
@@ -191,6 +197,22 @@ export function validateAnnotation(items, context) {
     )
   }
 
+  /* 下界：只有上限没有下限，系统会"奖励偷懒"——标得越少越安全。
+   * 原则原文《深度阅读的二八法则》说的是「不超过 10%-20%」，
+   * 理想值就在这个区间里，不是"越少越好"。实测某份 29831 字的资料
+   * 只标了 0.85%（253 字），翻一页只看到 7 个字有颜色，注意力机制等于没有。 */
+  if (ratio < 0.02) {
+    issues.push(
+      issue(
+        'warn',
+        'budget-too-sparse',
+        `高亮只占 ${(ratio * 100).toFixed(2)}%（${highlightedChars}/${totalChars} 字）。` +
+          '原则建议 10%-20%，低于 2% 时三色注意力基本失效——' +
+          '请回头给关键段落补标，而不是只标几处。',
+      ),
+    )
+  }
+
   for (const [key, def] of Object.entries(ATTENTION_TIERS)) {
     if (def.budget === null) continue
     if (!byTier[key]) continue
@@ -203,6 +225,53 @@ export function validateAnnotation(items, context) {
           `${def.zh}档占 ${(tierRatio * 100).toFixed(1)}%，超过该档上限 ${(def.budget * 100).toFixed(0)}%。` +
             `${def.zh}档只留${def.why}。`,
         ),
+      )
+    }
+  }
+
+  /* 段内密度：单条 quote 不超过段落的 90% 还不够。
+   * 一段 200 字可以标 5 条 30 字的 quote，每条都能过单条检查，
+   * 但合起来 150 字 = 段的 75%，用户看到的仍然是"整段都是颜色"。
+   * 三色预算的分母是全文，所以这种局部染色永远不会被总量检查发现。
+   *
+   * 必须先做区间**并集**再算覆盖率：多条 quote 可能互相重叠，
+   * 直接相加会把实际覆盖算多。 */
+  for (const [segId, ranges] of quoteRanges) {
+    const seg = context.segments.find((s) => s.id === segId)
+    const segChars = seg?.chars || [...(seg?.text ?? '')].length
+    if (!segChars) continue
+    // 短段落不参与密度检查：一段 12 个字里标 5 个字就是 42%，
+    // 但这是正常做法（整段就那么长），密度在这里没有意义。
+    if (segChars < SEGMENT_DENSITY_MIN_CHARS) continue
+    const merged = []
+    for (const [a, b] of [...ranges].sort((x, y) => x[0] - y[0])) {
+      const last = merged[merged.length - 1]
+      if (last && a <= last[1]) last[1] = Math.max(last[1], b)
+      else merged.push([a, b])
+    }
+    const covered = merged.reduce((sum, [a, b]) => sum + (b - a), 0)
+    const density = covered / segChars
+    if (density > 0.5) {
+      issues.push(
+        issue(
+          'error',
+          'segment-over-highlighted',
+          `段落 ${segId} 有 ${(density * 100).toFixed(0)}% 的字被高亮（${covered}/${segChars}），` +
+            '这等于整段染色。请把这一段收缩到一两处最关键的短语。',
+        ),
+      )
+    } else if (density > 0.35) {
+      issues.push(
+        issue(
+          'warn',
+          'segment-dense',
+          `段落 ${segId} 有 ${(density * 100).toFixed(0)}% 的字被高亮，偏多；建议再挑一挑。`,
+        ),
+      )
+    }
+    if (merged.length < ranges.length) {
+      issues.push(
+        issue('warn', 'quote-overlap', `段落 ${segId} 的 quote 有重叠，可能标重了同一处。`),
       )
     }
   }
@@ -369,6 +438,32 @@ export function validateRelations(graph) {
     if (!RELATION_TYPES[edge?.relation]) {
       issues.push(issue('error', 'edge-type', `关系类型 "${edge?.relation}" 无效`))
     }
+    if (edge?.from && edge?.to && edge.from === edge.to) {
+      issues.push(issue('error', 'edge-self', `关系自己指向自己：${edge.from}`))
+    }
+    // 每条边都要有原文出处。模型很容易为了"图好看"硬连一条材料里
+    // 并不存在的关系，而类型检查看不出真假——只有让它给出原文才拦得住。
+    //
+    // 允许一种诚实的例外：明确标 evidence: 'inference' 的推断边。
+    // 有些关系是读者/模型自己推出来的（原文没说"因此"），
+    // 这类边不是编造，但必须自我标注，不能伪装成原文事实。
+    const hasQuote = String(edge?.quote ?? '').trim()
+    const isInference = edge?.evidence === 'inference'
+    if (!hasQuote && !isInference) {
+      issues.push(
+        issue(
+          'error',
+          'edge-no-evidence',
+          `关系 ${edge?.from} → ${edge?.to}（${edge?.relation}）缺原文出处：` +
+            '请给出说明这条关系的那句原文；如果原文并没有明说、是你自己推出来的，请标 evidence:"inference" 并写 why',
+        ),
+      )
+    }
+    if (!hasQuote && isInference && !String(edge?.why ?? '').trim()) {
+      issues.push(
+        issue('error', 'inference-no-reason', `关系 ${edge?.from} → ${edge?.to} 标了推断但没有 why，说说你凭什么这么推的`),
+      )
+    }
   }
 
   // 前置关系必须无环，否则学习顺序不存在
@@ -390,8 +485,93 @@ export function validateRelations(graph) {
   for (const id of ids) walk(id, [])
   for (const cycle of cyclic) issues.push(issue('error', 'cycle', `前置关系成环：${cycle}`))
 
+  /* 零连接 = 图没有意义。
+   * 原来 edges.length===0 只会让每个节点各报一条 isolated 警告，
+   * 全部 warn 都不阻塞，于是"33 个节点 0 条边"也能通过校验。
+   * 用户打开图谱看到的是一堆散点。 */
+  if (nodes.length >= 2 && edges.length === 0) {
+    issues.push(
+      issue(
+        'error',
+        'no-edges',
+        '有多个知识点但一条关系都没有：知识图谱至少要能看出谁先谁后、谁包含谁。' +
+          '如果这份材料确实彼此独立，请在 relationReview 里逐类说明理由。',
+      ),
+    )
+  }
+
+  /* 八种关系逐类表态。
+   * 不是要求每种关系都存在——是要求逐个想过。
+   * "没画线"永远不是理由，要么给出这条边，要么说明材料里为什么没有。 */
+  const review = graph?.relationReview ?? null
+  if (nodes.length >= 2) {
+    if (!review || typeof review !== 'object') {
+      issues.push(
+        issue(
+          'error',
+          'review-missing',
+          '缺少 relationReview：八种关系（前置/整体部分/对比/因果/例证/应用/次序/类比）要逐类说明' +
+            '「有就列边 id，没有就说材料里为什么没有」',
+        ),
+      )
+    } else {
+      for (const key of Object.keys(RELATION_TYPES)) {
+        const entry = review[key]
+        if (!entry) {
+          issues.push(issue('error', 'review-incomplete', `relationReview 漏了「${RELATION_TYPES[key].zh}」这一类`))
+          continue
+        }
+        const status = entry.status
+        if (status !== 'mapped' && status !== 'unsupported') {
+          issues.push(
+            issue('error', 'review-bad-status', `relationReview.${key}.status 只能是 mapped 或 unsupported`),
+          )
+          continue
+        }
+        if (status === 'mapped') {
+          const list = Array.isArray(entry.edgeIds) ? entry.edgeIds : []
+          if (!list.length) {
+            issues.push(issue('error', 'review-no-edges', `relationReview.${key} 说是 mapped，却没列出任何边`))
+          }
+          const real = new Set(edges.map((e) => String(e?.id ?? '')))
+          for (const id of list) {
+            if (!real.has(String(id))) {
+              issues.push(
+                issue('error', 'review-edge-mismatch', `relationReview.${key} 引用了不存在的边 ${id}`),
+              )
+            }
+          }
+        } else if (!String(entry.why ?? '').trim()) {
+          issues.push(
+            issue(
+              'error',
+              'review-no-reason',
+              `relationReview.${key} 标了 unsupported，但没写理由；「没画线」不算理由，要说明材料里为什么没有这种关系`,
+            ),
+          )
+        }
+      }
+    }
+  }
+
   const connected = new Set(edges.flatMap((e) => [e?.from, e?.to]))
-  for (const id of ids) if (!connected.has(id)) issues.push(issue('warn', 'isolated', `知识点 ${id} 没有任何关系边`))
+  // 孤立节点可以被独立节点声明豁免（带理由），否则是错误
+  const independent = new Set(
+    (Array.isArray(graph?.independentNodes) ? graph.independentNodes : [])
+      .filter((n) => String(n?.why ?? '').trim())
+      .map((n) => String(n.id)),
+  )
+  for (const id of ids) {
+    if (connected.has(id)) continue
+    if (independent.has(id)) continue
+    issues.push(
+      issue(
+        'error',
+        'isolated',
+        `知识点 ${id} 没有任何关系边。要么给它连上关系，要么在 independentNodes 里说明它为什么不参与论证`,
+      ),
+    )
+  }
 
   return {
     ok: !issues.some((i) => i.level === 'error'),

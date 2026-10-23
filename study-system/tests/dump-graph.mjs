@@ -11,7 +11,7 @@ const LIB = join('D:', 'learn', 'study-system', 'plugin', 'lib')
 const { StudyService } = await import(`file://${join(LIB, 'service.js')}`)
 
 const svc = new StudyService(WS)
-const project = await svc.project(DOC, { width: 1400 })
+const project = await svc.project(DOC, { width: 1400, withLayout: true })
 if (!project.graphLayout) {
   console.error(`「${DOC}」没有 relations，无法导出图谱布局`)
   process.exit(1)

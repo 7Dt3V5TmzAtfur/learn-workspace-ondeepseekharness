@@ -240,6 +240,35 @@ export class StudyStore {
     return file
   }
 
+  /**
+   * 整体覆写一个 JSONL 文件（每条一行）。
+   *
+   * 注意：不能用 writeArtifact —— 它对对象一律走 writeJson，
+   * 会把数组写成一个 JSON 数组，而 jsonl 的读法是"每行一条"，
+   * 两种格式混在一起会让后续 readJsonl 全部解析失败。
+   *
+   * 写完立即回读校验条数：曾因为"读全量→改一条→覆盖写"时读到的是残缺数据，
+   * 覆盖后把历史永久抹掉（见 INCIDENT-terms-data-loss.md）。
+   * 宁可抛错让调用方知道，也不要静默写少一截。
+   */
+  async writeJsonl(docId, name, records) {
+    const dir = this.dir(docId)
+    await mkdir(dir, { recursive: true })
+    const file = join(dir, name)
+    const list = records ?? []
+    const body = list.map((r) => JSON.stringify(r)).join('\n')
+    await writeFile(file, body ? `${body}\n` : '', 'utf8')
+
+    const expected = list.length
+    const actual = (await readJsonl(file).catch(() => [])).length
+    if (expected > 0 && actual !== expected) {
+      throw new Error(`写 ${name} 失败：写了 ${expected} 条，回读只有 ${actual} 条`)
+    }
+
+    await this.saveMeta(docId, {})
+    return file
+  }
+
   /** 读回 JSONL 记录（考核记录、术语追问等）。 */
   async jsonl(docId, name) {
     return readJsonl(join(this.dir(docId), name))
@@ -262,7 +291,11 @@ export class StudyStore {
       annotated: Boolean(annotation?.items?.length),
       mapped: has('relations.json'),
       recalled: Boolean(qa?.items?.length),
-      drilled: drillRecords.length > 0,
+      // 只有"有效"的复述才算完成考核：合书 + 够时长 + 没抄原文。
+      // 早期只数条数，于是随手打两行、甚至把原文复制一遍都能点亮最后一段。
+      drilled: drillRecords.some((d) => d?.valid !== false),
+      handledCount: drillRecords.length,
+      drilledCount: drillRecords.filter((d) => d?.valid !== false).length,
       annotatedCount: annotation?.items?.length ?? 0,
       drillCount: drillRecords.length,
       qaCount: qa?.items?.length ?? 0,

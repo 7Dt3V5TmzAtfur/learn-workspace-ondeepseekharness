@@ -21,78 +21,169 @@ window.__ModuleLoader__.load({
     /* ------------------------------------------------------------ 样式 */
 
     const CSS = `
-.sc-root{display:flex;flex-direction:column;height:100%;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font-size:13px}
-.sc-head{display:flex;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--dsw-alias-border-l1);flex:none}
-.sc-title{font-size:14px;font-weight:600}
-.sc-muted{color:var(--dsw-alias-label-secondary);font-size:12px}
+/* ============================================================
+ * 设计令牌
+ *
+ * 为什么要有这一层：原来 CSS 里散着 15 种字号、21 种 padding、6 个硬编码
+ * 色值，改一处要动十几个地方，而且深浅两套主题根本没法对齐。
+ * 这里把"能变的"集中成变量，后面的规则只引用变量。
+ *
+ * 三色为什么不是蓝/红/绿：蓝 #4f8ff7、红 #e5484d、绿 #30a46c 正好是 DSH
+ * 的 info/error/success 语义色，用户在同一个界面里看到红会读成"报错"。
+ * 改用 橙→品红→青：橙表达"这是骨架"，品红表达"这里要停下来想"，
+ * 青表达"需要时回来查"，与状态色彻底解耦。
+ * ============================================================ */
+.sc-root{
+  /* 字号阶：7 档，正文 13.5px */
+  --sc-fs-xs:11px; --sc-fs-sm:12px; --sc-fs-base:13.5px;
+  --sc-fs-md:14px; --sc-fs-lg:16px; --sc-fs-xl:19px; --sc-fs-2xl:24px;
+  /* 间距：4px 基栅 */
+  --sc-sp-1:4px; --sc-sp-2:8px; --sc-sp-3:12px; --sc-sp-4:16px; --sc-sp-5:24px; --sc-sp-6:32px;
+  /* 行高 */
+  --sc-lh-tight:1.4; --sc-lh-body:1.8;
+  /* 圆角 */
+  --sc-r-sm:4px; --sc-r-md:8px; --sc-r-lg:12px;
+  /* 三色注意力（浅色主题） */
+  --sc-core-fg:#b45309; --sc-core-bg:#fff7ed; --sc-core-line:#f59e0b; --sc-core-row:rgba(245,158,11,.09);
+  --sc-hard-fg:#a21caf; --sc-hard-bg:#fdf4ff; --sc-hard-line:#c026d3; --sc-hard-row:rgba(192,38,211,.08);
+  --sc-ref-fg:#0f766e;  --sc-ref-bg:#f0fdfa;  --sc-ref-line:#14b8a6; --sc-ref-row:rgba(20,184,166,.07);
+  --sc-hl-pad:0 2px;
+  --sc-lv-color:var(--dsw-alias-label-secondary);
+}
+/* 深色必须单独给值。原来全部靠 rgba(x,.10) 叠在深色底上，
+ * 实测深底 #2c2c2e 上 10% 蓝 ≈ #313a4a，几乎看不见。 */
+body[data-ds-dark-theme] .sc-root{
+  --sc-core-fg:#fdba74; --sc-core-bg:#3a2617; --sc-core-line:#f59e0b; --sc-core-row:rgba(245,158,11,.14);
+  --sc-hard-fg:#f0abfc; --sc-hard-bg:#3b1d3f; --sc-hard-line:#c026d3; --sc-hard-row:rgba(192,38,211,.14);
+  --sc-ref-fg:#5eead4;  --sc-ref-bg:#12332f;  --sc-ref-line:#14b8a6; --sc-ref-row:rgba(20,184,166,.12);
+}
+.sc-root{display:flex;flex-direction:column;height:100%;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font-size:var(--sc-fs-base)}
+.sc-head{display:flex;align-items:center;gap:var(--sc-sp-2);padding:10px var(--sc-sp-4);border-bottom:1px solid var(--dsw-alias-border-l1);flex:none}
+.sc-title{font-size:var(--sc-fs-md);font-weight:600}
+.sc-muted{color:var(--dsw-alias-label-secondary);font-size:var(--sc-fs-sm)}
 .sc-body{display:flex;flex:1;min-height:0}
-.sc-side{width:230px;flex:none;border-right:1px solid var(--dsw-alias-border-l1);overflow:auto;padding:8px}
+.sc-side{width:230px;flex:none;border-right:1px solid var(--dsw-alias-border-l1);overflow:auto;padding:var(--sc-sp-2)}
 .sc-main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
-.sc-doc{display:block;width:100%;text-align:left;padding:8px 10px;border-radius:6px;border:1px solid transparent;background:none;color:inherit;cursor:pointer;font:inherit;margin-bottom:4px}
+.sc-doc{display:block;width:100%;text-align:left;padding:var(--sc-sp-2) 10px;border-radius:6px;border:1px solid transparent;background:none;color:inherit;cursor:pointer;font:inherit;margin-bottom:var(--sc-sp-1)}
 .sc-doc:hover{background:var(--dsw-alias-bg-layer-2)}
+.sc-doc:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:-2px}
 .sc-doc[data-active=true]{background:var(--dsw-alias-bg-layer-1);border-color:var(--dsw-alias-border-l2)}
 .sc-doc-name{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.sc-tabs{display:flex;gap:2px;padding:6px 12px 0;border-bottom:1px solid var(--dsw-alias-border-l1);flex:none}
-.sc-tab{border:none;background:none;color:var(--dsw-alias-label-secondary);padding:7px 12px;border-radius:6px 6px 0 0;cursor:pointer;font:inherit;border-bottom:2px solid transparent}
+.sc-tabs{display:flex;gap:2px;padding:6px var(--sc-sp-3) 0;border-bottom:1px solid var(--dsw-alias-border-l1);flex:none;overflow-x:auto}
+.sc-tab{border:none;background:none;color:var(--dsw-alias-label-secondary);padding:7px var(--sc-sp-3);border-radius:6px 6px 0 0;cursor:pointer;font:inherit;border-bottom:2px solid transparent;white-space:nowrap}
+.sc-tab:hover{color:var(--dsw-alias-label-primary)}
+.sc-tab:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:-2px}
 .sc-tab[data-active=true]{color:var(--dsw-alias-label-primary);border-bottom-color:var(--dsw-alias-brand-primary)}
-.sc-pane{flex:1;overflow:auto;padding:16px 20px}
+.sc-tab i{font-style:normal;opacity:.55;margin-left:4px;font-size:var(--sc-fs-xs)}
+.sc-pane{flex:1;overflow:auto;padding:var(--sc-sp-4) var(--sc-sp-5)}
 .sc-stage{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.sc-pill{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--dsw-alias-border-l2);color:var(--dsw-alias-label-secondary);white-space:nowrap}
-.sc-pill[data-on=true]{background:var(--dsw-alias-brand-primary);border-color:transparent;color:#fff}
+/* 阶段徽标：不再用 brand 填充。
+ * 原来 .sc-pill[data-on]{background:brand;color:#fff} 在深色主题下
+ * brand 变成近白色 → 白底白字，整个阶段条像被抹掉。 */
+.sc-pill{font-size:var(--sc-fs-xs);padding:2px var(--sc-sp-2);border-radius:999px;border:1px solid var(--dsw-alias-border-l2);color:var(--dsw-alias-label-secondary);white-space:nowrap}
+.sc-pill[data-on=true]{background:var(--dsw-alias-bg-layer-2);border-color:var(--dsw-alias-label-primary);color:var(--dsw-alias-label-primary);font-weight:600}
 .sc-bar{height:4px;border-radius:2px;background:var(--dsw-alias-bg-layer-2);overflow:hidden;margin-top:6px}
 .sc-bar>i{display:block;height:100%;background:var(--dsw-alias-brand-primary);transition:width .3s}
-.sc-seg{border-left:3px solid transparent;padding:6px 10px;border-radius:0 6px 6px 0;margin-bottom:6px}
-.sc-seg p{margin:0 0 4px;line-height:1.75}
-.sc-seg .sc-h{font-weight:600;margin:2px 0 4px}
-.sc-hl-core{border-left-color:#4f8ff7;background:rgba(79,143,247,.10)}
-.sc-hl-hard{border-left-color:#e5484d;background:rgba(229,72,77,.10)}
-.sc-hl-ref{border-left-color:#30a46c;background:rgba(48,164,108,.10)}
-.sc-tag{display:inline-block;font-size:10px;letter-spacing:.02em;padding:1px 6px;border-radius:4px;margin-bottom:4px;background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-secondary)}
-.sc-tag-d{background:rgba(79,143,247,.18)}
-.sc-tag-e{background:rgba(48,164,108,.18)}
-.sc-tag-q{background:rgba(229,72,77,.18)}
-.sc-tag-s{background:rgba(171,122,239,.18)}
-.sc-tag-t{background:rgba(255,184,108,.22)}
-.sc-tag-v{background:rgba(0,160,160,.18)}
-.sc-btn{border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-primary);padding:5px 12px;border-radius:6px;cursor:pointer;font:inherit}
+@media (prefers-reduced-motion:reduce){.sc-bar>i{transition:none}}
+
+/* ============================================================
+ * 标注段落
+ *
+ * 用户原话：「这一个标注整一个行是有颜色的，而不是整个段落都是颜色，
+ * 也不是只有符号有颜色。」
+ *
+ * 所以做两级着色：
+ *   1. 段落整行：data-tier 上极淡的行底色 + 左侧 3px 色条（横向贯穿，不是整段大色块）
+ *   2. 原文短语：三色加粗 + 同色下划线，字重和颜色都变
+ * 行底色只有 7-9% 透明度，保证"一眼看出这段被标了"，但不会变成色斑。
+ * ============================================================ */
+.sc-seg{border-left:3px solid transparent;padding:7px var(--sc-sp-3);border-radius:0 var(--sc-r-md) var(--sc-r-md) 0;margin-bottom:var(--sc-sp-2);scroll-margin-top:80px}
+.sc-seg[data-tier=core]{border-left-color:var(--sc-core-line);background:var(--sc-core-row)}
+.sc-seg[data-tier=hard]{border-left-color:var(--sc-hard-line);background:var(--sc-hard-row)}
+.sc-seg[data-tier=ref]{border-left-color:var(--sc-ref-line);background:var(--sc-ref-row)}
+.sc-seg:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}
+.sc-seg p{margin:0 0 5px;line-height:var(--sc-lh-body)}
+.sc-seg p:last-child{margin-bottom:0}
+.sc-seg .sc-h{font-weight:600;margin:2px 0 5px}
+
+/* 三色短语：加粗 + 文字色 + 下划线三件事一起做。
+ * 原来只写了 border-left-color，但 <strong> 是行内元素且没设 border-style，
+ * 这条规则完全无效 —— 实际只有 10% 的背景色，三色几乎看不出差别。 */
+.sc-hl-core,.sc-hl-hard,.sc-hl-ref{font-weight:700;color:inherit;border-radius:2px;padding:var(--sc-hl-pad)}
+.sc-hl-core{background:var(--sc-core-bg);box-shadow:inset 0 -2px 0 var(--sc-core-line);color:var(--sc-core-fg)}
+.sc-hl-hard{background:var(--sc-hard-bg);box-shadow:inset 0 -2px 0 var(--sc-hard-line);color:var(--sc-hard-fg)}
+.sc-hl-ref{background:var(--sc-ref-bg);box-shadow:inset 0 -2px 0 var(--sc-ref-line);color:var(--sc-ref-fg)}
+
+/* 渐构标签徽标：#d 定义|Definition */
+.sc-tag{display:inline-flex;align-items:baseline;gap:5px;font-size:var(--sc-fs-xs);line-height:1.6;padding:1px 7px;border-radius:var(--sc-r-sm);margin-bottom:5px;background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary);font-weight:500}
+/* 英文副标签：原来是硬挤在中文后面的。
+ * 现在单独一档 9.5px、半透明、有分隔点，读起来是「五类工具的审视特征 · Definition」 */
+.sc-tag-en{font-size:9.5px;letter-spacing:.03em;text-transform:none;opacity:.5;font-weight:400}
+.sc-tag-d{background:rgba(245,158,11,.18)}
+.sc-tag-e{background:rgba(20,184,166,.18)}
+.sc-tag-q{background:rgba(192,38,211,.16)}
+.sc-tag-s{background:rgba(37,99,235,.16)}
+.sc-tag-t{background:rgba(249,115,22,.18)}
+.sc-tag-c{background:rgba(100,116,139,.20)}
+.sc-tag-v{background:rgba(13,148,136,.18)}
+/* 段落备注：原来是裸文本，和正文同色分不清。
+ * 现在左侧竖线 + 斜体 + 小一号，明确是批注不是原文。 */
+.sc-seg-note{margin-top:6px;padding:5px var(--sc-sp-2);border-left:2px solid var(--dsw-alias-border-l2);font-size:var(--sc-fs-sm);line-height:1.7;color:var(--dsw-alias-label-secondary);font-style:italic}
+.sc-seg-note::before{content:'批注 · ';font-style:normal;opacity:.6}
+/* 段落头：标签 + 概括 + 字数 */
+.sc-seg-head{display:flex;align-items:center;gap:var(--sc-sp-2);flex-wrap:wrap;margin-bottom:5px}
+.sc-seg-chars{font-size:var(--sc-fs-xs);color:var(--dsw-alias-label-secondary);opacity:.7;margin-left:auto;white-space:nowrap}
+.sc-btn{border:1px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-primary);padding:5px var(--sc-sp-3);border-radius:6px;cursor:pointer;font:inherit}
 .sc-btn:hover{background:var(--dsw-alias-bg-layer-2)}
+.sc-btn:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:1px}
 .sc-btn[disabled]{opacity:.5;cursor:not-allowed}
-.sc-btn-primary{background:var(--dsw-alias-brand-primary);border-color:transparent;color:#fff}
-.sc-card{border:1px solid var(--dsw-alias-border-l1);border-radius:8px;padding:12px 14px;margin-bottom:10px;background:var(--dsw-alias-bg-layer-1)}
-.sc-card h4{margin:0 0 6px;font-size:12px;letter-spacing:.02em;color:var(--dsw-alias-label-secondary);font-weight:600}
-.sc-kv{display:grid;grid-template-columns:88px 1fr;gap:4px 10px;line-height:1.6}
+.sc-btn-primary{background:var(--dsw-alias-brand-primary);border-color:transparent;color:var(--dsw-alias-bg-base);font-weight:500}
+.sc-btn-sm{padding:2px var(--sc-sp-2);font-size:var(--sc-fs-xs)}
+.sc-card{border:1px solid var(--dsw-alias-border-l1);border-radius:var(--sc-r-md);padding:var(--sc-sp-3) 14px;margin-bottom:10px;background:var(--dsw-alias-bg-layer-1)}
+.sc-card h4{margin:0 0 6px;font-size:var(--sc-fs-sm);letter-spacing:.02em;color:var(--dsw-alias-label-secondary);font-weight:600}
+.sc-kv{display:grid;grid-template-columns:88px 1fr;gap:var(--sc-sp-1) 10px;line-height:1.6}
 .sc-kv>span:first-child{color:var(--dsw-alias-label-secondary)}
 .sc-empty{color:var(--dsw-alias-label-secondary);text-align:center;padding:40px 10px;line-height:1.8}
-.sc-issue{font-size:12px;line-height:1.6;padding:5px 8px;border-radius:5px;margin-bottom:4px;background:rgba(229,72,77,.10);border-left:2px solid var(--dsw-alias-state-error-primary)}
-.sc-issue[data-level=warn]{background:rgba(255,184,108,.14);border-left-color:var(--dsw-alias-state-warn-primary)}
-.sc-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--dsw-alias-label-secondary);margin-bottom:10px}
-.sc-legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:-1px}
-.sc-dock{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--dsw-alias-border-l1);border-radius:8px;background:var(--dsw-alias-bg-layer-1);font-size:12px;color:var(--dsw-alias-label-secondary)}
+.sc-issue{font-size:var(--sc-fs-sm);line-height:1.6;padding:5px var(--sc-sp-2);border-radius:5px;margin-bottom:var(--sc-sp-1);background:rgba(229,72,77,.10);border-left:2px solid var(--dsw-alias-state-error-primary)}
+.sc-issue[data-level=warn]{background:rgba(245,158,11,.14);border-left-color:var(--dsw-alias-state-warn-primary)}
+.sc-legend{display:flex;gap:var(--sc-sp-3);flex-wrap:wrap;font-size:var(--sc-fs-xs);color:var(--dsw-alias-label-secondary);margin-bottom:10px;align-items:center}
+.sc-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.sc-dock{display:flex;align-items:center;gap:var(--sc-sp-2);padding:6px 10px;border:1px solid var(--dsw-alias-border-l1);border-radius:var(--sc-r-md);background:var(--dsw-alias-bg-layer-1);font-size:var(--sc-fs-sm);color:var(--dsw-alias-label-secondary)}
 .sc-dock b{color:var(--dsw-alias-label-primary);font-weight:500}
-.sc-seg-meta{display:flex;align-items:center;gap:6px;margin-bottom:4px;font-size:12px}
-.sc-details{margin-top:8px}
-.sc-details>summary{cursor:pointer;font-size:12px;color:var(--dsw-alias-label-secondary);user-select:none}
-.sc-details[open]>summary{margin-bottom:4px}
-.sc-pop{max-width:min(420px,calc(100% - 32px));right:16px;bottom:16px;position:absolute;z-index:20;background:var(--dsw-alias-bg-overlay);border:1px solid var(--dsw-alias-border-l2);border-radius:8px;padding:8px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:12px;min-width:180px}
+.sc-seg-meta{display:flex;align-items:center;gap:6px;margin-bottom:var(--sc-sp-1);font-size:var(--sc-fs-sm)}
+.sc-details{margin-top:var(--sc-sp-2)}
+.sc-details>summary{cursor:pointer;font-size:var(--sc-fs-sm);color:var(--dsw-alias-label-secondary);user-select:none}
+.sc-details>summary:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}
+.sc-details[open]>summary{margin-bottom:var(--sc-sp-1)}
+.sc-pop{max-width:min(460px,calc(100% - 32px));right:16px;bottom:16px;position:absolute;z-index:20;background:var(--dsw-alias-bg-overlay);border:1px solid var(--dsw-alias-border-l2);border-radius:var(--sc-r-md);padding:10px var(--sc-sp-3);box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:var(--sc-fs-sm);min-width:200px}
+/* 复习到期横幅：只在真的到期时出现 */
+.sc-review{display:flex;flex-direction:column;gap:6px;padding:var(--sc-sp-3);margin-bottom:var(--sc-sp-3);border:1px solid var(--sc-core-line);border-radius:var(--sc-r-md);background:var(--sc-core-bg)}
+.sc-review-title{font-size:var(--sc-fs-sm);font-weight:700;color:var(--sc-core-fg)}
+.sc-review-item{display:flex;align-items:center;gap:var(--sc-sp-2);font-size:var(--sc-fs-sm);flex-wrap:wrap}
+.sc-review-name{font-weight:600;max-width:32ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 追问等待中的转圈：没有它的话，用户点了按钮只看到一行字，会以为没反应 */
+.sc-spin{width:12px;height:12px;border:2px solid var(--dsw-alias-border-l2);border-top-color:var(--dsw-alias-brand-primary);border-radius:50%;display:inline-block;animation:sc-spin .8s linear infinite}
+@keyframes sc-spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){.sc-spin{animation:none;border-top-color:var(--dsw-alias-border-l2)}}
 .sc-pre{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;line-height:1.65;background:var(--dsw-alias-bg-layer-2);padding:10px;border-radius:6px;overflow:auto;max-height:340px;margin:0}
 /* ---- Markdown 渲染结果 ---- */
 .sc-md{line-height:1.85;overflow-wrap:anywhere}
 .sc-md p{margin:0 0 9px}
-.sc-md h1,.sc-md h2,.sc-md h3,.sc-md h4,.sc-md h5,.sc-md h6{margin:16px 0 8px;line-height:1.4;font-weight:600}
-.sc-md h1{font-size:19px}
+.sc-md h1,.sc-md h2,.sc-md h3,.sc-md h4,.sc-md h5,.sc-md h6{margin:var(--sc-sp-4) 0 var(--sc-sp-2);line-height:var(--sc-lh-tight);font-weight:600}
+.sc-md h1{font-size:var(--sc-fs-xl)}
 .sc-md h2{font-size:17px}
-.sc-md h3{font-size:15px}
-.sc-md h4,.sc-md h5,.sc-md h6{font-size:13.5px}
+.sc-md h3{font-size:var(--sc-fs-lg)}
+.sc-md h4,.sc-md h5,.sc-md h6{font-size:var(--sc-fs-base);font-weight:600}
 .sc-md ul,.sc-md ol{margin:0 0 9px;padding-left:22px}
 .sc-md li{margin-bottom:3px}
 .sc-md li>ul,.sc-md li>ol{margin:3px 0 0}
-.sc-md code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;background:var(--dsw-alias-bg-layer-2);padding:1px 5px;border-radius:4px;border:1px solid var(--dsw-alias-border-l1)}
-.sc-md .sc-code{background:var(--dsw-alias-bg-layer-2);border:1px solid var(--dsw-alias-border-l1);border-radius:6px;padding:10px 12px;overflow:auto;margin:0 0 10px}
+.sc-md code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em;background:var(--dsw-alias-bg-layer-2);padding:1px 5px;border-radius:var(--sc-r-sm);border:1px solid var(--dsw-alias-border-l1)}
+.sc-md .sc-code{background:var(--dsw-alias-bg-layer-2);border:1px solid var(--dsw-alias-border-l1);border-radius:6px;padding:10px var(--sc-sp-3);overflow:auto;margin:0 0 10px}
 .sc-md .sc-code code{background:none;border:none;padding:0;font-size:11.5px;line-height:1.7;display:block;white-space:pre}
-.sc-md blockquote{margin:0 0 10px;padding:6px 12px;border-left:3px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-1);border-radius:0 6px 6px 0;color:var(--dsw-alias-label-secondary)}
+.sc-md blockquote{margin:0 0 10px;padding:6px var(--sc-sp-3);border-left:3px solid var(--dsw-alias-border-l2);background:var(--dsw-alias-bg-layer-1);border-radius:0 6px 6px 0;color:var(--dsw-alias-label-secondary)}
 .sc-md .sc-quote p{margin:0 0 4px}
 .sc-md .sc-quote p:last-child{margin:0}
-.sc-md .sc-table-wrap{overflow-x:auto;margin:0 0 12px;border:1px solid var(--dsw-alias-border-l1);border-radius:6px}
+.sc-md .sc-table-wrap{overflow-x:auto;margin:0 0 var(--sc-sp-3);border:1px solid var(--dsw-alias-border-l1);border-radius:6px}
 .sc-md table{border-collapse:collapse;width:100%;font-size:12.5px}
 .sc-md th,.sc-md td{border-bottom:1px solid var(--dsw-alias-border-l1);border-right:1px solid var(--dsw-alias-border-l1);padding:6px 10px;text-align:left;vertical-align:top}
 .sc-md th{background:var(--dsw-alias-bg-layer-2);font-weight:600;white-space:nowrap}
@@ -103,85 +194,113 @@ window.__ModuleLoader__.load({
 .sc-md a:hover{text-decoration:underline}
 .sc-md hr{border:none;border-top:1px solid var(--dsw-alias-border-l1);margin:14px 0}
 .sc-md .sc-fn{font-size:.75em;color:var(--dsw-alias-brand-primary)}
-.sc-md .sc-footnote{font-size:11.5px;line-height:1.7;color:var(--dsw-alias-label-secondary);padding:5px 8px;border-top:1px dashed var(--dsw-alias-border-l1);overflow-wrap:anywhere}
-.sc-md .sc-fn-id{display:inline-block;margin-right:6px;padding:0 5px;border-radius:4px;background:var(--dsw-alias-bg-layer-2);font-family:ui-monospace,monospace;font-size:10.5px}
+.sc-md .sc-footnote{font-size:11.5px;line-height:1.7;color:var(--dsw-alias-label-secondary);padding:5px var(--sc-sp-2);border-top:1px dashed var(--dsw-alias-border-l1);overflow-wrap:anywhere}
+.sc-md .sc-fn-id{display:inline-block;margin-right:6px;padding:0 5px;border-radius:var(--sc-r-sm);background:var(--dsw-alias-bg-layer-2);font-family:ui-monospace,monospace;font-size:10.5px}
 .sc-md mark{background:rgba(255,243,163,.5);color:inherit;padding:0 2px;border-radius:2px}
 .sc-md del{opacity:.7}
-/* ---- 读前建构 ----
- * 注意：卡片标签内部只允许行内元素。块级 <p> 一旦被塞进 <h3>/<span>/<li>，
- * 浏览器会强行闭合外层，导致标题断裂、行高错乱，整页看着没排版。
- */
-.sc-pf{font-size:13px;line-height:1.75}
-.sc-pf h3{font-size:13px;font-weight:600;margin:0 0 10px;padding-bottom:6px;
+/* 正文里裸出现的表格/列表（宿主直接产出，没有 sc-md 外层） */
+.sc-seg table,.sc-table{border-collapse:collapse;width:100%;font-size:12.5px;margin:0 0 var(--sc-sp-3)}
+.sc-seg th,.sc-seg td,.sc-table th,.sc-table td{border:1px solid var(--dsw-alias-border-l1);padding:6px 10px;text-align:left;vertical-align:top}
+.sc-seg th,.sc-table th{background:var(--dsw-alias-bg-layer-2);font-weight:600}
+.sc-seg .sc-table-wrap{overflow-x:auto;margin:0 0 var(--sc-sp-3);border:1px solid var(--dsw-alias-border-l1);border-radius:6px}
+.sc-seg ul,.sc-seg ol{margin:0 0 var(--sc-sp-2);padding-left:22px}
+.sc-seg li{margin-bottom:3px;line-height:var(--sc-lh-body)}
+/* ---- 读前建构 ---- */
+/* 六段式分节布局：左侧目录 200px + 右侧单节内容。
+ * 原来 15KB 一次性渲染，用户要滚六屏；现在一屏一节。 */
+.sc-pf-layout{display:grid;grid-template-columns:196px 1fr;gap:var(--sc-sp-4);align-items:start}
+.sc-pf-nav{position:sticky;top:0;display:flex;flex-direction:column;gap:2px}
+.sc-pf-navitem{display:flex;gap:var(--sc-sp-2);align-items:flex-start;text-align:left;padding:7px var(--sc-sp-2);
+  border:none;border-left:2px solid transparent;background:none;color:var(--dsw-alias-label-secondary);
+  cursor:pointer;font:inherit;border-radius:0 6px 6px 0}
+.sc-pf-navitem:hover{background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary)}
+.sc-pf-navitem:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:-2px}
+.sc-pf-navitem[data-on=true]{border-left-color:var(--dsw-alias-brand-primary);background:var(--dsw-alias-bg-layer-1);color:var(--dsw-alias-label-primary)}
+.sc-pf-navnum{flex:none;font-size:var(--sc-fs-base);line-height:1.5;opacity:.9}
+.sc-pf-navtext{min-width:0;display:flex;flex-direction:column}
+.sc-pf-navlabel{font-size:var(--sc-fs-sm);line-height:1.5;font-weight:500}
+.sc-pf-navitem[data-on=true] .sc-pf-navlabel{font-weight:600}
+.sc-pf-navhint{font-size:10.5px;line-height:1.45;opacity:.65;margin-top:1px}
+.sc-pf-content{min-width:0;max-width:80ch}
+.sc-pf-foot{display:flex;gap:var(--sc-sp-2);align-items:center;margin-top:var(--sc-sp-4);
+  padding-top:var(--sc-sp-3);border-top:1px solid var(--dsw-alias-border-l1)}
+.sc-pf{font-size:var(--sc-fs-base);line-height:1.75}
+/* 六段式区块：原来是裸 <section>，六段之间没有任何分隔，13KB 糊成一片。
+ * 现在每段一张卡、有圆角、有间隔，扫一眼就知道"这是第几段"。 */
+.sc-pf-sec{border:1px solid var(--dsw-alias-border-l1);border-radius:var(--sc-r-md);
+  padding:var(--sc-sp-3) var(--sc-sp-4);margin:0 0 var(--sc-sp-3);background:var(--dsw-alias-bg-layer-1)}
+.sc-pf-sec:last-child{margin-bottom:0}
+.sc-pf-h{font-size:var(--sc-fs-md);font-weight:600;margin:0 0 var(--sc-sp-3);
+  padding-bottom:var(--sc-sp-2);border-bottom:1px solid var(--dsw-alias-border-l1);
+  display:flex;align-items:baseline;gap:var(--sc-sp-2);line-height:var(--sc-lh-tight)}
+.sc-pf-h em{font-style:normal;color:var(--dsw-alias-label-secondary);font-size:var(--sc-fs-sm);font-weight:400}
+.sc-pf-body{min-width:0}
+.sc-pf-body>p:last-child{margin-bottom:0}
+.sc-pf h3{font-size:var(--sc-fs-base);font-weight:600;margin:0 0 10px;padding-bottom:6px;
   border-bottom:1px solid var(--dsw-alias-border-l1);line-height:1.5}
-.sc-pf section,.sc-pf .sc-part{border:1px solid var(--dsw-alias-border-l1);border-radius:8px;
-  padding:12px 14px;margin:0 0 10px;background:var(--dsw-alias-bg-layer-1)}
+.sc-pf section,.sc-pf .sc-part{border:1px solid var(--dsw-alias-border-l1);border-radius:var(--sc-r-md);
+  padding:var(--sc-sp-3) 14px;margin:0 0 10px;background:var(--dsw-alias-bg-layer-1)}
 .sc-pf-part+.sc-part{margin-top:0}
 .sc-pf ul,.sc-pf ol{margin:0;padding-left:20px}
 .sc-pf li{margin-bottom:5px;line-height:1.75}
 .sc-pf li::marker{color:var(--dsw-alias-label-secondary)}
-/* 段落之间才留给空隙；行内元素之间不要额外留白 */
-.sc-pf p{margin:0 0 8px}
+.sc-pf p{margin:0 0 var(--sc-sp-2)}
 .sc-pf p:last-child{margin-bottom:0}
-.sc-pf-body>p:last-child{margin-bottom:0}
+.sc-list{margin:0;padding-left:20px}
+.sc-list>li{margin-bottom:4px;line-height:1.75}
+.sc-list>li::marker{color:var(--dsw-alias-label-secondary)}
 .sc-req{color:var(--dsw-alias-label-secondary);margin:0 0 10px;padding:7px 10px;
   border-radius:6px;background:var(--dsw-alias-bg-layer-2)}
-
-/* 键值卡片：左侧窄标签、右侧内容。标签必须 first-line 对齐，不能撑高整行 */
-.sc-kv2{display:grid;grid-template-columns:56px 1fr;gap:2px 12px;margin-bottom:8px;
+/* 键值卡片：左侧窄标签、右侧内容 */
+.sc-kv2{display:grid;grid-template-columns:56px 1fr;gap:2px var(--sc-sp-3);margin-bottom:var(--sc-sp-2);
   align-items:start;line-height:1.75}
 .sc-kv2:last-child{margin-bottom:0}
-.sc-kv2-k{color:var(--dsw-alias-label-secondary);font-size:12px;line-height:1.75;
+.sc-kv2-k{color:var(--dsw-alias-label-secondary);font-size:var(--sc-fs-sm);line-height:1.75;
   white-space:nowrap;padding-top:1px}
 .sc-kv2-v{min-width:0}
 .sc-kv2-v>ul,.sc-kv2-list{margin:0;padding-left:18px}
 .sc-kv2-v>p:last-child{margin-bottom:0}
 .sc-kv2-list>li>p{margin:0}
-
 /* 知识点块 */
-.sc-kp{border-left:2px solid var(--dsw-alias-brand-primary);padding:2px 0 2px 10px;margin:10px 0}
+.sc-kp{border-left:2px solid var(--sc-core-line);padding:2px 0 2px 10px;margin:10px 0}
 .sc-kp:last-child{margin-bottom:0}
 .sc-kp-h{font-weight:600;margin-bottom:3px;line-height:1.6}
+.sc-kp-b{margin:0}
 .sc-kp-b>p{margin:0 0 4px}
 .sc-kp-b>p:last-child{margin-bottom:0}
-.sc-kp-note{color:var(--dsw-alias-label-secondary);font-size:12px;margin-top:4px;line-height:1.7}
-
-/* 档位标签：压住行高，避免把所在行顶高 */
-.sc-lv{display:inline-block;font-size:11px;line-height:16px;padding:0 6px;border-radius:4px;
-  background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-secondary);
-  margin-left:5px;vertical-align:1px;white-space:nowrap}
-.sc-assessment{margin-left:8px}
-
+.sc-kp-note{color:var(--dsw-alias-label-secondary);font-size:var(--sc-fs-sm);margin-top:var(--sc-sp-1);line-height:1.7}
+/* 档位标签：了解/理解/掌握/熟练掌握 四档用同一强调色的 4 级不透明度 */
+.sc-lv{display:inline-block;font-size:var(--sc-fs-xs);line-height:16px;padding:0 6px;border-radius:var(--sc-r-sm);
+  color:var(--dsw-alias-label-primary);margin-left:5px;vertical-align:1px;white-space:nowrap;
+  border:1px solid var(--dsw-alias-border-l2)}
+.sc-lv[data-lv=了解]{background:rgba(100,116,139,.14)}
+.sc-lv[data-lv=理解]{background:rgba(100,116,139,.26)}
+.sc-lv[data-lv=掌握]{background:rgba(100,116,139,.40)}
+.sc-lv[data-lv=熟练掌握]{background:rgba(100,116,139,.58);color:var(--dsw-alias-label-primary);font-weight:600}
+.sc-assessment{margin-left:var(--sc-sp-2)}
 /* 思考题 / 参考资料列表 */
 .sc-ex-list,.sc-ref-list{margin:0;padding-left:20px}
-.sc-ex{margin-bottom:12px;line-height:1.75}
+.sc-ex{margin-bottom:var(--sc-sp-3);line-height:1.75}
 .sc-ex:last-child{margin-bottom:0}
 .sc-ex-q{font-weight:500}
 .sc-ex-q>p{margin:0}
-.sc-rubric{margin:2px 0 0;padding-left:20px;color:var(--dsw-alias-label-secondary);font-size:12px}
+.sc-rubric{margin:2px 0 0;padding-left:20px;color:var(--dsw-alias-label-secondary);font-size:var(--sc-fs-sm)}
 .sc-rubric>li{margin-bottom:2px;line-height:1.7}
-.sc-muted{color:var(--dsw-alias-label-secondary);font-size:12px;margin-top:3px;line-height:1.7}
-/* ---- 图谱 SVG ---- */
-.sc-graph-wrap{position:relative;border:1px solid var(--dsw-alias-border-l1);border-radius:8px;background:var(--dsw-alias-bg-layer-1);overflow:auto;max-height:70vh}
+.sc-muted{color:var(--dsw-alias-label-secondary);font-size:var(--sc-fs-sm);margin-top:3px;line-height:1.7}
+.sc-ref{display:flex;gap:var(--sc-sp-2);align-items:baseline;margin-bottom:6px;line-height:1.7}
+.sc-ref-kind{flex:none;font-size:var(--sc-fs-xs);padding:0 6px;border-radius:var(--sc-r-sm);white-space:nowrap;
+  border:1px solid var(--dsw-alias-border-l2);color:var(--dsw-alias-label-secondary)}
+.sc-ref-kind[data-kind=原文]{background:var(--sc-core-bg);color:var(--sc-core-fg);border-color:var(--sc-core-line)}
+.sc-ref-kind[data-kind=联网检索]{background:var(--sc-ref-bg);color:var(--sc-ref-fg);border-color:var(--sc-ref-line)}
+.sc-ref-kind[data-kind=我的知识]{background:var(--dsw-alias-bg-layer-2)}
+.sc-ref-body{min-width:0}
+.sc-ref-note{color:var(--dsw-alias-label-secondary);font-size:var(--sc-fs-sm)}
+/* ---- 图谱 SVG（archify iframe 的降级路径） ---- */
+.sc-graph-wrap{position:relative;border:1px solid var(--dsw-alias-border-l1);border-radius:var(--sc-r-md);background:var(--dsw-alias-bg-layer-1);overflow:auto;max-height:70vh}
 .sc-graph{display:block;min-width:100%}
-.sc-gnode{cursor:pointer}
-.sc-gnode rect{fill:var(--dsw-alias-bg-base);stroke:var(--dsw-alias-border-l2);stroke-width:1.2;rx:8}
-.sc-gnode[data-k=concept] rect{fill:rgba(79,143,247,.10);stroke:rgba(79,143,247,.55)}
-.sc-gnode[data-k=premise] rect{fill:rgba(171,122,239,.10);stroke:rgba(171,122,239,.55)}
-.sc-gnode[data-k=principle] rect,.sc-gnode[data-k=method] rect{fill:rgba(48,164,108,.10);stroke:rgba(48,164,108,.55)}
-.sc-gnode[data-k=problem] rect,.sc-gnode[data-k=anti-pattern] rect,.sc-gnode[data-k=risk] rect{fill:rgba(229,72,77,.10);stroke:rgba(229,72,77,.55)}
-.sc-gnode[data-k=example] rect{fill:rgba(255,184,108,.14);stroke:rgba(255,184,108,.6)}
-.sc-gnode[data-sel=true] rect{stroke-width:2.4;stroke:var(--dsw-alias-brand-primary)}
-.sc-gnode[data-dim=true]{opacity:.28}
-.sc-gnode text{font-size:11.5px;fill:var(--dsw-alias-label-primary);pointer-events:none}
-.sc-gedge path{fill:none;stroke:var(--dsw-alias-border-l2);stroke-width:1.2}
-.sc-gedge[data-dashed=true] path{stroke-dasharray:4 3}
-.sc-gedge[data-hl=true] path{stroke:var(--dsw-alias-brand-primary);stroke-width:2}
-.sc-gedge[data-dim=true]{opacity:.15}
-.sc-gedge text{font-size:9.5px;fill:var(--dsw-alias-label-secondary)}
-.sc-glegend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--dsw-alias-label-secondary);margin-bottom:8px}
+.sc-glegend{display:flex;gap:10px;flex-wrap:wrap;font-size:var(--sc-fs-xs);color:var(--dsw-alias-label-secondary);margin-bottom:var(--sc-sp-2)}
 .sc-glegend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:-1px}
-.sc-gtip{position:absolute;z-index:30;max-width:300px;background:var(--dsw-alias-bg-overlay);border:1px solid var(--dsw-alias-border-l2);border-radius:8px;padding:8px 10px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:12px;line-height:1.7;pointer-events:none}
+.sc-gtip{position:absolute;z-index:30;max-width:300px;background:var(--dsw-alias-bg-overlay);border:1px solid var(--dsw-alias-border-l2);border-radius:var(--sc-r-md);padding:var(--sc-sp-2) 10px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:var(--sc-fs-sm);line-height:1.7;pointer-events:none}
 `
 
     if (typeof document !== 'undefined' && !document.getElementById('sc-style')) {
@@ -255,8 +374,49 @@ window.__ModuleLoader__.load({
 
     /* -------------------------------------------------------- 读前面板 */
 
-    function PreflightPane({ project }) {
+    /* -------------------------------------------------------- 读前面板 */
+
+    /**
+     * 读前建构面板。
+     *
+     * 解决两个问题：
+     * 1. 六段式原来是 15KB HTML 一次性塞进去，要滚六屏才能看完。
+     *    改成左侧分节目录 + 右侧只渲染当前一节，「一眼看到学什么/怎么考」。
+     * 2. 降级路径原来只实现了 ①②，③④⑤⑥ 完全缺失（数据在，代码没写）。
+     *
+     * 六段本身仍然由宿主渲染（见 service.renderPreflightHtml），界面不再自己拼字段，
+     * 保证 Agent 看到的结构和用户看到的一致。
+     */
+    const PF_SECTIONS = [
+      { key: '①', label: '资料摘要', hint: '300 字看懂这份资料讲什么' },
+      { key: '②', label: '对我的帮助与目标', hint: '为什么学、学到什么程度' },
+      { key: '③', label: '目标·要求·重点·难点', hint: '每一部分要盯住什么' },
+      { key: '④', label: '考核方式与知识点', hint: '了解/理解/掌握/熟练掌握' },
+      { key: '⑤', label: '思考题与作业', hint: '费曼式自测' },
+      { key: '⑥', label: '参考资料', hint: '原文 / 联网检索 / 我的知识' },
+    ]
+
+    /** 把六段式 HTML 按 <section class="sc-pf-sec"> 切成六块，供分节渲染。 */
+    function splitPreflight(html) {
+      if (!html) return {}
+      const out = {}
+      const re = /<section class="sc-pf-sec">([\s\S]*?)<\/section>/g
+      let m
+      let i = 0
+      while ((m = re.exec(html)) !== null) {
+        const key = PF_SECTIONS[i]?.key
+        if (key) out[key] = `<section class="sc-pf-sec">${m[1]}</section>`
+        i += 1
+      }
+      return out
+    }
+
+    function PreflightPane({ project, onJump }) {
       const plan = project.preflight
+      const [cur, setCur] = useState('①')
+
+      const blocks = useMemo(() => splitPreflight(project.preflightHtml), [project.preflightHtml])
+
       if (!plan) {
         return h(
           Empty,
@@ -265,31 +425,183 @@ window.__ModuleLoader__.load({
           h('div', { className: 'sc-muted', style: { marginTop: 8 } }, '在对话里说「帮我做读前建构」，Agent 会加载 study-preflight 技能生成六段式。'),
         )
       }
-      // 六段式的人读版由宿主渲染成 HTML（含表格、列表、粗体），界面只负责插入
-      if (project.preflightHtml) {
+
+      // 宿主没给 HTML 时的降级：仍要六段齐全，缺哪段就明说缺
+      if (!project.preflightHtml) {
         return h(
           'div',
           null,
           h(IssueList, { issues: plan.check?.issues }),
-          h('div', { className: 'sc-md' }, h('div', { dangerouslySetInnerHTML: { __html: project.preflightHtml } })),
+          h(FallbackPreflight, { plan }),
         )
       }
-      // 宿主没给 HTML 时的降级：纯文本逐字段列出
-      const md = (t) => h('div', { style: { whiteSpace: 'pre-wrap', lineHeight: 1.8 } }, String(t ?? '—'))
+
+      const body = blocks[cur]
       return h(
         'div',
-        null,
-        h(IssueList, { issues: plan.check?.issues }),
-        h('div', { className: 'sc-card' }, h('h4', null, '① 资料摘要'), md(plan.summary)),
+        { className: 'sc-pf-layout' },
+        h(
+          'nav',
+          { className: 'sc-pf-nav', role: 'tablist', 'aria-label': '读前建构分节' },
+          PF_SECTIONS.map((s) =>
+            h(
+              'button',
+              {
+                key: s.key,
+                role: 'tab',
+                'aria-selected': cur === s.key ? 'true' : 'false',
+                className: 'sc-pf-navitem',
+                'data-on': cur === s.key ? 'true' : 'false',
+                onClick: () => setCur(s.key),
+              },
+              h('span', { className: 'sc-pf-navnum' }, s.key),
+              h(
+                'span',
+                { className: 'sc-pf-navtext' },
+                h('span', { className: 'sc-pf-navlabel' }, s.label),
+                h('span', { className: 'sc-pf-navhint' }, s.hint),
+              ),
+            ),
+          ),
+        ),
         h(
           'div',
-          { className: 'sc-card' },
-          h('h4', null, '② 对我的帮助与目标'),
-          h('div', { className: 'sc-kv' },
+          { className: 'sc-pf-content' },
+          h(IssueList, { issues: plan.check?.issues }),
+          body
+            ? h('div', { className: 'sc-md', dangerouslySetInnerHTML: { __html: body } })
+            : h('div', { className: 'sc-muted' }, `第 ${cur} 部分还没有内容。`),
+          h(
+            'div',
+            { className: 'sc-pf-foot' },
+            h(
+              'button',
+              {
+                className: 'sc-btn',
+                disabled: cur === '①',
+                onClick: () => {
+                  const i = PF_SECTIONS.findIndex((s) => s.key === cur)
+                  if (i > 0) setCur(PF_SECTIONS[i - 1].key)
+                },
+              },
+              '← 上一节',
+            ),
+            h(
+              'button',
+              {
+                className: 'sc-btn sc-btn-primary',
+                disabled: cur === '⑥',
+                onClick: () => {
+                  const i = PF_SECTIONS.findIndex((s) => s.key === cur)
+                  if (i >= 0 && i < PF_SECTIONS.length - 1) setCur(PF_SECTIONS[i + 1].key)
+                },
+              },
+              cur === '⑥' ? '看完了，去读正文 →' : '下一节 →',
+            ),
+            cur === '⑥' && onJump
+              ? h('button', { className: 'sc-btn', onClick: () => onJump('read') }, '进入读中加工')
+              : null,
+          ),
+        ),
+      )
+    }
+
+    /** 降级渲染：宿主没给 preflightHtml 时用的兜底，六段都要有。 */
+    function FallbackPreflight({ plan }) {
+      const md = (t) => h('div', { style: { whiteSpace: 'pre-wrap', lineHeight: 1.8 } }, String(t ?? '—'))
+      const sec = (num, title, body) =>
+        h(
+          'section',
+          { className: 'sc-pf-sec' },
+          h('h3', { className: 'sc-pf-h' }, `${num}　${title}`),
+          h('div', { className: 'sc-pf-body' }, body),
+        )
+      const parts = plan.parts ?? []
+      return h(
+        'div',
+        { className: 'sc-pf' },
+        sec('①', '资料摘要', md(plan.summary)),
+        sec(
+          '②',
+          '对我的帮助与目标',
+          h(
+            'div',
+            { className: 'sc-kv' },
             h('span', null, '对我的帮助'), md(plan.goals?.help),
             h('span', null, '总目标'), md(plan.goals?.main),
             h('span', null, '子目标'), md((plan.goals?.subgoals ?? []).map((s) => (typeof s === 'string' ? s : s.text)).join('\n')),
           ),
+        ),
+        sec(
+          '③',
+          '每一部分的目标、要求、重点、难点',
+          parts.length
+            ? h(
+                'div',
+                null,
+                parts.map((p, i) =>
+                  h(
+                    'div',
+                    { className: 'sc-part', key: i },
+                    h('h3', null, p.title ?? `第 ${i + 1} 部分`),
+                    h('div', { className: 'sc-kv2' }, h('span', { className: 'sc-kv2-k' }, '重点'), h('div', { className: 'sc-kv2-v' }, md((p.keyPoints ?? []).join('\n')))),
+                    h('div', { className: 'sc-kv2' }, h('span', { className: 'sc-kv2-k' }, '难点'), h('div', { className: 'sc-kv2-v' }, md((p.difficulties ?? []).join('\n')))),
+                  ),
+                ),
+              )
+            : h('div', { className: 'sc-muted' }, '（还没有分部分内容）'),
+        ),
+        sec(
+          '④',
+          '每一部分的考核方式与知识点',
+          parts.length
+            ? h(
+                'div',
+                null,
+                parts.map((p, i) =>
+                  h(
+                    'div',
+                    { className: 'sc-part', key: i },
+                    h('h3', null, p.title ?? `第 ${i + 1} 部分`, h('span', { className: 'sc-lv', 'data-lv': p.assessment?.level ?? '' }, p.assessment?.level ?? '—')),
+                    p.assessment?.requirement ? h('div', { className: 'sc-req' }, p.assessment.requirement) : null,
+                    (p.knowledgePoints ?? []).map((kp, j) =>
+                      h(
+                        'div',
+                        { className: 'sc-kp', key: j },
+                        h('div', { className: 'sc-kp-h' }, `知识点 ${j + 1}　${kp.name ?? ''}`),
+                        h('div', { className: 'sc-kp-b' }, md(kp.content)),
+                        kp.note ? h('div', { className: 'sc-kp-note' }, `备注：${kp.note}`) : null,
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            : h('div', { className: 'sc-muted' }, '（还没有考核要求）'),
+        ),
+        sec(
+          '⑤',
+          '思考题与作业（费曼）',
+          (plan.exercises ?? []).length
+            ? h('ol', { className: 'sc-ex-list' }, plan.exercises.map((ex, i) => h('li', { className: 'sc-ex', key: i }, h('div', { className: 'sc-ex-q' }, ex.question ?? '') )))
+            : h('div', { className: 'sc-muted' }, '（还没有思考题）'),
+        ),
+        sec(
+          '⑥',
+          '参考资料',
+          (plan.references ?? []).length
+            ? h(
+                'ol',
+                { className: 'sc-ref-list' },
+                plan.references.map((r, i) =>
+                  h(
+                    'li',
+                    { className: 'sc-ref', key: i },
+                    h('span', { className: 'sc-ref-kind', 'data-kind': r.kind ?? '我的知识' }, r.kind ?? '我的知识'),
+                    h('div', { className: 'sc-ref-body' }, r.title ?? r.name ?? '', r.note ? h('div', { className: 'sc-ref-note' }, r.note) : null),
+                  ),
+                ),
+              )
+            : h('div', { className: 'sc-muted' }, '（还没有参考资料）'),
         ),
       )
     }
@@ -360,6 +672,17 @@ window.__ModuleLoader__.load({
        * 用户按 Ctrl+V 回车即可。试过直接写输入框，但输入框不在本插件的控制范围内，
        * 硬改 DOM 很脆弱；宁可让用户多按一次，也不能让按钮点了没反应。
        */
+      /**
+       * 选中词 → 落库 → 等 Agent 回填答案 → 就地显示。
+       *
+       * 原来是"把问题复制到剪贴板，让用户自己去输入框粘贴"——按钮点了没结果，
+       * 用户必须离开面板操作。现在改成：
+       * 1. POST /term 建立一条待答记录（带上下文，后端按 id 直查，不再丢后 82 段）
+       * 2. 界面上立刻显示"正在结合上下文解释…"
+       * 3. 每 1.2 秒轮询 /terms-pending，Agent 调 study_term 回填后自动显示
+       *
+       * 仍然保留"复制问题"按钮作为兜底：万一 Agent 没被叫醒，用户可以手动发一次。
+       */
       const doAsk = async (word, segmentId) => {
         if (!word) return
         setAsking(true)
@@ -372,26 +695,12 @@ window.__ModuleLoader__.load({
               docId: project.id,
               term: word,
               segmentId,
-              question: word,
+              question: `「${word}」在这里是什么意思？`,
               source: 'ui',
             }),
           })
           const prompt = `在《${project.title ?? project.id}》${segmentId ?? ''} 这段里，「${word}」是什么意思？请结合上下文解释，不要只给字典释义。`
-          let copied = false
-          try {
-            await navigator.clipboard.writeText(prompt)
-            copied = true
-          } catch {
-            copied = false
-          }
-          setAnswer({
-            word,
-            prompt,
-            copied,
-            text:
-              (copied ? '问题已复制，粘贴到下方输入框并回车，Agent 就会结合上下文解释。' : '请复制下面这句话，粘贴到输入框并回车：') +
-              (r?.context ? `\n\n该段原文：${String(r.context).slice(0, 140)}…` : ''),
-          })
+          setAnswer({ word, segmentId, prompt, pending: true, context: r?.context ?? '' })
           if (onAsk) onAsk(word, segmentId)
         } catch (e) {
           setAnswer({ word, text: `追问失败：${e.message}`, error: true })
@@ -399,6 +708,38 @@ window.__ModuleLoader__.load({
           setAsking(false)
         }
       }
+
+      // 轮询待答记录：Agent 回填后把答案显示出来
+      useEffect(() => {
+        if (!answer?.pending) return undefined
+        let alive = true
+        const tick = async () => {
+          try {
+            const r = await api(`/terms-pending/${encodeURIComponent(project.id)}${q(workspace)}`)
+            const items = r?.items ?? []
+            if (!alive) return
+            // 这条已经不在待答列表里了 → 说明被答过，去拿全量找到它
+            if (!items.some((it) => it.term === answer.word)) {
+              const p = await api(`/project/${encodeURIComponent(project.id)}${q(workspace)}`)
+              if (!alive) return
+              const hit = [...(p.terms ?? [])]
+                .reverse()
+                .find((it) => it.term === answer.word && it.answer)
+              if (hit) {
+                setAnswer((a) => (a ? { ...a, pending: false, text: hit.answer } : a))
+              }
+            }
+          } catch {
+            /* 轮询失败不打扰用户，下次再试 */
+          }
+        }
+        const timer = window.setInterval(tick, 1200)
+        tick()
+        return () => {
+          alive = false
+          window.clearInterval(timer)
+        }
+      }, [answer?.pending, answer?.word, project.id, workspace])
 
       const startVoice = () => {
         const Ctor = window.SpeechRecognition || window.webkitSpeechRecognition
@@ -557,21 +898,41 @@ window.__ModuleLoader__.load({
                     'div',
                     { style: { marginTop: 10, paddingTop: 8, borderTop: '1px solid var(--dsw-alias-border-l1)' } },
                     h('div', { className: 'sc-muted' }, `「${answer.word}」在这段话里的意思`),
-                    h('div', { style: { marginTop: 4, lineHeight: 1.7, whiteSpace: 'pre-wrap' } }, answer.text),
-                    // 没能自动复制时，把问题原样给出，让用户手动选中复制
-                    answer.prompt && !answer.copied
+                    answer.pending
                       ? h(
                           'div',
+                          { style: { marginTop: 12, display: 'flex', gap: 8, alignItems: 'center' } },
+                          h('span', { className: 'sc-spin', 'aria-hidden': 'true' }),
+                          h('span', null, '正在结合这段上下文解释…'),
+                        )
+                      : h(
+                          'div',
+                          { style: { marginTop: 6, lineHeight: 1.75, whiteSpace: 'pre-wrap' } },
+                          answer.text ?? '',
+                        ),
+                    // 兜底：Agent 没被叫醒时，用户可以手动把问题发出去
+                    answer.pending
+                      ? h(
+                          'button',
                           {
-                            style: {
-                              marginTop: 6,
-                              padding: 8,
-                              background: 'var(--dsw-alias-bg-layer-1)',
-                              borderRadius: 6,
-                              userSelect: 'all',
-                              fontSize: 12,
+                            className: 'sc-btn sc-btn-sm',
+                            style: { marginTop: 10 },
+                            onClick: async () => {
+                              try {
+                                await navigator.clipboard.writeText(answer.prompt)
+                                setAnswer((a) => (a ? { ...a, copied: true } : a))
+                              } catch {
+                                /* 剪贴板不可用时下方文本仍然可选 */
+                              }
                             },
                           },
+                          answer.copied ? '✓ 已复制' : '复制问题，自己去输入框问',
+                        )
+                      : null,
+                    answer.pending && answer.copied
+                      ? h(
+                          'div',
+                          { className: 'sc-muted', style: { marginTop: 6, userSelect: 'all' } },
                           answer.prompt,
                         )
                       : null,
@@ -584,19 +945,6 @@ window.__ModuleLoader__.load({
 
     /* -------------------------------------------------------- 图谱面板 */
 
-    const KIND_LABEL = {
-      concept: '概念',
-      premise: '前提',
-      principle: '原则',
-      method: '方法',
-      problem: '问题',
-      'anti-pattern': '反模式',
-      risk: '风险',
-      example: '例子',
-      taxonomy: '分类',
-      protocol: '协议',
-      'tool-type': '工具类型',
-    }
     const KIND_COLOR = {
       concept: '#4f8ff7',
       premise: '#ab7aef',
@@ -611,16 +959,6 @@ window.__ModuleLoader__.load({
       'tool-type': '#00a0a0',
     }
 
-    const REL_LABEL = {
-      prerequisite: '前置',
-      'part-of': '整体-部分',
-      contrast: '对比',
-      cause: '因果',
-      'example-of': '例证',
-      application: '应用',
-      sequence: '次序',
-      analogy: '类比',
-    }
 
     /** 按节点像素宽度折行，中英混排各自计宽。 */
     function wrapToWidth(text, pxWidth, fontSize = 11.5, maxLines = 3) {
@@ -837,6 +1175,84 @@ window.__ModuleLoader__.load({
       )
     }
 
+    /**
+     * 读完自测面板。
+     *
+     * 为什么要单独一个页签：QA 原来是塞在"费曼考核"页底部的，
+     * 而它其实是考核**之前**的那一步（先能回忆细节，再能完整复述）。
+     * 混在一起用户根本不知道有这一步，进度也一直推不动。
+     */
+    function RecallPane({ project }) {
+      const pairs = project.qa ?? []
+      const [cov, setCov] = useState(null)
+      useEffect(() => {
+        let alive = true
+        api(`/coverage/${encodeURIComponent(project.id)}`)
+          .then((d) => alive && setCov(d))
+          .catch(() => {})
+        return () => {
+          alive = false
+        }
+      }, [project.id, project.annotations])
+
+      const total = cov?.total ?? project.progress?.segmentCount ?? 0
+      const doneCount = cov?.done ?? project.progress?.annotatedCount ?? 0
+      const pct = cov?.percent ?? (total ? Math.round((doneCount / total) * 1000) / 10 : 0)
+      const left = cov?.skippedCount ?? Math.max(0, total - doneCount)
+
+      return h(
+        'div',
+        null,
+        h(
+          'div',
+          { className: 'sc-card' },
+          h('h4', null, '这一步做什么'),
+          h(
+            'div',
+            { style: { lineHeight: 1.8 } },
+            '闭上书，按顺序过一遍下面的问答。先在心里答，再点开核对。',
+            '答不上来的说明那段只是"看过"，不是"记住"——回到读中加工把那段的三色高亮再看一遍。',
+          ),
+          // 覆盖率必须带分母。只说"已标注 37"没有意义，
+          // 用户看不出还有 145 段没碰。
+          h(
+            'div',
+            { className: 'sc-muted', style: { marginTop: 8 } },
+            `加工进度 ${doneCount}/${total} 段（${pct}%），还剩 ${left} 段没标；QA ${pairs.length} 条。`,
+          ),
+          left > 0 && (cov?.groups ?? []).length
+            ? h(
+                'details',
+                { style: { marginTop: 8 } },
+                h('summary', { className: 'sc-muted', style: { cursor: 'pointer' } }, '哪几节还没标？'),
+                h(
+                  'div',
+                  { style: { marginTop: 6 } },
+                  cov.groups.slice(0, 6).map((g, i) =>
+                    h(
+                      'div',
+                      { key: i, className: 'sc-muted', style: { fontSize: 'var(--sc-fs-sm)', padding: '2px 0' } },
+                      `${g.heading}　${g.count} 段 · ${g.chars} 字`,
+                    ),
+                  ),
+                ),
+              )
+            : null,
+        ),
+        h(QaCard, { pairs }),
+        h(
+          'div',
+          { className: 'sc-card' },
+          h('h4', null, '怎么补 QA'),
+          h(
+            'div',
+            { className: 'sc-muted', style: { lineHeight: 1.8 } },
+            '在对话里说「我读完了，帮我留点自测题」，Agent 会加载 study-recall 技能生成 6-12 条问答，每条问题和回答都不超过 100 字，并给一个明天能做完的最小行动。',
+          ),
+        ),
+      )
+    }
+
     function QuizPane({ project }) {
       const [terms, setTerms] = useState(project.terms ?? [])
       useEffect(() => setTerms(project.terms ?? []), [project.terms])
@@ -844,6 +1260,16 @@ window.__ModuleLoader__.load({
         'div',
         null,
         h(QaCard, { pairs: project.qa }),
+        // 参考资料：宿主早就渲染好了 refsHtml，但界面从来没显示过。
+        // 用户明确要求第 6 段要有参考资料清单并标注 原文/我的知识/联网检索。
+        h(
+          'div',
+          { className: 'sc-card' },
+          h('h4', null, '参考资料（原文 / 联网检索 / 我的知识）'),
+          project.refsHtml
+            ? h('div', { className: 'sc-md', dangerouslySetInnerHTML: { __html: project.refsHtml } })
+            : h('div', { className: 'sc-muted' }, '还没有参考资料。让 Agent 做读前建构时会一并生成。'),
+        ),
         h(
           'div',
           { className: 'sc-card' },
@@ -898,6 +1324,65 @@ window.__ModuleLoader__.load({
     }
 
     /* ------------------------------------------------------ 工作台主面板 */
+
+    /**
+     * 复习到期横幅。
+     *
+     * 只在"真的有资料到期"时出现，其余时候不占地方——
+     * 一个永远存在的横幅等于没有提示。
+     */
+    function ReviewBanner({ onOpen }) {
+      const [state, setState] = useState(null)
+      const [done, setDone] = useState({})
+      useEffect(() => {
+        let alive = true
+        api('/review')
+          .then((d) => alive && setState(d))
+          .catch(() => {})
+        return () => {
+          alive = false
+        }
+      }, [])
+
+      const due = (state?.due ?? []).filter((i) => !done[i.docId])
+      if (!due.length) return null
+
+      const mark = async (docId) => {
+        // 先乐观更新，避免点了没反应
+        setDone((v) => ({ ...v, [docId]: true }))
+        try {
+          await api('/review-done', { method: 'POST', body: JSON.stringify({ docId }) })
+          const d = await api('/review')
+          setState(d)
+        } catch {
+          setDone((v) => ({ ...v, [docId]: false }))
+        }
+      }
+
+      return h(
+        'div',
+        { className: 'sc-review' },
+        h('div', { className: 'sc-review-title' }, `今天该复习 ${due.length} 份`),
+        due.map((i) =>
+          h(
+            'div',
+            { key: i.docId, className: 'sc-review-item' },
+            h('span', { className: 'sc-review-name' }, i.title),
+            i.overdueDays > 0 ? h('span', { className: 'sc-muted' }, `已拖 ${i.overdueDays} 天`) : null,
+            h(
+              'button',
+              { className: 'sc-btn sc-btn-sm', onClick: () => onOpen?.(i.docId) },
+              '打开',
+            ),
+            h(
+              'button',
+              { className: 'sc-btn sc-btn-sm', onClick: () => mark(i.docId), title: '标记这次复习完成，下次间隔会拉长' },
+              '复习过了',
+            ),
+          ),
+        ),
+      )
+    }
 
     function Workbench(props) {
       const { useWorkspaces } = props
@@ -1003,12 +1488,34 @@ window.__ModuleLoader__.load({
         [docId, wsPath],
       )
 
+      /* Tab 顺序 = 学习流程顺序。
+       * 原来第一个 Tab 是"精读加工"、默认也停在它，而学习第一步是读前建构，
+       * 用户一进来看到的是一堆正文，却看不到"我要学什么、怎么考"。 */
       const tabs = [
-        { key: 'read', label: '精读加工' },
-        { key: 'plan', label: '读前建构' },
-        { key: 'graph', label: '知识图谱' },
-        { key: 'quiz', label: '费曼考核' },
+        { key: 'plan', label: '读前建构', stage: 'planned' },
+        { key: 'read', label: '读中加工', stage: 'annotated' },
+        { key: 'graph', label: '知识图谱', stage: 'mapped' },
+        { key: 'recall', label: '读完自测', stage: 'recalled' },
+        { key: 'quiz', label: '费曼考核', stage: 'drilled' },
       ]
+
+      // 默认落在"下一步该做的那一步"上，用户打开就知道从哪开始
+      const nextTabKey = useMemo(() => {
+        const action = project?.next?.action ?? ''
+        if (!action) return 'plan'
+        if (action === 'study-preflight' || action === 'study_ingest') return 'plan'
+        if (action === 'study-annotate') return 'read'
+        if (action === 'study-map') return 'graph'
+        if (action === 'study-recall') return 'recall'
+        if (action === 'study-feynman') return 'quiz'
+        return 'plan'
+      }, [project?.next?.action])
+
+      // 用户没手动点过 Tab 时，跟随 next 走；点过之后就尊重他的选择
+      const [tabTouched, setTabTouched] = useState(false)
+      useEffect(() => {
+        if (!tabTouched && project) setTab(nextTabKey)
+      }, [nextTabKey, tabTouched, project])
 
       return h(
         'div',
@@ -1150,13 +1657,16 @@ window.__ModuleLoader__.load({
               ? h(
                   React.Fragment,
                   null,
+                  // 复习到期提醒：间隔重复的关键是"该复习时被提醒"，
+                  // 而不是让用户自己记着哪天学过什么。
+                  h(ReviewBanner, { onOpen: setDocId }),
                   h(
                     'div',
                     { className: 'sc-tabs' },
                     tabs.map((t) =>
                       h(
                         'button',
-                        { key: t.key, className: 'sc-tab', 'data-active': tab === t.key, onClick: () => setTab(t.key) },
+                        { key: t.key, className: 'sc-tab', 'data-active': tab === t.key, onClick: () => { setTabTouched(true); setTab(t.key) } },
                         t.label,
                       ),
                     ),
@@ -1167,10 +1677,12 @@ window.__ModuleLoader__.load({
                     tab === 'read'
                       ? h(ReadingPane, { project, onAsk: ask, workspace: wsPath })
                       : tab === 'plan'
-                        ? h(PreflightPane, { project })
+                        ? h(PreflightPane, { project, onJump: setTab })
                         : tab === 'graph'
                           ? h(GraphPane, { project })
-                          : h(QuizPane, { project }),
+                          : tab === 'recall'
+                            ? h(RecallPane, { project })
+                            : h(QuizPane, { project }),
                   ),
                 )
               : h(Empty, null, '从左侧选一份资料，或先在对话里导入一份。'),

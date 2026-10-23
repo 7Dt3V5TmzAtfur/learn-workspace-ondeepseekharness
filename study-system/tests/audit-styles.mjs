@@ -40,11 +40,14 @@ const hasRule = (c) => {
 
 const dynamicPrefix = ['sc-hl-', 'sc-tag-', 'sc-lv']
 
+// 注释里举的例子（如 class="sc-hl-x"）不是真实输出，不该算缺失
+const DOC_EXAMPLES = new Set(['sc-hl-x'])
+
 const missing = []
 const covered = []
 for (const c of [...hostClasses].sort()) {
   if (hasRule(c)) covered.push(c)
-  else missing.push(c)
+  else if (!DOC_EXAMPLES.has(c)) missing.push(c)
 }
 
 console.log(`宿主生成的 class：${hostClasses.size} 个`)

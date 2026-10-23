@@ -144,17 +144,20 @@ const TOOLS = [
   {
     name: 'study_status',
     description:
-      '查看学习项目状态：各阶段完成度、标注统计、校验问题、下一步该做什么。' +
-      '不传 docId 时列出工作区里全部学习项目。',
+      '查看学习项目状态：各阶段完成度、标注覆盖率（带分母）、校验问题、下一步该做什么。' +
+      '不传 docId 时列出工作区里全部学习项目。' +
+      '想知道"还有哪些段没加工"时传 coverageOnly=true，会逐个列出空着的段落与所在小节。',
     parameters: jsonSchema({
       docId: { type: 'string', description: '可选：只查这一个项目' },
+      coverageOnly: { type: 'boolean', description: '只返回覆盖审计（未加工的段落清单），不含其他进度信息' },
     }),
   },
   {
     name: 'study_drill',
     description:
       '记录一次费曼考核：学习者真的用自己的话复述/作答之后，把原文、他的说法、达标要点与判卷结论存下来。' +
-      '这是"读后考核"阶段唯一能推进进度的地方——只生成思考题不算完成考核。',
+      '这是"读后考核"阶段唯一能推进进度的地方——只生成思考题不算完成考核。' +
+      '注意：只有闭卷（closedBook=true）且没被判为"抄原文/太快"的复述才算有效、才会推进进度。',
     parameters: jsonSchema(
       {
         docId: { type: 'string', description: '学习项目 id' },
@@ -167,8 +170,26 @@ const TOOLS = [
         },
         verdict: { type: 'string', description: '判卷结论：达标/部分达标/未达标，附一句理由' },
         minimalAction: { type: 'string', description: '下一步最小行动' },
+        closedBook: {
+          type: 'boolean',
+          description: '学习者是否合上了资料再复述（true 才计入掌握度；开卷复述照样记录但不推进进度）',
+        },
+        durationSec: { type: 'number', description: '这次复述花了多少秒（用于判断是不是随手打两行）' },
       },
       ['docId', 'answer'],
+    ),
+  },
+  {
+    name: 'study_review',
+    description:
+      '复习调度：查今天该复习哪些资料，或完成一次复习把下次到期日推进到 1→3→7 天。' +
+      '不传 action 时默认列出到期清单。',
+    parameters: jsonSchema(
+      {
+        action: { type: 'string', description: 'list（默认）| complete' },
+        docId: { type: 'string', description: 'action=complete 时必填' },
+      },
+      [],
     ),
   },
 ]
@@ -249,7 +270,17 @@ export function apply(ctx, config = {}) {
             if (kind === 'qa') return svc.saveQa(docId, payload?.pairs ?? payload?.items ?? payload)
             throw new Error(`未知的 kind: ${kind}`)
           }
-          case 'study_term':
+          case 'study_term': {
+            // 有 answer 时优先回填界面点出来的"待答"记录（不新增重复条目）；
+            // 找不到待答记录才作为一条新的追问落库。
+            if (args.answer) {
+              const filled = await svc.answerTerm(args.docId, {
+                term: args.term,
+                segmentId: args.segmentId,
+                answer: args.answer,
+              })
+              if (filled.updated) return filled.record
+            }
             return svc.askTerm(args.docId, {
               term: args.term,
               segmentId: args.segmentId,
@@ -257,10 +288,12 @@ export function apply(ctx, config = {}) {
               answer: args.answer,
               source: 'agent',
             })
+          }
           case 'study_status': {
             // 注意：这里必须用 status() 而不是 project()。
             // project() 是给界面渲染用的，带 182 段原文 + 三份 HTML（实测 222 KB），
             // 而 study_status 是每轮都可能调的工具，只需要进度与校验摘要。
+            if (args.coverageOnly && args.docId) return svc.coverage(args.docId)
             if (args.docId) return svc.status(args.docId)
             return { projects: await svc.list() }
           }
@@ -271,7 +304,15 @@ export function apply(ctx, config = {}) {
               rubricHit: args.rubricHit,
               verdict: args.verdict,
               minimalAction: args.minimalAction,
+              closedBook: args.closedBook,
+              durationSec: args.durationSec,
             })
+          case 'study_review':
+            if (args.action === 'complete') {
+              if (!args.docId) throw new Error('action=complete 需要 docId')
+              return svc.completeReview(args.docId)
+            }
+            return svc.reviewDue()
           default:
             throw new Error(`未实现的工具 ${def.name}`)
         }
@@ -563,6 +604,29 @@ export function apply(ctx, config = {}) {
           if (req.method === 'POST' && route === '/term') {
             const body = await readBody(req)
             return send(res, 200, await svcOf(url).askTerm(body.docId, body))
+          }
+          // 覆盖审计：哪些段还没加工
+          if (req.method === 'GET' && route.startsWith('/coverage/')) {
+            const docId = decodeURIComponent(route.slice('/coverage/'.length))
+            return send(res, 200, await svcOf(url).coverage(docId))
+          }
+          // 复习到期清单（界面顶部提醒用）
+          if (req.method === 'GET' && route === '/review') {
+            return send(res, 200, await svcOf(url).reviewDue())
+          }
+          if (req.method === 'POST' && route === '/review-done') {
+            const body = await readBody(req)
+            return send(res, 200, await svcOf(url).completeReview(body.docId))
+          }
+          // 界面点词后轮询：还有哪些追问没答
+          if (req.method === 'GET' && route.startsWith('/terms-pending/')) {
+            const docId = decodeURIComponent(route.slice('/terms-pending/'.length))
+            return send(res, 200, { items: await svcOf(url).pendingTerms(docId) })
+          }
+          // Agent 答完回填
+          if (req.method === 'POST' && route === '/term-answer') {
+            const body = await readBody(req)
+            return send(res, 200, await svcOf(url).answerTerm(body.docId, body))
           }
           // 读完自测问答（每条 ≤100 字）
           if (req.method === 'POST' && route === '/qa') {
