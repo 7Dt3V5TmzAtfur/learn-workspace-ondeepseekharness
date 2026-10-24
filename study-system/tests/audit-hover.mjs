@@ -54,13 +54,13 @@ const html = `<!doctype html>
     <section class="sc-seg" data-id="¶3" data-tier="core">
       <span class="sc-seg-mark" aria-hidden="true">¶3</span>
       <span class="sc-seg-role sc-role-d">#d</span>
-      <span class="sc-seg-role-full"><b class="sc-role-text sc-role-d">#d</b> · 全章的判断标准 · Agent 与普通对话的区别</span>
+      <span class="sc-seg-role-full sc-role-d"><b class="sc-role-text sc-role-d">#d</b> · 全章的判断标准 · Agent 与普通对话的区别</span>
       <div>这些产品的形态各异，但有一个共同点：它们不再是“你问一句、它答一句”的被动对话，而是能够自主规划执行步骤的智能系统。</div>
     </section>
     <section class="sc-seg" data-id="¶4" data-tier="hard">
       <span class="sc-seg-mark" aria-hidden="true">¶4</span>
       <span class="sc-seg-role sc-role-q">#q</span>
-      <span class="sc-seg-role-full"><b class="sc-role-text sc-role-q">#q</b> · 为什么 Agent 与 Environment 是闭环而不是组成</span>
+      <span class="sc-seg-role-full sc-role-q"><b class="sc-role-text sc-role-q">#q</b> · 为什么 Agent 与 Environment 是闭环而不是组成</span>
       <div>这里提出一个需要停下来想的问题。</div>
     </section>
   </div>
@@ -147,6 +147,11 @@ try {
     q: getComputedStyle(document.querySelector('.sc-role-q')).color,
   }))
   check('#d 与 #q 的角色颜色不同', roleColors.d !== roleColors.q, JSON.stringify(roleColors))
+  const panelColors = await colorPage.evaluate(() => ({
+    d: getComputedStyle(document.querySelector('.sc-seg[data-id="¶3"] .sc-seg-role-full')).color,
+    q: getComputedStyle(document.querySelector('.sc-seg[data-id="¶4"] .sc-seg-role-full')).color,
+  }))
+  check('弹层整段文字随角色换色', panelColors.d !== panelColors.q, JSON.stringify(panelColors))
   await colorPage.close()
 
   /* ---------- 2. 配色：明暗两套都必须读得清 */
@@ -165,6 +170,29 @@ try {
     check(`${theme} 弹层背景不透明`, Boolean(bgc) && !/rgba\([^)]+,\s*0\)/.test(bg), `bg=${bg}`)
     const ratio = bgc && fgc ? contrast(bgc, fgc) : 0
     check(`${theme} 文字与背景对比度 ≥ 4.5`, ratio >= 4.5, `fg=${fg} on bg=${bg}，对比度 ${ratio.toFixed(2)}`)
+
+    // 七类角色逐一验：面板整段都用角色色，任何一个不可读都不行
+    const roleSamples = await p.evaluate((labels) => {
+      const host = document.querySelector('.sc-root')
+      return labels.map((label) => {
+        const el = document.createElement('span')
+        el.className = `sc-seg-role-full sc-role-${label}`
+        el.style.cssText = 'display:block;position:static;width:auto'
+        el.textContent = '样例'
+        host.appendChild(el)
+        const cs = getComputedStyle(el)
+        const out = { label, fg: cs.color, bg: cs.backgroundColor }
+        el.remove()
+        return out
+      })
+    }, ['d', 'e', 'q', 's', 't', 'c', 'v'])
+
+    for (const sample of roleSamples) {
+      const c1 = parseColor(sample.fg)
+      const c2 = parseColor(sample.bg)
+      const r = c1 && c2 ? contrast(c1, c2) : 0
+      check(`${theme} #${sample.label} 对比度 ≥ 4.5`, r >= 4.5, `fg=${sample.fg} on bg=${sample.bg}，${r.toFixed(2)}`)
+    }
     await p.close()
   }
 } finally {

@@ -63,7 +63,7 @@ window.__ModuleLoader__.load({
   --sc-role-e:#0f766e;
   --sc-role-q:#c026d3;
   --sc-role-s:#b45309;
-  --sc-role-t:#16a34a;
+  --sc-role-t:#15803d;
   --sc-role-c:#64748b;
   --sc-role-v:#4f46e5;
 }
@@ -199,7 +199,7 @@ body[data-ds-dark-theme] .sc-root{
 .sc-seg-role{position:absolute;left:2px;top:30px;width:36px;text-align:right;font-size:calc(10px * var(--sc-scale));font-weight:600;letter-spacing:.02em;opacity:.5;transition:opacity .15s;cursor:help;user-select:none}
 /* 悬停整段就显示角色全称：只挂在小标记上时，鼠标几乎不可能正好停在 36px 里。
  * 面板向上落在这段的上留白中，不遮挡正文。 */
-.sc-seg-role-full{display:none;position:absolute;left:44px;bottom:calc(100% + 4px);width:max-content;max-width:320px;padding:3px 8px;border:1px solid var(--sc-pop-border);border-radius:var(--sc-r-sm);background:var(--sc-pop-bg);color:var(--sc-pop-fg);font-size:var(--sc-fs-xs);font-weight:400;line-height:1.6;white-space:normal;box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:6;pointer-events:none}
+.sc-seg-role-full{display:none;position:absolute;left:44px;bottom:calc(100% + 4px);width:max-content;max-width:320px;padding:3px 8px;border:1px solid var(--sc-pop-border);border-radius:var(--sc-r-sm);background:var(--sc-pop-bg);color:var(--sc-role-current,var(--sc-pop-fg));font-size:var(--sc-fs-xs);font-weight:400;line-height:1.6;white-space:normal;box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:6;pointer-events:none}
 .sc-seg:hover .sc-seg-role-full,.sc-seg:focus-within .sc-seg-role-full{display:block}
 .sc-role-d{--sc-role-current:var(--sc-role-d)}
 .sc-role-e{--sc-role-current:var(--sc-role-e)}
@@ -1891,7 +1891,7 @@ body[data-ds-dark-theme] .sc-root{
               a && hasRoleDetail(a)
                 ? h(
                     'span',
-                    { className: 'sc-seg-role-full' },
+                    { className: `sc-seg-role-full sc-role-${a.label}` },
                     h('b', { className: `sc-role-text sc-role-${a.label}` }, `#${a.label}`),
                     roleDetail(a) ? ` · ${roleDetail(a)}` : null,
                   )
