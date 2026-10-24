@@ -14,6 +14,7 @@ const NODE = process.execPath
 
 const SUITES = [
   ['run-tests.mjs', '单元 / 端到端 / 规则'],
+  ['case-api-mount.mjs', '宿主挂载 / 路由时序'],
   ['e2e-check.mjs', '真实 HTTP 接口'],
   ['audit-ui.mjs', '界面渲染内容'],
   ['audit-skills.mjs', '技能文档约束'],

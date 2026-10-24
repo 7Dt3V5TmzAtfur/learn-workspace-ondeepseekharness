@@ -339,394 +339,400 @@ export function apply(ctx, config = {}) {
   })
 
   /* ---- HTTP API（供界面使用） ---- */
-  const webServer = ctx.get('webServer')
-  if (!webServer) return
+  // webServer 由 dsh-web-app 提供，可能晚于本插件就绪。apply 只跑一次，
+  // 一次性 ctx.get 拿不到就永久没有路由 —— 界面全部 404、POST 全部 405，
+  // 而客户端照常渲染，看起来像「路径填错了」。改用 ctx.inject 等它就绪；
+  // 服务已就绪时回调立即执行，不会重复挂。
+  ctx.inject(['webServer'], (ctx) => {
+    const webServer = ctx.webServer
+    if (!webServer) return
 
-  const send = (res, status, body) => {
-    const payload = JSON.stringify(body)
-    res.writeHead(status, {
-      'content-type': 'application/json; charset=utf-8',
-      'cache-control': 'no-store',
-      'content-length': Buffer.byteLength(payload),
-    })
-    res.end(payload)
-  }
-
-  const MIME = {
-    '.svg': 'image/svg+xml',
-    '.png': 'image/png',
-    '.jpg': 'image/jpeg',
-    '.jpeg': 'image/jpeg',
-    '.gif': 'image/gif',
-    '.webp': 'image/webp',
-    '.bmp': 'image/bmp',
-    // archify 生成的图是独立 HTML，必须能作为文档渲染，否则 iframe 一片空白
-    '.html': 'text/html; charset=utf-8',
-    '.json': 'application/json; charset=utf-8',
-    '.md': 'text/markdown; charset=utf-8',
-    '.txt': 'text/plain; charset=utf-8',
-  }
-
-  /**
-   * 提供项目内的静态资源。
-   *
-   * 两类来源：
-   * 1. 项目目录 `.study/<docId>/` 内的产物（archify 图 graph-N.html 就放这里）
-   * 2. 原文档所在目录的图片（原文里引用的图）
-   *
-   * 只允许访问这两个根及其子目录，防止用 ../ 跳到别处。
-   */
-  const serveAsset = async (res, svc, docId, relPath) => {
-    try {
-      const projectDir = resolve(svc.store.dir(docId))
-      const meta = await svc.store.meta(docId).catch(() => null)
-      const sourceRoot = meta?.sourcePath ? dirname(resolve(meta.sourcePath)) : null
-
-      // 先找项目目录，再找原文目录
-      const roots = [projectDir, sourceRoot].filter(Boolean)
-      let target = null
-      for (const root of roots) {
-        const cand = resolve(root, relPath)
-        const normRoot = root.endsWith(sep) ? root : root + sep
-        if (cand !== root && !cand.startsWith(normRoot)) continue // 越界，跳过
-        if (existsSync(cand)) {
-          target = cand
-          break
-        }
-      }
-
-      if (!target) {
-        res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' })
-        res.end('not found')
-        return
-      }
-
-      const ext = extname(target).toLowerCase()
-      const type = MIME[ext]
-      if (!type) {
-        res.writeHead(415, { 'content-type': 'text/plain; charset=utf-8' })
-        res.end('unsupported media type')
-        return
-      }
-
-      const buf = await readFile(target)
-      res.writeHead(200, {
-        'content-type': type,
-        'content-length': buf.length,
-        // archify 的 HTML 每次重新生成内容会变，不缓存太久以免看到旧图
-        'cache-control': ext === '.html' ? 'no-cache' : 'public, max-age=86400',
+    const send = (res, status, body) => {
+      const payload = JSON.stringify(body)
+      res.writeHead(status, {
+        'content-type': 'application/json; charset=utf-8',
+        'cache-control': 'no-store',
+        'content-length': Buffer.byteLength(payload),
       })
-      res.end(buf)
-    } catch (e) {
-      res.writeHead(500, { 'content-type': 'application/json; charset=utf-8' })
-      res.end(JSON.stringify({ error: `资源读取失败：${e?.message ?? e}`, docId, relPath }))
+      res.end(payload)
     }
-  }
 
-  const readBody = (req) =>
-    new Promise((resolveBody, rejectBody) => {
-      const chunks = []
-      let size = 0
-      req.on('data', (c) => {
-        size += c.length
-        if (size > 8 * 1024 * 1024) rejectBody(new Error('请求体过大'))
-        else chunks.push(c)
+    const MIME = {
+      '.svg': 'image/svg+xml',
+      '.png': 'image/png',
+      '.jpg': 'image/jpeg',
+      '.jpeg': 'image/jpeg',
+      '.gif': 'image/gif',
+      '.webp': 'image/webp',
+      '.bmp': 'image/bmp',
+      // archify 生成的图是独立 HTML，必须能作为文档渲染，否则 iframe 一片空白
+      '.html': 'text/html; charset=utf-8',
+      '.json': 'application/json; charset=utf-8',
+      '.md': 'text/markdown; charset=utf-8',
+      '.txt': 'text/plain; charset=utf-8',
+    }
+
+    /**
+     * 提供项目内的静态资源。
+     *
+     * 两类来源：
+     * 1. 项目目录 `.study/<docId>/` 内的产物（archify 图 graph-N.html 就放这里）
+     * 2. 原文档所在目录的图片（原文里引用的图）
+     *
+     * 只允许访问这两个根及其子目录，防止用 ../ 跳到别处。
+     */
+    const serveAsset = async (res, svc, docId, relPath) => {
+      try {
+        const projectDir = resolve(svc.store.dir(docId))
+        const meta = await svc.store.meta(docId).catch(() => null)
+        const sourceRoot = meta?.sourcePath ? dirname(resolve(meta.sourcePath)) : null
+
+        // 先找项目目录，再找原文目录
+        const roots = [projectDir, sourceRoot].filter(Boolean)
+        let target = null
+        for (const root of roots) {
+          const cand = resolve(root, relPath)
+          const normRoot = root.endsWith(sep) ? root : root + sep
+          if (cand !== root && !cand.startsWith(normRoot)) continue // 越界，跳过
+          if (existsSync(cand)) {
+            target = cand
+            break
+          }
+        }
+
+        if (!target) {
+          res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' })
+          res.end('not found')
+          return
+        }
+
+        const ext = extname(target).toLowerCase()
+        const type = MIME[ext]
+        if (!type) {
+          res.writeHead(415, { 'content-type': 'text/plain; charset=utf-8' })
+          res.end('unsupported media type')
+          return
+        }
+
+        const buf = await readFile(target)
+        res.writeHead(200, {
+          'content-type': type,
+          'content-length': buf.length,
+          // archify 的 HTML 每次重新生成内容会变，不缓存太久以免看到旧图
+          'cache-control': ext === '.html' ? 'no-cache' : 'public, max-age=86400',
+        })
+        res.end(buf)
+      } catch (e) {
+        res.writeHead(500, { 'content-type': 'application/json; charset=utf-8' })
+        res.end(JSON.stringify({ error: `资源读取失败：${e?.message ?? e}`, docId, relPath }))
+      }
+    }
+
+    const readBody = (req) =>
+      new Promise((resolveBody, rejectBody) => {
+        const chunks = []
+        let size = 0
+        req.on('data', (c) => {
+          size += c.length
+          if (size > 8 * 1024 * 1024) rejectBody(new Error('请求体过大'))
+          else chunks.push(c)
+        })
+        req.on('end', () => {
+          if (!chunks.length) return resolveBody({})
+          try {
+            resolveBody(JSON.parse(Buffer.concat(chunks).toString('utf8')))
+          } catch {
+            rejectBody(new Error('请求体不是合法 JSON'))
+          }
+        })
+        req.on('error', rejectBody)
       })
-      req.on('end', () => {
-        if (!chunks.length) return resolveBody({})
+
+    /**
+     * 工作区来自查询参数；没带时按顺序找：
+     * 最近一次 Agent 用过的工作区 → 配置 → 会话默认目录 → 进程 cwd。
+     * 注意 process.cwd() 是 profile 目录，不是用户工作区，放在最后仅作兜底。
+     */
+    const defaultWorkspace = () => {
+      const wd = ctx.get('workingDirectory')
+      return lastGoodWorkspace || lastAgentWorkspace || config.workspace || wd?.defaultDirectory || process.cwd()
+    }
+
+    /**
+     * 把用户给的任意路径解析成真实工作区。
+     * 用户点"诊断"通常填的是**资料文件路径**（如 D:\learn\学习资料\book\chapter4.md），
+     * 不是工作区。所以这里逐级向上找含 .study 的目录；找不到就退回原路径。
+     */
+    const resolveWorkspace = (raw) => {
+      if (!raw) return defaultWorkspace()
+      const hit = findWorkspaceRoot(raw)
+      return hit ?? resolve(raw)
+    }
+
+    /**
+     * 记住最近一次成功定位到项目的工作区，并落盘。
+     * 界面刷新/插件重载后，靠它立刻回到用户真正在用的目录，
+     * 而不是退回 profile 目录导致"一个文件都没有"。
+     */
+    let lastGoodWorkspace = null
+    const STATE_FILE = () => resolve(DSH_HOME, 'study-copilot.state.json')
+    const loadState = () => {
+      try {
+        const raw = readFileSync(STATE_FILE(), 'utf8')
+        const v = JSON.parse(raw)
+        if (v?.workspace && existsSync(findWorkspaceRoot(v.workspace) ?? v.workspace)) {
+          lastGoodWorkspace = v.workspace
+        }
+      } catch {
+        /* 首次运行没有状态文件，正常 */
+      }
+    }
+    const saveState = (ws) => {
+      try {
+        writeFileSync(STATE_FILE(), JSON.stringify({ workspace: ws, at: new Date().toISOString() }, null, 2), 'utf8')
+      } catch {
+        /* profile 目录不可写时忽略，只是下次要重新定位 */
+      }
+    }
+    const rememberGood = (ws, count) => {
+      if (count > 0 && ws !== lastGoodWorkspace) {
+        lastGoodWorkspace = ws
+        saveState(ws)
+      }
+    }
+    loadState()
+
+    const svcOf = (url) => {
+      const ws = resolveWorkspace(url.searchParams.get('ws'))
+      return serviceFor(ws)
+    }
+
+    /** 列出各候选工作区下已有的学习项目，帮界面在拿不到路径时自我修复。 */
+    const discoverWorkspaces = async () => {
+      const candidates = []
+      const push = (p) => {
+        if (p && !candidates.includes(p)) candidates.push(p)
+      }
+      push(lastGoodWorkspace)
+      push(lastAgentWorkspace)
+      push(config.workspace)
+      push(ctx.get('workingDirectory')?.defaultDirectory)
+      push(process.cwd())
+      // 再往下扫有限层，把 .study 真在的地方都找出来
+      for (const extra of findWorkspaceRoots(candidates, 4)) push(extra)
+      // 仍然一个项目都没找到时，扫各盘符根下一层：用户常在 D:\ 或 E:\ 下建项目
+      const hasAny = candidates.some((p) => {
         try {
-          resolveBody(JSON.parse(Buffer.concat(chunks).toString('utf8')))
+          return existsSync(join(p, '.study'))
         } catch {
-          rejectBody(new Error('请求体不是合法 JSON'))
+          return false
         }
       })
-      req.on('error', rejectBody)
-    })
-
-  /**
-   * 工作区来自查询参数；没带时按顺序找：
-   * 最近一次 Agent 用过的工作区 → 配置 → 会话默认目录 → 进程 cwd。
-   * 注意 process.cwd() 是 profile 目录，不是用户工作区，放在最后仅作兜底。
-   */
-  const defaultWorkspace = () => {
-    const wd = ctx.get('workingDirectory')
-    return lastGoodWorkspace || lastAgentWorkspace || config.workspace || wd?.defaultDirectory || process.cwd()
-  }
-
-  /**
-   * 把用户给的任意路径解析成真实工作区。
-   * 用户点"诊断"通常填的是**资料文件路径**（如 D:\learn\学习资料\book\chapter4.md），
-   * 不是工作区。所以这里逐级向上找含 .study 的目录；找不到就退回原路径。
-   */
-  const resolveWorkspace = (raw) => {
-    if (!raw) return defaultWorkspace()
-    const hit = findWorkspaceRoot(raw)
-    return hit ?? resolve(raw)
-  }
-
-  /**
-   * 记住最近一次成功定位到项目的工作区，并落盘。
-   * 界面刷新/插件重载后，靠它立刻回到用户真正在用的目录，
-   * 而不是退回 profile 目录导致"一个文件都没有"。
-   */
-  let lastGoodWorkspace = null
-  const STATE_FILE = () => resolve(DSH_HOME, 'study-copilot.state.json')
-  const loadState = () => {
-    try {
-      const raw = readFileSync(STATE_FILE(), 'utf8')
-      const v = JSON.parse(raw)
-      if (v?.workspace && existsSync(findWorkspaceRoot(v.workspace) ?? v.workspace)) {
-        lastGoodWorkspace = v.workspace
+      if (!hasAny) {
+        for (const drive of ['C:', 'D:', 'E:', 'F:']) {
+          if (!existsSync(`${drive}\\`)) continue
+          for (const extra of findWorkspaceRoots([`${drive}\\`], 2)) push(extra)
+        }
       }
-    } catch {
-      /* 首次运行没有状态文件，正常 */
-    }
-  }
-  const saveState = (ws) => {
-    try {
-      writeFileSync(STATE_FILE(), JSON.stringify({ workspace: ws, at: new Date().toISOString() }, null, 2), 'utf8')
-    } catch {
-      /* profile 目录不可写时忽略，只是下次要重新定位 */
-    }
-  }
-  const rememberGood = (ws, count) => {
-    if (count > 0 && ws !== lastGoodWorkspace) {
-      lastGoodWorkspace = ws
-      saveState(ws)
-    }
-  }
-  loadState()
-
-  const svcOf = (url) => {
-    const ws = resolveWorkspace(url.searchParams.get('ws'))
-    return serviceFor(ws)
-  }
-
-  /** 列出各候选工作区下已有的学习项目，帮界面在拿不到路径时自我修复。 */
-  const discoverWorkspaces = async () => {
-    const candidates = []
-    const push = (p) => {
-      if (p && !candidates.includes(p)) candidates.push(p)
-    }
-    push(lastGoodWorkspace)
-    push(lastAgentWorkspace)
-    push(config.workspace)
-    push(ctx.get('workingDirectory')?.defaultDirectory)
-    push(process.cwd())
-    // 再往下扫有限层，把 .study 真在的地方都找出来
-    for (const extra of findWorkspaceRoots(candidates, 4)) push(extra)
-    // 仍然一个项目都没找到时，扫各盘符根下一层：用户常在 D:\ 或 E:\ 下建项目
-    const hasAny = candidates.some((p) => {
-      try {
-        return existsSync(join(p, '.study'))
-      } catch {
-        return false
-      }
-    })
-    if (!hasAny) {
-      for (const drive of ['C:', 'D:', 'E:', 'F:']) {
-        if (!existsSync(`${drive}\\`)) continue
-        for (const extra of findWorkspaceRoots([`${drive}\\`], 2)) push(extra)
-      }
-    }
-    const out = []
-    for (const path of candidates) {
-      try {
-        const items = await serviceFor(path).list()
-        out.push({ path, count: items.length, titles: items.slice(0, 20).map((i) => i.title) })
-      } catch {
-        out.push({ path, count: 0, titles: [], error: true })
-      }
-    }
-    return out.sort((a, b) => b.count - a.count)
-  }
-
-  ctx.effect(() => {
-    const dispose = webServer.register({
-      kind: 'prefix',
-      path: API_PREFIX,
-      async handler(req, res) {
-        const url = new URL(req.url ?? '/', 'http://localhost')
-        const route = url.pathname.slice(API_PREFIX.length) || '/'
+      const out = []
+      for (const path of candidates) {
         try {
-          if (req.method === 'GET' && route === '/health') {
-            return send(res, 200, {
-              ok: true,
-              workspace: svcOf(url).ws,
-              defaultWorkspace: defaultWorkspace(),
-              hasWsParam: Boolean(url.searchParams.get('ws')),
-            })
-          }
-          if (req.method === 'GET' && route === '/workspaces') {
-            return send(res, 200, { items: await discoverWorkspaces() })
-          }
-          // 图片等静态资源：/asset/<docId>/<相对路径>
-          if (req.method === 'GET' && route.startsWith('/asset/')) {
-            const rest = route.slice('/asset/'.length)
-            const slash = rest.indexOf('/')
-            if (slash < 0) return send(res, 400, { error: '缺少资源路径' })
-            const safeDecode = (v) => {
+          const items = await serviceFor(path).list()
+          out.push({ path, count: items.length, titles: items.slice(0, 20).map((i) => i.title) })
+        } catch {
+          out.push({ path, count: 0, titles: [], error: true })
+        }
+      }
+      return out.sort((a, b) => b.count - a.count)
+    }
+
+    ctx.effect(() => {
+      const dispose = webServer.register({
+        kind: 'prefix',
+        path: API_PREFIX,
+        async handler(req, res) {
+          const url = new URL(req.url ?? '/', 'http://localhost')
+          const route = url.pathname.slice(API_PREFIX.length) || '/'
+          try {
+            if (req.method === 'GET' && route === '/health') {
+              return send(res, 200, {
+                ok: true,
+                workspace: svcOf(url).ws,
+                defaultWorkspace: defaultWorkspace(),
+                hasWsParam: Boolean(url.searchParams.get('ws')),
+              })
+            }
+            if (req.method === 'GET' && route === '/workspaces') {
+              return send(res, 200, { items: await discoverWorkspaces() })
+            }
+            // 图片等静态资源：/asset/<docId>/<相对路径>
+            if (req.method === 'GET' && route.startsWith('/asset/')) {
+              const rest = route.slice('/asset/'.length)
+              const slash = rest.indexOf('/')
+              if (slash < 0) return send(res, 400, { error: '缺少资源路径' })
+              const safeDecode = (v) => {
+                try {
+                  return decodeURIComponent(v)
+                } catch {
+                  return v
+                }
+              }
+              const docId = safeDecode(rest.slice(0, slash))
+              // route 来自 url.pathname，本身仍是百分号编码的，这里只需解码一次
+              const relPath = safeDecode(rest.slice(slash + 1))
+              await serveAsset(res, svcOf(url), docId, relPath)
+              return
+            }
+            if (req.method === 'GET' && route === '/projects') {
+              const raw = url.searchParams.get('ws')
+              const svc = svcOf(url)
+              const items = await svc.list()
+              rememberGood(svc.ws, items.length)
+              const body = { items, workspace: svc.ws }
+              // 用户给了路径但没解析到东西：说清"我把它当成了哪个目录"
+              if (raw && items.length === 0) {
+                body.requested = raw
+                body.resolvedTo = svc.ws
+                body.hint =
+                  svc.ws === resolve(raw)
+                    ? '这个目录下没有 .study，也没在它的上级目录里找到。请填工作区目录（通常是你放资料的项目根目录）。'
+                    : '已向上找到工作区，但那里还没有学习项目。'
+              }
+              // 没带 ws 且当前目录是空的：顺手告诉界面哪个候选目录里有项目
+              if (!raw && items.length === 0) {
+                const found = await discoverWorkspaces()
+                body.suggested = found.find((it) => it.count > 0)?.path ?? null
+                body.candidates = found
+              }
+              return send(res, 200, body)
+            }
+            if (req.method === 'GET' && route.startsWith('/project/')) {
+              const docId = decodeURIComponent(route.slice('/project/'.length))
+              return send(res, 200, await svcOf(url).project(docId))
+            }
+            if (req.method === 'GET' && route === '/vocabulary') {
+              return send(res, 200, svcOf(url).vocabulary())
+            }
+            // 阶段名唯一真值（rules.js STAGES），界面页签也用它，
+            // 免得界面说「费曼考核」、服务端说「读后考核」、技能说「读后巩固」
+            if (req.method === 'GET' && route === '/stages') {
+              return send(res, 200, { stages: Object.values(STAGES) })
+            }
+            if (req.method === 'POST' && route === '/ingest') {
+              const body = await readBody(req)
+              return send(res, 200, await svcOf(url).ingest(body.path, body))
+            }
+            /**
+             * 浏览器上传：把文件内容原样放进请求体，文件名放查询参数。
+             *
+             * 不用 multipart：multipart 要在服务端解析边界、处理字段顺序，
+             * 只为传一个文件引入这套解析没有收益。前端用 fetch 直接把 File
+             * 当 body 发过来，这里收原始字节，一次读完即可。
+             * 文件名走 ?name=，因为 header 里的中文文件名在部分代理下会被改写。
+             */
+            if (req.method === 'POST' && route === '/ingest-upload') {
+              const name = url.searchParams.get('name') ?? ''
+              const limit = 200 * 1024 * 1024
+              const chunks = []
+              let size = 0
+              const tooBig = await new Promise((ok) => {
+                req.on('data', (c) => {
+                  size += c.length
+                  if (size > limit) {
+                    ok(true)
+                    req.destroy()
+                  } else chunks.push(c)
+                })
+                req.on('end', () => ok(false))
+                req.on('error', () => ok(false))
+              })
+              if (tooBig) {
+                return send(res, 413, {
+                  error: `文件超过 200MB。请先拆分，或把它放到工作区里改用路径导入。`,
+                })
+              }
               try {
-                return decodeURIComponent(v)
-              } catch {
-                return v
+                const out = await svcOf(url).ingestBuffer(Buffer.concat(chunks), name)
+                return send(res, 200, out)
+              } catch (e) {
+                // 导入失败要说清是哪一种，不能只回「失败」
+                return send(res, 400, { error: String(e?.message ?? e) })
               }
             }
-            const docId = safeDecode(rest.slice(0, slash))
-            // route 来自 url.pathname，本身仍是百分号编码的，这里只需解码一次
-            const relPath = safeDecode(rest.slice(slash + 1))
-            await serveAsset(res, svcOf(url), docId, relPath)
-            return
-          }
-          if (req.method === 'GET' && route === '/projects') {
-            const raw = url.searchParams.get('ws')
-            const svc = svcOf(url)
-            const items = await svc.list()
-            rememberGood(svc.ws, items.length)
-            const body = { items, workspace: svc.ws }
-            // 用户给了路径但没解析到东西：说清"我把它当成了哪个目录"
-            if (raw && items.length === 0) {
-              body.requested = raw
-              body.resolvedTo = svc.ws
-              body.hint =
-                svc.ws === resolve(raw)
-                  ? '这个目录下没有 .study，也没在它的上级目录里找到。请填工作区目录（通常是你放资料的项目根目录）。'
-                  : '已向上找到工作区，但那里还没有学习项目。'
+            if (req.method === 'POST' && route === '/term') {
+              const body = await readBody(req)
+              return send(res, 200, await svcOf(url).askTerm(body.docId, body))
             }
-            // 没带 ws 且当前目录是空的：顺手告诉界面哪个候选目录里有项目
-            if (!raw && items.length === 0) {
-              const found = await discoverWorkspaces()
-              body.suggested = found.find((it) => it.count > 0)?.path ?? null
-              body.candidates = found
+            // 覆盖审计：哪些段还没加工
+            if (req.method === 'GET' && route.startsWith('/coverage/')) {
+              const docId = decodeURIComponent(route.slice('/coverage/'.length))
+              return send(res, 200, await svcOf(url).coverage(docId))
             }
-            return send(res, 200, body)
-          }
-          if (req.method === 'GET' && route.startsWith('/project/')) {
-            const docId = decodeURIComponent(route.slice('/project/'.length))
-            return send(res, 200, await svcOf(url).project(docId))
-          }
-          if (req.method === 'GET' && route === '/vocabulary') {
-            return send(res, 200, svcOf(url).vocabulary())
-          }
-          // 阶段名唯一真值（rules.js STAGES），界面页签也用它，
-          // 免得界面说「费曼考核」、服务端说「读后考核」、技能说「读后巩固」
-          if (req.method === 'GET' && route === '/stages') {
-            return send(res, 200, { stages: Object.values(STAGES) })
-          }
-          if (req.method === 'POST' && route === '/ingest') {
-            const body = await readBody(req)
-            return send(res, 200, await svcOf(url).ingest(body.path, body))
-          }
-          /**
-           * 浏览器上传：把文件内容原样放进请求体，文件名放查询参数。
-           *
-           * 不用 multipart：multipart 要在服务端解析边界、处理字段顺序，
-           * 只为传一个文件引入这套解析没有收益。前端用 fetch 直接把 File
-           * 当 body 发过来，这里收原始字节，一次读完即可。
-           * 文件名走 ?name=，因为 header 里的中文文件名在部分代理下会被改写。
-           */
-          if (req.method === 'POST' && route === '/ingest-upload') {
-            const name = url.searchParams.get('name') ?? ''
-            const limit = 200 * 1024 * 1024
-            const chunks = []
-            let size = 0
-            const tooBig = await new Promise((ok) => {
-              req.on('data', (c) => {
-                size += c.length
-                if (size > limit) {
-                  ok(true)
-                  req.destroy()
-                } else chunks.push(c)
-              })
-              req.on('end', () => ok(false))
-              req.on('error', () => ok(false))
-            })
-            if (tooBig) {
-              return send(res, 413, {
-                error: `文件超过 200MB。请先拆分，或把它放到工作区里改用路径导入。`,
-              })
+            // 拿到了什么：与 coverage 并行的另一个视角（不数过程，只数成果）
+            if (req.method === 'GET' && route.startsWith('/harvested/')) {
+              const docId = decodeURIComponent(route.slice('/harvested/'.length))
+              return send(res, 200, await svcOf(url).harvested(docId))
             }
-            try {
-              const out = await svcOf(url).ingestBuffer(Buffer.concat(chunks), name)
-              return send(res, 200, out)
-            } catch (e) {
-              // 导入失败要说清是哪一种，不能只回「失败」
-              return send(res, 400, { error: String(e?.message ?? e) })
+            // 30 秒预览：这份资料值不值得投入。入口之后第一个该问的问题。
+            if (req.method === 'GET' && route.startsWith('/peek/')) {
+              const docId = decodeURIComponent(route.slice('/peek/'.length))
+              return send(res, 200, { peek: await svcOf(url).peek(docId) })
             }
+            // 单元清单：这份资料分几块（左侧目录用）
+            if (req.method === 'GET' && route.startsWith('/units/')) {
+              const docId = decodeURIComponent(route.slice('/units/'.length))
+              const data = await svcOf(url).units(docId)
+              // 老项目还没生成过单元，返回 200 + null 而不是 404：
+              // 界面据此显示"还没切分"，不当成错误
+              return send(res, 200, { units: data ?? null })
+            }
+            // 复习到期清单（界面顶部提醒用）
+            if (req.method === 'GET' && route === '/review') {
+              return send(res, 200, await svcOf(url).reviewDue())
+            }
+            if (req.method === 'POST' && route === '/review-done') {
+              const body = await readBody(req)
+              return send(res, 200, await svcOf(url).completeReview(body.docId))
+            }
+            // 界面点词后轮询：还有哪些追问没答
+            if (req.method === 'GET' && route.startsWith('/terms-pending/')) {
+              const docId = decodeURIComponent(route.slice('/terms-pending/'.length))
+              return send(res, 200, { items: await svcOf(url).pendingTerms(docId) })
+            }
+            // Agent 答完回填
+            if (req.method === 'POST' && route === '/term-answer') {
+              const body = await readBody(req)
+              return send(res, 200, await svcOf(url).answerTerm(body.docId, body))
+            }
+            // 读完自测问答（每条 ≤100 字）
+            if (req.method === 'POST' && route === '/qa') {
+              const body = await readBody(req)
+              return send(res, 200, await svcOf(url).saveQa(body.docId, body.pairs ?? body.items))
+            }
+            if (req.method === 'GET' && route.startsWith('/qa/')) {
+              const docId = decodeURIComponent(route.slice('/qa/'.length))
+              return send(res, 200, { items: await svcOf(url).qa(docId) })
+            }
+            // 删除整个学习项目：主要给自动化测试收尾用，
+            // 让"建临时项目 → 验证 → 删掉"成为一个不留痕迹的原子动作。
+            if (req.method === 'DELETE' && route === '/project') {
+              const body = await readBody(req)
+              if (!body.docId) return send(res, 400, { error: '缺少 docId' })
+              await svcOf(url).store.remove(body.docId)
+              return send(res, 200, { removed: body.docId })
+            }
+            if (req.method === 'GET' && route.startsWith('/render/')) {
+              const docId = decodeURIComponent(route.slice('/render/'.length))
+              return send(res, 200, { html: await svcOf(url).render(docId) })
+            }
+            return send(res, 404, { error: `未知接口 ${route}` })
+          } catch (error) {
+            return send(res, 400, { error: error?.message ?? String(error) })
           }
-          if (req.method === 'POST' && route === '/term') {
-            const body = await readBody(req)
-            return send(res, 200, await svcOf(url).askTerm(body.docId, body))
-          }
-          // 覆盖审计：哪些段还没加工
-          if (req.method === 'GET' && route.startsWith('/coverage/')) {
-            const docId = decodeURIComponent(route.slice('/coverage/'.length))
-            return send(res, 200, await svcOf(url).coverage(docId))
-          }
-          // 拿到了什么：与 coverage 并行的另一个视角（不数过程，只数成果）
-          if (req.method === 'GET' && route.startsWith('/harvested/')) {
-            const docId = decodeURIComponent(route.slice('/harvested/'.length))
-            return send(res, 200, await svcOf(url).harvested(docId))
-          }
-          // 30 秒预览：这份资料值不值得投入。入口之后第一个该问的问题。
-          if (req.method === 'GET' && route.startsWith('/peek/')) {
-            const docId = decodeURIComponent(route.slice('/peek/'.length))
-            return send(res, 200, { peek: await svcOf(url).peek(docId) })
-          }
-          // 单元清单：这份资料分几块（左侧目录用）
-          if (req.method === 'GET' && route.startsWith('/units/')) {
-            const docId = decodeURIComponent(route.slice('/units/'.length))
-            const data = await svcOf(url).units(docId)
-            // 老项目还没生成过单元，返回 200 + null 而不是 404：
-            // 界面据此显示"还没切分"，不当成错误
-            return send(res, 200, { units: data ?? null })
-          }
-          // 复习到期清单（界面顶部提醒用）
-          if (req.method === 'GET' && route === '/review') {
-            return send(res, 200, await svcOf(url).reviewDue())
-          }
-          if (req.method === 'POST' && route === '/review-done') {
-            const body = await readBody(req)
-            return send(res, 200, await svcOf(url).completeReview(body.docId))
-          }
-          // 界面点词后轮询：还有哪些追问没答
-          if (req.method === 'GET' && route.startsWith('/terms-pending/')) {
-            const docId = decodeURIComponent(route.slice('/terms-pending/'.length))
-            return send(res, 200, { items: await svcOf(url).pendingTerms(docId) })
-          }
-          // Agent 答完回填
-          if (req.method === 'POST' && route === '/term-answer') {
-            const body = await readBody(req)
-            return send(res, 200, await svcOf(url).answerTerm(body.docId, body))
-          }
-          // 读完自测问答（每条 ≤100 字）
-          if (req.method === 'POST' && route === '/qa') {
-            const body = await readBody(req)
-            return send(res, 200, await svcOf(url).saveQa(body.docId, body.pairs ?? body.items))
-          }
-          if (req.method === 'GET' && route.startsWith('/qa/')) {
-            const docId = decodeURIComponent(route.slice('/qa/'.length))
-            return send(res, 200, { items: await svcOf(url).qa(docId) })
-          }
-          // 删除整个学习项目：主要给自动化测试收尾用，
-          // 让"建临时项目 → 验证 → 删掉"成为一个不留痕迹的原子动作。
-          if (req.method === 'DELETE' && route === '/project') {
-            const body = await readBody(req)
-            if (!body.docId) return send(res, 400, { error: '缺少 docId' })
-            await svcOf(url).store.remove(body.docId)
-            return send(res, 200, { removed: body.docId })
-          }
-          if (req.method === 'GET' && route.startsWith('/render/')) {
-            const docId = decodeURIComponent(route.slice('/render/'.length))
-            return send(res, 200, { html: await svcOf(url).render(docId) })
-          }
-          return send(res, 404, { error: `未知接口 ${route}` })
-        } catch (error) {
-          return send(res, 400, { error: error?.message ?? String(error) })
-        }
-      },
+        },
+      })
+      return () => dispose?.()
     })
-    return () => dispose?.()
   })
 }
 

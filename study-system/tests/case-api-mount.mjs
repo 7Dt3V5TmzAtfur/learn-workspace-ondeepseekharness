@@ -38,11 +38,16 @@ function makeHost({ webServerAtApply = null } = {}) {
   }
 
   const base = {
-    get: (name) => (name === 'webServer' ? webServer : undefined),
+    // 服务不存在时 cordis 返回 undefined，而不是 null —— 用 ?? undefined 对齐，
+    // 否则 ready() 会把 null 当成"已就绪"，测出来的时序就是假的。
+    get: (name) => (name === 'webServer' ? (webServer ?? undefined) : undefined),
     effect,
     tools: { register() {} },
     systemPrompt: { section() {} },
   }
+  // 真实 cordis 会把注入的服务直接挂在 ctx 上（ctx.webServer）。
+  // 用 getter 复刻这一点，否则测的就不是插件的真实取法。
+  Object.defineProperty(base, 'webServer', { get: () => webServer })
 
   /**
    * cordis 的 inject：依赖齐了就立刻回调，没齐就等。
@@ -165,5 +170,5 @@ await test('webServer 一开始就在：注册一次，不重复挂', async () =
   assert.equal(host.pendingCount(), 0)
 })
 
-console.log(`\n${failed === 0 ? '全部通过' : '有失败'}：${passed} 通过 / ${failed} 失败\n`)
-process.exit(failed === 0 ? 0 : 1)
+console.log(`\n通过 ${passed}　失败 ${failed}\n`)
+process.exitCode = failed === 0 ? 0 : 1
