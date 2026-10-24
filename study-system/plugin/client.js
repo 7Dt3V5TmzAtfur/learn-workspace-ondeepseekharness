@@ -156,12 +156,60 @@ body[data-ds-dark-theme] .sc-root{
 .sc-kv{display:grid;grid-template-columns:88px 1fr;gap:var(--sc-sp-1) 10px;line-height:1.6}
 .sc-kv>span:first-child{color:var(--dsw-alias-label-secondary)}
 .sc-empty{color:var(--dsw-alias-label-secondary);text-align:center;padding:40px 10px;line-height:1.8}
+
+/* ============================ 入口
+   一个框装三种投喂方式。虚线框是"这里可以放东西"的通用语言，
+   悬停变色 + 轻微放大给出"接住了"的即时反馈（每步都要有即时回报）。 */
+.sc-entry{max-width:520px;margin:0 auto;padding:8px 4px}
+.sc-entry-box{border:2px dashed var(--dsw-alias-border-l2);border-radius:10px;padding:34px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s,transform .15s;background:var(--dsw-alias-bg-layer-1)}
+.sc-entry-box:hover{border-color:var(--dsw-alias-brand-primary);background:var(--dsw-alias-bg-layer-2)}
+.sc-entry-box:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}
+.sc-entry-box.is-over{border-color:var(--dsw-alias-brand-primary);background:var(--dsw-alias-bg-layer-2);transform:scale(1.01)}
+.sc-entry-title{font-size:var(--sc-fs-md);color:var(--dsw-alias-label-primary);font-weight:500;margin-bottom:6px}
+.sc-entry-sub{font-size:var(--sc-fs-xs);color:var(--dsw-alias-label-secondary);line-height:1.6}
+.sc-entry-path{margin-top:10px}
+.sc-entry-input{width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--dsw-alias-border-l1);border-radius:6px;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font-size:var(--sc-fs-sm);font-family:inherit}
+.sc-entry-input:focus{outline:none;border-color:var(--dsw-alias-brand-primary)}
+.sc-entry-input::placeholder{color:var(--dsw-alias-label-secondary);opacity:.75}
+.sc-entry-err{margin-top:10px;padding:8px 10px;border-radius:6px;font-size:var(--sc-fs-sm);line-height:1.6;color:var(--dsw-alias-label-primary);background:rgba(229,72,77,.10);border-left:3px solid var(--dsw-alias-state-error-primary)}
+.sc-entry-err-hint{margin-top:4px;font-size:var(--sc-fs-xs);color:var(--dsw-alias-label-secondary)}
+.sc-entry-aside{margin-top:14px;text-align:center;font-size:var(--sc-fs-xs);color:var(--dsw-alias-label-secondary);line-height:1.7}
+.sc-entry-asktip{margin-top:8px;padding:7px 10px;border-radius:6px;background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);color:var(--dsw-alias-label-primary);text-align:left;line-height:1.7}
+.sc-linkbtn{background:none;border:none;padding:0 2px;color:var(--dsw-alias-brand-primary);cursor:pointer;font:inherit;text-decoration:underline;text-underline-offset:2px}
+.sc-linkbtn:hover{opacity:.8}
+.sc-linkbtn:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px;border-radius:3px}
+@media (prefers-reduced-motion:reduce){.sc-entry-box{transition:none}.sc-entry-box.is-over{transform:none}}
+
+/* ============================ 30 秒预览
+   回答"要不要读"，不是"怎么读"。所以不放进度条、不放百分比，
+   只放结构 + 成本 + 三句原话。整块必须一屏放得下。 */
+.sc-peek{max-width:620px;margin:0 auto;padding:10px 6px;text-align:left}
+.sc-peek-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;padding-bottom:8px;border-bottom:1px solid var(--dsw-alias-border-l1)}
+.sc-peek-title{font-size:var(--sc-fs-md);font-weight:600;color:var(--dsw-alias-label-primary)}
+.sc-peek-meta{font-size:var(--sc-fs-xs);color:var(--dsw-alias-label-secondary);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sc-peek-outline{display:flex;flex-wrap:wrap;gap:4px 6px;margin:10px 0}
+.sc-peek-item{background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);border-radius:5px;padding:3px 8px;font:inherit;font-size:var(--sc-fs-xs);color:var(--dsw-alias-label-secondary);cursor:pointer;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc-peek-item[data-lv="1"]{color:var(--dsw-alias-label-primary);font-weight:500}
+.sc-peek-item:hover{border-color:var(--dsw-alias-brand-primary);color:var(--dsw-alias-label-primary)}
+.sc-peek-item:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:1px}
+.sc-peek-hooks{display:flex;flex-direction:column;gap:6px;margin:4px 0 12px}
+.sc-peek-hook{display:flex;gap:8px;align-items:flex-start;font-size:var(--sc-fs-sm);line-height:1.7}
+.sc-peek-hook-k{flex:0 0 auto;color:var(--dsw-alias-label-secondary);font-size:var(--sc-fs-xs);padding-top:2px;white-space:nowrap}
+.sc-peek-hook-t{flex:1;text-align:left;background:none;border:none;padding:0;font:inherit;color:var(--dsw-alias-label-primary);cursor:pointer;border-bottom:1px dashed var(--dsw-alias-border-l2)}
+.sc-peek-hook-t:hover{border-bottom-color:var(--dsw-alias-brand-primary)}
+.sc-peek-hook-t:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px;border-radius:2px}
+.sc-peek-actions{display:flex;align-items:center;gap:14px}
+.sc-peek-go{background:var(--dsw-alias-brand-primary);color:#fff;border:none;border-radius:6px;padding:7px 18px;font:inherit;font-size:var(--sc-fs-sm);font-weight:500;cursor:pointer}
+.sc-peek-go:hover{opacity:.9}
+.sc-peek-go:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}
 .sc-issue{font-size:var(--sc-fs-sm);line-height:1.6;padding:5px var(--sc-sp-2);border-radius:5px;margin-bottom:var(--sc-sp-1);background:rgba(229,72,77,.10);border-left:2px solid var(--dsw-alias-state-error-primary)}
 .sc-issue[data-level=warn]{background:rgba(245,158,11,.14);border-left-color:var(--dsw-alias-state-warn-primary)}
 .sc-legend{display:flex;gap:var(--sc-sp-3);flex-wrap:wrap;font-size:var(--sc-fs-xs);color:var(--dsw-alias-label-secondary);margin-bottom:10px;align-items:center}
 .sc-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
 .sc-dock{display:flex;align-items:center;gap:var(--sc-sp-2);padding:6px 10px;border:1px solid var(--dsw-alias-border-l1);border-radius:var(--sc-r-md);background:var(--dsw-alias-bg-layer-1);font-size:var(--sc-fs-sm);color:var(--dsw-alias-label-secondary)}
 .sc-dock b{color:var(--dsw-alias-label-primary);font-weight:500}
+.sc-dock-light{display:inline-flex;align-items:center;gap:5px;font-size:var(--sc-fs-xs);color:var(--dsw-alias-label-secondary);max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc-dock-light-tag{flex:0 0 auto;padding:0 5px;border-radius:3px;background:var(--dsw-alias-bg-layer-2);border:1px solid var(--dsw-alias-border-l1);font-size:10px;line-height:1.5}
 .sc-seg-meta{display:flex;align-items:center;gap:6px;margin-bottom:var(--sc-sp-1);font-size:var(--sc-fs-sm)}
 .sc-details{margin-top:var(--sc-sp-2)}
 .sc-details>summary{cursor:pointer;font-size:var(--sc-fs-sm);color:var(--dsw-alias-label-secondary);user-select:none}
@@ -484,7 +532,292 @@ body[data-ds-dark-theme] .sc-root{
 
     const Empty = ({ children }) => h('div', { className: 'sc-empty' }, children)
 
-    /* -------------------------------------------------------- 读前面板 */
+    /* ------------------------------------------------------------ 入口 */
+
+    /**
+     * 用一个框接收资料，三种投喂方式：
+     *   拖进来 / 点选文件 / 粘路径
+     *
+     * 为什么是"一个框"而不是三个按钮：
+     * 用户脑子里想的只是"我要读这个东西"，不该先判断自己属于哪一类用户。
+     * 三种方式最后都收敛成同一个动作 —— 拿到文件内容，交给 /ingest-upload
+     * 或 /ingest。界面不区分它们，失败时才分别说清是哪种问题。
+     *
+     * 为什么还要一条"我不知道读什么"的支线：
+     * 「以终为始兴趣破序」讲的是用想解决的事反推该读什么。有人此刻手里
+     * 没有文件，只有一个问题。把他赶回对话框等于说"这不归我管"。
+     * 但这条支线只占一行，不抢主流程的位置 —— 有文件的人 99% 的情况
+     * 只该看到那个框。
+     */
+    function Entry(props) {
+      const { onImported, onAsk, busyHint } = props
+      const [dragOver, setDragOver] = useState(false)
+      const [pathInput, setPathInput] = useState('')
+      // 只有一个布尔量。原来还多一个 stage='done'，但它从来没被读过 ——
+      // 两个状态变量表达同一件事，迟早会有一个忘了改。
+      const [busy, setBusy] = useState(false)
+      const [err, setErr] = useState(null)
+      // 点「说说你想解决什么」之后，光标到底有没有落到对话框上。
+      // 落上了什么也不用说；没落上就明说一句该去哪儿，别让按钮看起来坏了。
+      const [askTip, setAskTip] = useState(null)
+      const fileRef = useRef(null)
+
+      const send = useCallback(
+        async (file) => {
+          setErr(null)
+          setBusy(true)
+          try {
+            const res = await fetch(
+              `${API}/ingest-upload?name=${encodeURIComponent(file.name)}`,
+              { method: 'POST', body: file },
+            )
+            const body = await res.json().catch(() => ({}))
+            if (!res.ok) throw new Error(body.error ?? `导入失败（${res.status}）`)
+            // 交给上层去显示预览；这里不自己切状态
+            onImported?.(body)
+          } catch (e) {
+            setErr(e.message)
+          } finally {
+            setBusy(false)
+          }
+        },
+        [onImported],
+      )
+
+      const sendPath = useCallback(async () => {
+        const p = pathInput.trim()
+        if (!p) return
+        setErr(null)
+        setBusy(true)
+        try {
+          const body = await api('/ingest', { method: 'POST', body: JSON.stringify({ path: p }) })
+          setPathInput('')
+          onImported?.(body)
+        } catch (e) {
+          setErr(e.message)
+        } finally {
+          setBusy(false)
+        }
+      }, [pathInput, onImported])
+
+      const onDrop = useCallback(
+        (ev) => {
+          ev.preventDefault()
+          setDragOver(false)
+          const f = ev.dataTransfer?.files?.[0]
+          if (f) send(f)
+        },
+        [send],
+      )
+
+      return h(
+        'div',
+        { className: 'sc-entry' },
+        h(
+          'div',
+          {
+            className: 'sc-entry-box' + (dragOver ? ' is-over' : ''),
+            onDragOver: (ev) => {
+              ev.preventDefault()
+              setDragOver(true)
+            },
+            onDragLeave: () => setDragOver(false),
+            onDrop,
+            onClick: () => !busy && fileRef.current?.click(),
+            role: 'button',
+            tabIndex: 0,
+            'aria-label': '导入资料：拖入文件或点击选择',
+            onKeyDown: (ev) => {
+              if (ev.key === 'Enter' || ev.key === ' ') {
+                ev.preventDefault()
+                if (!busy) fileRef.current?.click()
+              }
+            },
+          },
+          h('input', {
+            ref: fileRef,
+            type: 'file',
+            style: { display: 'none' },
+            onChange: (ev) => {
+              const f = ev.target.files?.[0]
+              if (f) send(f)
+              ev.target.value = ''
+            },
+          }),
+          h('div', { className: 'sc-entry-title' }, busy ? busyHint || '正在读这份资料…' : '把资料拖到这里'),
+          h(
+            'div',
+            { className: 'sc-entry-sub' },
+            busy ? '文件大时会久一点，不要关这个页面' : '或点击选择文件 · pdf / docx / pptx / epub / md / txt',
+          ),
+        ),
+
+        // 路径导入：拖拽之外必须留一条，因为从资源管理器复制路径比拖拽更常用
+        h(
+          'div',
+          { className: 'sc-entry-path' },
+          h('input', {
+            className: 'sc-entry-input',
+            placeholder: '…或者把文件路径粘在这里，回车导入',
+            value: pathInput,
+            disabled: busy,
+            onChange: (ev) => setPathInput(ev.target.value),
+            onKeyDown: (ev) => {
+              if (ev.key === 'Enter') sendPath()
+            },
+          }),
+        ),
+
+        // 失败要说清是哪一种，不能只回「失败」
+        err
+          ? h(
+              'div',
+              { className: 'sc-entry-err', role: 'alert' },
+              err,
+              h(
+                'div',
+                { className: 'sc-entry-err-hint' },
+                '常见原因：路径写成了文件夹、文件被别的程序占着、或是扫描件需要先 OCR。',
+              ),
+            )
+          : null,
+
+        // 支线：手里没有文件，只有想搞懂的事
+        h(
+          'div',
+          { className: 'sc-entry-aside' },
+          '手里还没有文件？',
+          h(
+            'button',
+            {
+              className: 'sc-linkbtn',
+              onClick: () => {
+                // onAsk 返回 true 表示光标真的落到对话框上了，什么都不用说；
+                // 返回 false 就明说一句该去哪儿
+                const ok = onAsk?.()
+                setAskTip(
+                  ok
+                    ? null
+                    : '在下面的对话输入框里说一句“我想搞懂 X”，我会先帮你定目标再找资料。',
+                )
+              },
+            },
+            '说说你想解决什么',
+          ),
+          '，先定目标再找资料。',
+          // 聚焦失败时不能装作没事：告诉用户该去哪儿说
+          askTip
+            ? h('div', { className: 'sc-entry-asktip', role: 'status' }, askTip)
+            : null,
+        ),
+      )
+    }
+
+    /* ------------------------------------------------------------ 预览 */
+
+    /**
+     * 30 秒预览：这份资料值不值得投入。
+     *
+     * 入口之后的第一个问题不是"该怎么读"，而是"要不要读"。
+     * 原则里「反完成主义阅读」说得很清楚：不合胃口应当立即止损。
+     * 但止损得有依据 —— 先让人读 14000 字的读前建构再决定，
+     * 等于付完全款才知道要不要买。
+     *
+     * 所以这里只回答三个问题，加起来不到一屏：
+     *   这是什么东西（结构）／ 我要付出多少（字数与时间）／ 里面有什么（三句原话）
+     * 然后给两个出口：开始读、或换一份。
+     */
+    function Peek(props) {
+      const { peek, onStart, onDismiss, onPlan } = props
+      if (!peek) return null
+      const { hooks } = peek
+      // 只有一块的小资料，开头和结尾是同一句，重复显示只会让人觉得系统没想清楚
+      const showEnd = hooks?.end && hooks.start && hooks.end.segId !== hooks.start.segId
+      const outline = peek.outline ?? []
+
+      const hookRow = (icon, label, item) =>
+        item
+          ? h(
+              'div',
+              { className: 'sc-peek-hook' },
+              h('span', { className: 'sc-peek-hook-k' }, `${icon} ${label}`),
+              h(
+                'button',
+                {
+                  className: 'sc-peek-hook-t',
+                  onClick: () => onStart?.(item.segId),
+                  title: '跳到这段原文',
+                },
+                item.text,
+              ),
+            )
+          : null
+
+      return h(
+        'div',
+        { className: 'sc-peek' },
+        h(
+          'div',
+          { className: 'sc-peek-head' },
+          h('div', { className: 'sc-peek-title' }, peek.title),
+          h(
+            'div',
+            { className: 'sc-peek-meta' },
+            `${peek.chars.toLocaleString()} 字`,
+            ' · ',
+            `约 ${peek.minutes} 分钟`,
+            peek.unitCount > 1 ? ` · ${peek.unitCount} 块` : '',
+          ),
+        ),
+
+        // 目录：最多 8 条，再长就不是"预览"了
+        outline.length > 1
+          ? h(
+              'div',
+              { className: 'sc-peek-outline' },
+              outline.map((o, i) =>
+                h(
+                  'button',
+                  {
+                    key: i,
+                    className: 'sc-peek-item',
+                    'data-lv': o.level,
+                    onClick: () => onStart?.(o.segId),
+                  },
+                  o.title,
+                ),
+              ),
+            )
+          : null,
+
+        // 三句原话：让人当场判断"这是我想看的东西吗"
+        h(
+          'div',
+          { className: 'sc-peek-hooks' },
+          hookRow('开', '开头', hooks?.start),
+          showEnd ? hookRow('收', '结尾', hooks.end) : null,
+          hooks?.biggest && hooks.biggest.segId !== hooks.start?.segId
+            ? hookRow('重', `最长一块「${hooks.biggest.title}」`, hooks.biggest)
+            : null,
+        ),
+
+        h(
+          'div',
+          { className: 'sc-peek-actions' },
+          h(
+            'button',
+            { className: 'sc-peek-go', onClick: () => onStart?.() },
+            peek.hasPreflight ? '继续读' : '开始读',
+          ),
+          // 想先看学习计划的走这里。它是次要动作 —— 主按钮永远是"开始读"，
+          // 因为绝大多数时候人只想看内容，不想先读一份计划。
+          onPlan
+            ? h('button', { className: 'sc-linkbtn', onClick: () => onPlan() }, '先看学习计划')
+            : null,
+          h('button', { className: 'sc-linkbtn', onClick: () => onDismiss?.() }, '换一份'),
+        ),
+      )
+    }
 
     /* -------------------------------------------------------- 读前面板 */
 
@@ -1812,35 +2145,50 @@ body[data-ds-dark-theme] .sc-root{
       }, [])
       const [error, setError] = useState(null)
       const [busy, setBusy] = useState(false)
+      // 30 秒预览：导入完成后先给这个，而不是直接把人扔进读前建构。
+      // 存成一个 {docId, peek} 而不是只存 peek —— 否则刷新或切换资料后
+      // 分不清这份预览属于哪一份资料。
+      const [preview, setPreview] = useState(null)
       const [showDiag, setShowDiag] = useState(false)
       const [diag, setDiag] = useState(null)
       const [candidates, setCandidates] = useState([])
 
-      const refresh = useCallback(async () => {
-        try {
-          const data = await api(`/projects${q(wsPath)}`)
-          // 后端在发现“别的目录里有项目”时会给出 suggested，直接采用并记住
-          if (!manualWs && data.suggested && data.suggested !== wsPath) {
-            setManualWs(data.suggested)
-            return
+      // 第一次列目录时自动选中第一份，省得用户面对空白。
+      // 但"刚导入了一份"这种情况不能这么办：refresh 时 docId 还是 null，
+      // 自动选中会挑到列表第一项（很可能是另一份旧资料），
+      // 于是预览显示的是新文件、右侧选中的却是旧文件。
+      // 所以给它一个可选的 preferId，明确指定要选哪一份。
+      const refresh = useCallback(
+        async (preferId) => {
+          try {
+            const data = await api(`/projects${q(wsPath)}`)
+            // 后端在发现“别的目录里有项目”时会给出 suggested，直接采用并记住
+            if (!manualWs && data.suggested && data.suggested !== wsPath) {
+              setManualWs(data.suggested)
+              return
+            }
+            setProjects(data.items ?? [])
+            setDiag({
+              workspace: data.workspace,
+              requested: data.requested,
+              resolvedTo: data.resolvedTo,
+              hint: data.hint,
+              candidates: data.candidates,
+            })
+            if (data.candidates) setCandidates(data.candidates.filter((c) => c.count > 0))
+            setError(null)
+            if (preferId) setDocId(preferId)
+            else if (!docId && data.items?.length) setDocId(data.items[0].id)
+          } catch (e) {
+            setError(e.message)
           }
-          setProjects(data.items ?? [])
-          setDiag({
-            workspace: data.workspace,
-            requested: data.requested,
-            resolvedTo: data.resolvedTo,
-            hint: data.hint,
-            candidates: data.candidates,
-          })
-          if (data.candidates) setCandidates(data.candidates.filter((c) => c.count > 0))
-          setError(null)
-          if (!docId && data.items?.length) setDocId(data.items[0].id)
-        } catch (e) {
-          setError(e.message)
-        }
-      }, [wsPath, docId, manualWs, setManualWs])
+        },
+        [wsPath, docId, manualWs, setManualWs],
+      )
 
       useEffect(() => {
+        // 必须显式不传参：不写成 onClick={refresh} 之类的地方，
+        // 否则事件对象会被当成 preferId 塞进 setDocId
         refresh()
       }, [refresh])
 
@@ -1955,7 +2303,8 @@ body[data-ds-dark-theme] .sc-root{
           h('span', { className: 'sc-title' }, '学习工作台'),
           project ? h(StagePills, { progress: project.progress }) : null,
           h('span', { style: { flex: 1 } }),
-          h('button', { className: 'sc-btn', onClick: refresh, disabled: busy }, '刷新'),
+          // 包一层：直接把 refresh 交给 onClick 会把 MouseEvent 当成 preferId
+          h('button', { className: 'sc-btn', onClick: () => refresh(), disabled: busy }, '刷新'),
           h(
             'button',
             { className: 'sc-btn', style: { marginLeft: 6 }, onClick: () => setShowDiag((v) => !v), title: '诊断：查看工作区解析情况' },
@@ -2082,7 +2431,35 @@ body[data-ds-dark-theme] .sc-root{
           h(
             'div',
             { className: 'sc-main' },
-            project
+            // 预览优先于"正在读取"：刚导入完，用户还没决定要不要读这份，
+            // 这时候把他扔进读前建构是越权替人做决定。
+            preview && preview.docId === docId
+              ? h(Peek, {
+                  peek: preview.peek,
+                  // 点目录上的某一块 → 直接跳到那块的原文
+                  // 点「开始读」→ 直接看正文
+                  //
+                  // 原来「开始读」是跳去读前建构。那等于：用户只是想看看内容，
+                  // 却被塞了一份 14000 字的学习计划 —— 这正是"太复杂就不想看了"的来源。
+                  // 读前建构要在人真的准备投入时才出现，而不是当门槛。
+                  onStart: (segId) => {
+                    setPreview(null)
+                    setTabTouched(true)
+                    if (segId) gotoSegment(segId)
+                    else setTab('read')
+                  },
+                  onDismiss: () => {
+                    setPreview(null)
+                    setDocId(null)
+                  },
+                  onPlan: () => {
+                    // 想先看计划的，自己在页签上点「读前」即可；这里只给一个明确出口
+                    setPreview(null)
+                    setTabTouched(true)
+                    setTab('plan')
+                  },
+                })
+              : project
               ? h(
                   React.Fragment,
                   null,
@@ -2124,7 +2501,52 @@ body[data-ds-dark-theme] .sc-root{
                     h('div', { className: 'sc-wait-dot' }),
                     h('div', { className: 'sc-wait-txt' }, '正在读取资料…'),
                   )
-                : h(Empty, null, '从左侧选一份资料，或先在对话里导入一份。'),
+                : h(Entry, {
+                    busyHint: '正在读这份资料…',
+                    onImported: async (out) => {
+                      // 导入完成后不直接跳进读前建构。
+                      // 先给一份 30 秒预览，回答"这值不值得看" ——
+                      // 不合胃口的资料应当当场止损，而不是读完 14000 字才知道。
+                      if (!out?.docId) return refresh()
+                      // 明确指定选中新导入的这份：不传的话 refresh 会去选列表第一项，
+                      // 那份很可能是旧的另一份资料，于是预览和右侧选中的对不上
+                      refresh(out.docId)
+                      try {
+                        const p = await api(`/peek/${encodeURIComponent(out.docId)}${q(wsPath)}`)
+                        setPreview({ docId: out.docId, peek: p.peek })
+                      } catch {
+                        // 预览拿不到不该拦住用户：正文已经能看了
+                        setPreview(null)
+                      }
+                    },
+                    onAsk: () => {
+                      // 没有文件的人：把光标送到对话框，让他说想解决什么。
+                      //
+                      // 不赌具体选择器：DSH 的对话框结构可能变，而这里写死一个
+                      // textarea 选择器，找不到时按钮就是"点了没反应"——
+                      // 比不提供这个按钮更糟。
+                      // 所以：找得到就聚焦；找不到就把话说清楚该怎么办。
+                      const box =
+                        document.querySelector('.dsh-composer textarea') ??
+                        document.querySelector('[data-slot="conversation.composer"] textarea') ??
+                        document.querySelector('textarea[placeholder]') ??
+                        document.querySelector('textarea')
+                      if (box && typeof box.focus === 'function') {
+                        box.focus()
+                        if (typeof box.setSelectionRange === 'function') {
+                          try {
+                            box.setSelectionRange(box.value.length, box.value.length)
+                          } catch {
+                            /* 有些输入框不支持选区，忽略 */
+                          }
+                        }
+                        return true
+                      }
+                      // 找不到对话框：返回 false，让入口自己说明该怎么办，
+                      // 而不是装作聚焦成功
+                      return false
+                    },
+                  }),
           ),
         ),
       )
@@ -2157,6 +2579,17 @@ body[data-ds-dark-theme] .sc-root{
         h(StagePills, { progress: current.progress }),
         h('span', { style: { flex: 1 } }),
         h('span', null, current.next?.message ?? ''),
+        // 轻的那一步：让"不必读完也能先试"随时可见。
+        // 不抢主推荐的位置，只在旁边给一句更轻的选择 ——
+        // 想读下去的人不受打扰，读不动的人知道自己还有别的路。
+        current.light
+          ? h(
+              'span',
+              { className: 'sc-dock-light', title: current.light.message },
+              h('span', { className: 'sc-dock-light-tag' }, '也可以'),
+              current.light.message.replace(/^[^：]*：/, ''),
+            )
+          : null,
         idx >= 0
           ? h(
               'span',

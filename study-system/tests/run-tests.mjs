@@ -1808,6 +1808,52 @@ await test('done 阶段不该再给出下一个动作', async () => {
   assert.equal(n.action, null, '流程走完了还在推动作，用户会以为没做完')
 })
 
+/* ---------------------------------------------------------------- 轻路径
+ *
+ * 五段流程按顺序走完才有资格做费曼复述 —— 但那次复述才是唯一
+ * 真正改变行为的事。实测三份资料两份都停在 recalled，一次复述都没做。
+ * 所以 recommendFrom 在"主推荐"之外还要给一个"轻的那一步"。
+ */
+const { recommendFrom } = await import(`file://${join(LIB, 'service.js')}`)
+
+await test('一标完核心要点就该看到「也可以直接去讲」', async () => {
+  const r = recommendFrom({ ingested: 1, planned: 1, annotated: 1, keyPointCount: 3 })
+  assert.equal(r.main.action, 'study-map', '主推荐还是按顺序走')
+  assert.ok(r.light, '什么都没标完就让人合书复述是折磨；但标出核心要点之后就该给这条路')
+  assert.equal(r.light.action, 'study-feynman')
+})
+
+await test('还没拿到任何东西时不推轻路径', async () => {
+  const r = recommendFrom({ ingested: 1, planned: 1 })
+  assert.equal(r.light, null, '一段都没读就让合书复述，只会让人放弃')
+})
+
+await test('轻路径不与主推荐重复', async () => {
+  // 主推荐本来就是考核时，再推荐一遍等于把同一句话说两次
+  const r = recommendFrom({ ingested: 1, planned: 1, annotated: 1, mapped: 1, recalled: 1, qaCount: 8 })
+  assert.equal(r.main.action, 'study-feynman')
+  assert.equal(r.light, null)
+})
+
+await test('已经考核过就不再推轻路径', async () => {
+  const r = recommendFrom({ ingested: 1, planned: 1, annotated: 1, mapped: 1, recalled: 1, drilled: 1, keyPointCount: 5 })
+  assert.equal(r.light, null, '做过一次有效复述了，别再催')
+})
+
+await test('/projects 的每一项都必须同时有 next 和 light 字段', async () => {
+  // 布局要求：recommendFrom 返回 { main, light }，
+  // 曾直接 { ...recommendFrom() } 展开，字段名变成 main，
+  // 界面读 next 全是空 —— 而且没有任何报错。
+  const WS = process.env.STUDY_WS || 'D:\\learn'
+  const svc = new StudyService(WS)
+  const items = await svc.list().catch(() => [])
+  for (const it of items) {
+    assert.ok('next' in it, `${it.title || it.id} 没有 next 字段，界面会显示空白提示`)
+    assert.ok('light' in it, `${it.title || it.id} 没有 light 字段`)
+    assert.ok(it.next && typeof it.next === 'object', 'next 必须是对象')
+  }
+})
+
 await test('列表的 stage 不信 meta 里的陈旧值', async () => {
   // 造一个 meta.stage 写错、但没有任何产物的项目，看列表怎么报
   const ws = await mkdtemp(join(tmpdir(), 'study-stage-'))
@@ -1819,6 +1865,72 @@ await test('列表的 stage 不信 meta 里的陈旧值', async () => {
   assert.ok(row, '应该列出这个项目')
   assert.notEqual(row.stage, 'drilled', 'meta 说已考核，但没有任何产物，不能信')
   assert.equal(row.stage, 'empty', `实际推导为 ${row.stage}`)
+  await rm(ws, { recursive: true, force: true })
+})
+
+/* ------------------------------------------------------------------ 预览
+ *
+ * 入口之后的第一个问题不是"该怎么读"，而是"要不要读"。
+ * peek 只用已有产物拼出三样东西：结构、成本、三句原话。
+ *
+ * 这一组是为了守住三个已经踩过的坑 —— 它们都不会报错，只会让预览悄悄变空：
+ *   1. 单元的 id 只指向标题段，正文在 segmentIds 里（否则抓手全是 null）
+ *   2. 没有 units.json 时 list 是空数组，list.length-1 = -1，循环不执行
+ *   3. 一次失败的编辑曾把 pick 的函数体插进了句子中间（语法能过，行为全错）
+ */
+await test('peek：抓手不能是空的，也不能指错段', async () => {
+  const ws = await mkdtemp(join(tmpdir(), 'study-peek-'))
+  const store = new StudyStore(ws)
+  await store.ensure()
+  const docId = 'p1'
+  await store.saveMeta(docId, { title: '测试文章', chars: 120, segmentCount: 4 })
+  await store.writeArtifact(docId, 'segment-texts.json', {
+    items: [
+      { id: '¶1', text: '# 测试文章' },
+      { id: '¶2', text: '这是第一段真正有内容的正文，用来当开头的抓手。' },
+      { id: '¶3', text: '中间这段是空的标题行。' },
+      { id: '¶4', text: '这是最后一段正文，应该被当成结尾的抓手。' },
+    ],
+  })
+  const svc = new StudyService(ws)
+  const p = await svc.peek(docId)
+  assert.ok(p, 'peek 不该返回 null')
+  assert.ok(p.hooks.start, '开头抓手不能为空')
+  assert.ok(p.hooks.end, '结尾抓手不能为空')
+  assert.equal(p.hooks.start.segId, '¶2', `开头该是 ¶2，实际 ${p.hooks.start.segId}`)
+  assert.equal(p.hooks.end.segId, '¶4', `结尾该是 ¶4，实际 ${p.hooks.end.segId}`)
+  assert.notEqual(p.hooks.start.text, p.hooks.end.text, '开头和结尾不能是同一句')
+  // 标题行不能被抓成正文
+  assert.ok(!p.hooks.start.text.startsWith('#'), '标题行不是正文')
+  await rm(ws, { recursive: true, force: true })
+})
+
+await test('peek：没有切过块的小资料也要给出目录', async () => {
+  const ws = await mkdtemp(join(tmpdir(), 'study-peek2-'))
+  const store = new StudyStore(ws)
+  await store.ensure()
+  const docId = 'p2'
+  await store.saveMeta(docId, { title: '小笔记', chars: 80, segmentCount: 3 })
+  await store.writeArtifact(docId, 'segment-texts.json', {
+    items: [
+      { id: '¶1', text: '## 第一小节' },
+      { id: '¶2', text: '正文内容在这里，长度够当抓手。' },
+      { id: '¶3', text: '## 第二小节' },
+    ],
+  })
+  const svc = new StudyService(ws)
+  const p = await svc.peek(docId)
+  assert.equal(p.outline.length, 2, `该从段落里认出 2 个标题，实际 ${p.outline.length}`)
+  assert.equal(p.outline[0].title, '第一小节')
+  assert.ok(p.unitCount >= 1, '不能报 0 块')
+  await rm(ws, { recursive: true, force: true })
+})
+
+await test('peek：资料不存在时返回 null 而不是抛错', async () => {
+  const ws = await mkdtemp(join(tmpdir(), 'study-peek3-'))
+  const svc = new StudyService(ws)
+  const p = await svc.peek('never-existed')
+  assert.equal(p, null)
   await rm(ws, { recursive: true, force: true })
 })
 

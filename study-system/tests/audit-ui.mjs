@@ -530,8 +530,55 @@ check(
 )
 check(
   '未选中时才提示去选资料',
-  /: h\(Empty, null, '从左侧选一份资料/.test(clientSrc),
-  '两个分支调换了，已选中时反而提示去选',
+  // 空状态已经换成入口组件：一个有文件的人应该当场就能投喂，
+  // 而不是被告知"去左侧选"或"回对话里导入"——那是把摩擦推回给用户。
+  /: h\(Entry, \{/.test(clientSrc),
+  '空状态没有入口，用户只能退出工作台去对话里导入',
+)
+check(
+  '入口接住三种投喂方式',
+  /function Entry\(props\)/.test(clientSrc) &&
+    /ev\.dataTransfer\?\.files\?\.\[0\]/.test(clientSrc) &&
+    /type: 'file'/.test(clientSrc) &&
+    /api\('\/ingest'/.test(clientSrc),
+  '拖拽 / 点选 / 粘路径 三条路缺一条，就有一类用户被挡住',
+)
+check(
+  '入口失败时说清是哪一种',
+  /sc-entry-err-hint/.test(clientSrc) && /常见原因/.test(clientSrc),
+  '只说"失败"等于让用户自己猜',
+)
+check(
+  '没有文件的人有一条支线，但只占一行',
+  /手里还没有文件/.test(clientSrc) && /说说你想解决什么/.test(clientSrc),
+  '把只有问题的用户赶回对话框，等于说这不归我管',
+)
+check(
+  '入口可纯键盘操作',
+  /tabIndex: 0/.test(clientSrc) &&
+    /onKeyDown: \(ev\) => \{[\s\S]{0,200}?ev\.key === 'Enter'[\s\S]{0,200}?fileRef\.current\?\.click\(\)/.test(clientSrc) &&
+    /'aria-label': '导入资料/.test(clientSrc),
+  '只能拖拽/点选的话，键盘用户根本进不来',
+)
+check(
+  '聚焦对话框失败时不装作成功',
+  /sc-entry-asktip/.test(clientSrc) && /return false/.test(clientSrc),
+  '按钮点了没反应，比没有这个按钮更糟',
+)
+check(
+  '导入后先给 30 秒预览，而不是直接进读前',
+  /function Peek\(props\)/.test(clientSrc) && /\/peek\//.test(clientSrc),
+  '先让人读完 14000 字再决定要不要读，等于付完全款才知道买什么',
+)
+check(
+  '「开始读」去正文，读前建构是次要出口',
+  /else setTab\('read'\)/.test(clientSrc) && /先看学习计划/.test(clientSrc),
+  '想要看内容却被塞一份学习计划，正是"太复杂就不想看了"的来源',
+)
+check(
+  '轻推荐显示在停靠条上',
+  /sc-dock-light-tag/.test(clientSrc) && /current\.light/.test(clientSrc),
+  '"不必读完也能先试"必须随时可见，读不动的人才知道还有别的路',
 )
 
 console.log('\n15. 「读不到」不能伪装成「你还没读」')

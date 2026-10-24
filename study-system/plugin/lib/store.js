@@ -320,6 +320,8 @@ export class StudyStore {
       handledCount: drillRecords.length,
       drilledCount: drillRecords.filter((d) => d?.valid !== false).length,
       annotatedCount: annotation?.items?.length ?? 0,
+      // 只要标过"能复述的要点"，就算拿到了东西 —— 不值得等全标完
+      keyPointCount: (annotation?.items ?? []).filter((a) => a?.tier === 'core').length,
       drillCount: drillRecords.length,
       qaCount: qa?.items?.length ?? 0,
       segmentCount: (await this.segments(docId)).length,

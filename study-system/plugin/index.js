@@ -146,6 +146,7 @@ const TOOLS = [
     name: 'study_status',
     description:
       '查看学习项目状态：各阶段完成度、标注覆盖率（带分母）、校验问题、下一步该做什么。' +
+      '返回的 next 是按顺序该走的那一步，light 是更轻的一步（通常是一次合书复述）。' +
       '不传 docId 时列出工作区里全部学习项目。' +
       '想知道"还有哪些段没加工"时传 coverageOnly=true，会逐个列出空着的段落与所在小节。',
     parameters: jsonSchema({
@@ -209,6 +210,9 @@ const SYSTEM_SECTION = `## 学习资料辅助（study-copilot）
 - 标注标签只有七类：\`#d\` 定义、\`#e\` 例子、\`#q\` 提问、\`#s\` 总结、\`#t\` 迁移、\`#c\` 备注（需两字关键词）、\`#v\` 验证。
 - 考核阶段只有 \`study_drill\` 能推进：只把思考题写进 quiz.md 不算完成考核，
   必须等学习者真的说了自己的话，再用原话记录进 drills.jsonl。
+- \`study_status\` 除了 \`next\`（按顺序该走的下一步）还会给 \`light\`（更轻的一步）。
+  有 \`light\` 时，要主动告诉用户"不必读完也能先试"，而不是只把人按顺序往前赶。
+  一次有效的合书复述胜过标完一百段 —— 用户卡在中途时，这往往才是他真正需要的选项。
 `
 
 /* ------------------------------------------------------------------ 插件 */
@@ -607,6 +611,43 @@ export function apply(ctx, config = {}) {
             const body = await readBody(req)
             return send(res, 200, await svcOf(url).ingest(body.path, body))
           }
+          /**
+           * 浏览器上传：把文件内容原样放进请求体，文件名放查询参数。
+           *
+           * 不用 multipart：multipart 要在服务端解析边界、处理字段顺序，
+           * 只为传一个文件引入这套解析没有收益。前端用 fetch 直接把 File
+           * 当 body 发过来，这里收原始字节，一次读完即可。
+           * 文件名走 ?name=，因为 header 里的中文文件名在部分代理下会被改写。
+           */
+          if (req.method === 'POST' && route === '/ingest-upload') {
+            const name = url.searchParams.get('name') ?? ''
+            const limit = 200 * 1024 * 1024
+            const chunks = []
+            let size = 0
+            const tooBig = await new Promise((ok) => {
+              req.on('data', (c) => {
+                size += c.length
+                if (size > limit) {
+                  ok(true)
+                  req.destroy()
+                } else chunks.push(c)
+              })
+              req.on('end', () => ok(false))
+              req.on('error', () => ok(false))
+            })
+            if (tooBig) {
+              return send(res, 413, {
+                error: `文件超过 200MB。请先拆分，或把它放到工作区里改用路径导入。`,
+              })
+            }
+            try {
+              const out = await svcOf(url).ingestBuffer(Buffer.concat(chunks), name)
+              return send(res, 200, out)
+            } catch (e) {
+              // 导入失败要说清是哪一种，不能只回「失败」
+              return send(res, 400, { error: String(e?.message ?? e) })
+            }
+          }
           if (req.method === 'POST' && route === '/term') {
             const body = await readBody(req)
             return send(res, 200, await svcOf(url).askTerm(body.docId, body))
@@ -620,6 +661,11 @@ export function apply(ctx, config = {}) {
           if (req.method === 'GET' && route.startsWith('/harvested/')) {
             const docId = decodeURIComponent(route.slice('/harvested/'.length))
             return send(res, 200, await svcOf(url).harvested(docId))
+          }
+          // 30 秒预览：这份资料值不值得投入。入口之后第一个该问的问题。
+          if (req.method === 'GET' && route.startsWith('/peek/')) {
+            const docId = decodeURIComponent(route.slice('/peek/'.length))
+            return send(res, 200, { peek: await svcOf(url).peek(docId) })
           }
           // 单元清单：这份资料分几块（左侧目录用）
           if (req.method === 'GET' && route.startsWith('/units/')) {

@@ -3,7 +3,7 @@
  * Agent 工具与界面 HTTP API 都调它 —— 同一件事只有一份实现。
  */
 import { basename, extname, resolve, isAbsolute } from 'node:path'
-import { readFile, stat } from 'node:fs/promises'
+import { readFile, stat, mkdir, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { extractDocument, segmentText } from './extract.js'
 import { StudyStore, slugify, STUDY_DIR_NAME, stageFromProgress } from './store.js'
@@ -66,6 +66,46 @@ function nextStepOf(progress) {
   return { stage: 'done', action: null, message: '全流程完成：可以做迁移应用或教给别人' }
 }
 
+/**
+ * "你现在最该做的那一步"。
+ *
+ * 整套流程是五段：读前 → 读中 → 图谱 → 巩固 → 考核。但严格按这个顺序走，
+ * 用户要先读完 14000 字的读前建构、标完 182 段、画完 33 个节点的图，
+ * 才有资格做一次费曼复述 —— 而那次复述才是唯一真正改变他行为的事。
+ * 实测就是这个结果：三份资料里两份都停在 recalled，一次复述都没做过。
+ *
+ * 所以这里分两种推荐：
+ *
+ *   main  主推荐：按顺序该做的那一步（保持原来行为，老的判断不需要改）
+ *   light 轻的那一步：不管流程走到哪，只要还没做过费曼复述，就把它也摆出来。
+ *
+ * 轻的那一步只推荐、不上锁。原则里「反完成主义阅读」讲的是：
+ * 一本书若有一句话改变认知，即已回本。那么"只读了一段、只想清一个概念"
+ * 就应当允许直接去复述，而不是被流程按住。
+ *
+ * 为什么不用"解锁"机制：解锁意味着先证明你读过了。而"读过"本身无法
+ * 被系统验证 —— 只能靠用户自己说。凡是要先证明再给东西的设计，
+ * 最后都会变成完成主义。
+ */
+function recommendFrom(progress) {
+  const main = nextStepOf(progress)
+  // 已经拿到手的成果：能复述的要点 / 自测 / 行动。一个都没有就别急着推荐考核，
+  // 那会变成"什么都没读就让人合书复述"，只会让人放弃。
+  const harvested = (progress?.keyPointCount ?? 0) + (progress?.qaCount ?? 0) > 0
+  const hasDrill = Boolean(progress?.drilled)
+  if (hasDrill || !harvested) return { main, light: null }
+  // 主推荐本身就是考核时，不必再推荐一遍
+  if (main.action === 'study-feynman') return { main, light: null }
+  return {
+    main,
+    light: {
+      stage: 'feynman',
+      action: 'study-feynman',
+      message: '不用读完也能先试：合上书把已经看懂的那一点讲一遍，讲不清的地方再回去读',
+    },
+  }
+}
+
 export class StudyService {
   constructor(workspace) {
     this.workspace = resolve(workspace)
@@ -92,6 +132,34 @@ export class StudyService {
       relationTypes: Object.entries(RELATION_TYPES).map(([key, zh]) => ({ key, zh })),
       stages: STAGE_ORDER,
     }
+  }
+
+  /**
+   * 浏览器上传的文件：先落到工作区的 _inbox 目录，再走同一条 ingest。
+   *
+   * 为什么不在这里另写一套解析：同一件事只能有一份实现。
+   * 上传与"给个路径"最后都变成"磁盘上有个文件"，后面完全共用，
+   * 这样两边永远不会漂移。
+   *
+   * @param {Buffer} buffer 文件内容
+   * @param {string} fileName 原始文件名（用于取标题、保后缀）
+   * @param {object} options 同 ingest
+   */
+  async ingestBuffer(buffer, fileName, options = {}) {
+    if (!buffer || !buffer.length) throw new Error('文件是空的')
+    const safeName = String(fileName ?? '').replace(/[\\/:*?"<>|]/g, '_').trim() || 'upload'
+    const ext = extname(safeName)
+    if (!ext) throw new Error(`认不出文件类型：${safeName}。文件名需要带后缀，例如 .pdf / .md`)
+
+    // 放进工作区的 _inbox：用户能自己找到，也不会和已有资料混在一起
+    const inbox = resolve(this.workspace, '_inbox')
+    await mkdir(inbox, { recursive: true })
+    const stamp = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 15)
+    const saved = resolve(inbox, `${stamp}-${safeName}`)
+    await writeFile(saved, buffer)
+    // 落盘名带时间戳是为了同名文件不互相覆盖，但标题必须保持干净 ——
+    // 否则列表里会显示「20261024T063647-上传测试」，用户认不出这是自己的文件。
+    return this.ingest(saved, { ...options, title: options.title ?? basename(safeName, ext) })
   }
 
   /**
@@ -151,7 +219,12 @@ export class StudyService {
 
   async list() {
     const items = await this.store.list()
-    return items.map((it) => ({ ...it, next: nextStepOf(it.progress) }))
+    // 注意别直接 { ...recommendFrom() }：它返回的是 { main, light }，
+    // 展开后字段名会变成 main 而不是 next，界面读 next 就全空了。
+    return items.map((it) => {
+      const r = recommendFrom(it.progress)
+      return { ...it, next: r.main, light: r.light }
+    })
   }
 
   /**
@@ -233,7 +306,9 @@ export class StudyService {
       graphLayout,
       figures,
       qa: (await this.store.artifact(docId, 'qa.json').catch(() => null))?.items ?? [],
+      // next 保持原样（很多地方在用它），另加 light 作为"轻的那一步"
       next: nextStepOf(project.progress),
+      light: recommendFrom(project.progress).light,
       vocabulary: this.vocabulary(),
     }
   }
@@ -904,6 +979,137 @@ export class StudyService {
    * 单元把「原文小节 → 段落 → 核心要点」串成一条线，
    * 界面左侧就能列出"这章有 25 块"，而且每块都能点回原文。
    *
+  /**
+   * 30 秒预览：这份资料值不值得投入。
+   *
+   * 入口之后的第一个问题不是"该怎么读"，而是"要不要读"。
+   * 原则里的「反完成主义阅读」说得很清楚：不合胃口应当立即止损。
+   * 但止损需要一个判断依据 —— 让人先读完 14000 字的读前建构再决定，
+   * 等于逼他付完全款才知道要不要买。
+   *
+   * 所以这里只给三样东西，加起来不到一屏：
+   *   1. 结构：分几块、各叫什么（回答"这是什么形状的东西"）
+   *   2. 密度：多少字、大概要多久（回答"我要付出多少"）
+   *   3. 抓手：开头、结尾、最长的那一块各一句原话（回答"里面有什么"）
+   *
+   * 不生成任何新数据，全部从已有产物里读，所以是零成本。
+   */
+  async peek(docId) {
+    const meta = await this.store.meta(docId).catch(() => null)
+    if (!meta) return null
+    const units = await this.store.artifact(docId, 'units.json').catch(() => null)
+    const texts = (await this.store.artifact(docId, 'segment-texts.json').catch(() => null))?.items ?? []
+    const textOf = new Map(texts.map((t) => [t.id, String(t.text ?? '')]))
+
+    const list = units?.units ?? []
+    // 没有单元的小资料（短文章、笔记）：把整篇当成一块，
+    // 否则下一篇 794 字的东西会显示"0 块、无抓手"，比不给预览还糟。
+    const pseudo =
+      list.length > 0
+        ? null
+        : [{ id: texts[0]?.id ?? '¶1', title: meta.title ?? docId, level: 1, segmentIds: texts.map((t) => t.id), chars: meta.chars ?? 0 }]
+    const blocks = list.length > 0 ? list : pseudo ?? []
+    // 只取前两层标题当目录：再细分就不是"预览"了
+    const outline =
+      list.length > 0
+        ? list
+            .filter((u) => (u.level ?? 1) <= 2)
+            .slice(0, 8)
+            .map((u) => ({ title: u.title, level: u.level ?? 1, segId: u.id }))
+        : // 没跑过切块的小资料，直接从段落里认标题。
+          // 不认的话 8 段带三个小标题的文章会显示"1 块、目录为空"，
+          // 等于没回答"这是什么形状"——而那正是预览的主要用途。
+          texts
+            .map((t) => {
+              const m = /^(#{1,3})\s+(.+)$/.exec(String(t.text ?? '').trim())
+              return m ? { title: m[2].trim(), level: m[1].length, segId: t.id } : null
+            })
+            .filter(Boolean)
+            .slice(0, 8)
+
+    // 抓手：开头、结尾、字数最多的那一块，各取一句原话
+    const biggest = [...blocks].sort((a, b) => (b.chars ?? 0) - (a.chars ?? 0))[0]
+
+    // 从一段原文里找第一句"正文"（跳过标题行、表格、代码块、加粗小标题）
+    const sentenceIn = (id) => {
+      const raw = textOf.get(id) ?? ''
+      const line = raw
+        .split('\n')
+        .map((x) => x.trim())
+        .find(
+          (x) =>
+            x &&
+            !/^#{1,6}\s/.test(x) &&
+            !/^[|>]/.test(x) &&
+            !/^```/.test(x) &&
+            !/^\*\*[^*]+\*\*[：:]?$/.test(x) &&
+            x.length >= 12,
+        )
+      return line ? { segId: id, text: line.replace(/\*\*/g, '').replace(/^[-*]\s+/, '').slice(0, 90) } : null
+    }
+
+    // 从某个单元里找第一句正文。
+    //
+    // 关键：单元的 id 只指向标题那一段（比如 ¶4 的全文就是「## 工具的分类」）。
+    // 正文在它的 segmentIds 里，所以必须按 segmentIds 顺序逐段找，
+    // 而不是只看 id 自己 —— 之前就栽在这里，所有抓手全是 null。
+    const pick = (u) => {
+      if (!u) return null
+      for (const id of u.segmentIds ?? [u.id]) {
+        const got = sentenceIn(id)
+        if (got) return got
+      }
+      return null
+    }
+
+    // 某个单元自己没正文就试它后面的兄弟，直到找到为止
+    const pickFrom = (fromIndex, step) => {
+      for (let i = fromIndex; i >= 0 && i < blocks.length; i += step) {
+        const got = pick(blocks[i])
+        if (got) return got
+      }
+      return null
+    }
+
+    // 整篇从后往前扫最后一句正文。
+    // 没有单元的小资料只有一个 pseudo block，从"最后一块"往前找会立刻撞到开头那段，
+    // 于是结尾抓手和开头一模一样。这里按真实段落顺序扫，才找得到真正的收尾。
+    const lastSentence = () => {
+      for (let i = texts.length - 1; i >= 0; i -= 1) {
+        const got = sentenceIn(texts[i].id)
+        if (got) return got
+      }
+      return null
+    }
+
+    const chars = meta.chars ?? 0
+    // 按 400 字/分钟估：这是中文默读的常见速度，宁可估高一点免得让人失去耐心
+    const minutes = Math.max(1, Math.round(chars / 400))
+
+    return {
+      docId,
+      title: meta.title ?? docId,
+      chars,
+      segmentCount: meta.segmentCount ?? 0,
+      minutes,
+      // 没有切过块的小资料，按认出来的标题数报告；一个标题都没有才算 1 块
+      unitCount: list.length > 0 ? list.length : Math.max(1, outline.length),
+      outline,
+      hooks: {
+        start: pickFrom(0, 1),
+        // 有单元时按单元从后往前找；没单元时按真实段落从后往前扫。
+        // 只用前者的话，没有 units.json 的小资料结尾抓手会等于开头。
+        end: list.length > 0 ? pickFrom(blocks.length - 1, -1) : lastSentence(),
+        biggest: biggest ? { ...pick(biggest), title: biggest.title, chars: biggest.chars } : null,
+      },
+      // 用户已经走到哪了 —— 重新打开一份旧资料时，别让他从头猜
+      hasPreflight: !!(await this.store.artifact(docId, 'preflight.json').catch(() => null)),
+    }
+  }
+
+  /**
+   * 单元清单：这份资料分几块（左侧目录用）。
+   *
    * 数据来自 units.json（由 tests/build-units.mjs 生成并校验不重不漏）。
    * 没生成过就返回 null —— 老项目不该因为缺这个文件而报错。
    */
@@ -966,6 +1172,9 @@ export class StudyService {
       sourcePath: meta?.sourcePath ?? null,
       stage: nextStepOf(progress).stage,
       next: nextStepOf(progress),
+      // 轻的那一步：模型据此可以主动说"其实你不必读完也能先讲一遍"，
+      // 而不是每次都把人按在流程上往前赶
+      light: recommendFrom(progress).light,
       progress,
       checks: {
         preflight: brief(preflight?.check),
@@ -1189,4 +1398,4 @@ export class StudyService {
   }
 }
 
-export { nextStepOf, STAGE_ORDER, STUDY_DIR_NAME }
+export { nextStepOf, recommendFrom, STAGE_ORDER, STUDY_DIR_NAME }
