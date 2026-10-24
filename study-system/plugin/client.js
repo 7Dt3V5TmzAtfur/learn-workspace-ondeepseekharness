@@ -364,14 +364,19 @@ body[data-ds-dark-theme] .sc-root{
   font-variant-numeric:tabular-nums;opacity:.8}
 @media (prefers-reduced-motion:reduce){.sc-units>summary::before{transition:none}}
 @media (prefers-reduced-motion:reduce){.sc-fold>summary::before{transition:none}}
-/* 档位标签：了解/理解/掌握/熟练掌握 四档用同一强调色的 4 级不透明度 */
-.sc-lv{display:inline-block;font-size:var(--sc-fs-xs);line-height:16px;padding:0 6px;border-radius:var(--sc-r-sm);
-  color:var(--dsw-alias-label-primary);margin-left:5px;vertical-align:1px;white-space:nowrap;
-  border:1px solid var(--dsw-alias-border-l2)}
-.sc-lv[data-lv=了解]{background:rgba(100,116,139,.14)}
-.sc-lv[data-lv=理解]{background:rgba(100,116,139,.26)}
-.sc-lv[data-lv=掌握]{background:rgba(100,116,139,.40)}
-.sc-lv[data-lv=熟练掌握]{background:rgba(100,116,139,.58);color:var(--dsw-alias-label-primary);font-weight:600}
+/* 档位标签：了解/理解/掌握/熟练掌握 四档用同一强调色的 4 级不透明度。
+   间距从 5px 加到 10px：5px 时标题和档位糊成一句
+   「第一部分 五类工具的分类理解」，看起来像标题的一部分。 */
+.sc-lv{display:inline-block;font-size:var(--sc-fs-xs);line-height:18px;padding:0 8px;border-radius:var(--sc-r-sm);
+  color:var(--dsw-alias-label-primary);margin-left:10px;vertical-align:1px;white-space:nowrap;
+  border:1px solid var(--dsw-alias-border-l2);font-weight:500;letter-spacing:.02em}
+/* 四档的区分要一眼看得出：原来 .14/.26/.40/.58 在浅色底上差别太小，
+   扫一行看不出哪部分要求更高，等于白标。改成四档递进 + 最高档描边。 */
+.sc-lv[data-lv=了解]{background:rgba(100,116,139,.10);color:var(--dsw-alias-label-secondary)}
+.sc-lv[data-lv=理解]{background:rgba(100,116,139,.22)}
+.sc-lv[data-lv=掌握]{background:rgba(100,116,139,.38)}
+.sc-lv[data-lv=熟练掌握]{background:rgba(100,116,139,.62);color:var(--dsw-alias-label-primary);
+  font-weight:700;border-color:var(--dsw-alias-label-secondary)}
 .sc-assessment{margin-left:var(--sc-sp-2)}
 /* 思考题 / 参考资料列表 */
 .sc-ex-list,.sc-ref-list{margin:0;padding-left:20px}
@@ -624,7 +629,7 @@ body[data-ds-dark-theme] .sc-root{
         h(
           'section',
           { className: 'sc-pf-sec' },
-          h('h3', { className: 'sc-pf-h' }, `${num}　${title}`),
+          h('h2', { className: 'sc-pf-h' }, `${num}　${title}`),
           h('div', { className: 'sc-pf-body' }, body),
         )
       const parts = plan.parts ?? []

@@ -252,7 +252,7 @@ export class StudyService {
     const partGoals = parts
       .map(
         (p, i) => `<section class="sc-part">
-    <h3>${headingOf(p, i)}</h3>
+    <h4>${headingOf(p, i)}</h4>
     ${p.requirements ? `<p class="sc-req">${t(p.requirements)}</p>` : ''}
     <details class="sc-fold">
       <summary>重点与难点</summary>
@@ -293,7 +293,7 @@ export class StudyService {
           })
           .join('\n      ')
         return `<section class="sc-part">
-    <h3>${headingOf(p, i)}<span class="sc-lv" data-lv="${escAttr(a.level ?? '')}">${t(a.level ?? '—')}</span></h3>
+    <h4>${headingOf(p, i)}<span class="sc-lv" data-lv="${escAttr(a.level ?? '')}">${t(a.level ?? '—')}</span></h4>
     ${a.requirement ? `<div class="sc-req">考核要求：${t(a.requirement)}</div>` : ''}
     ${
       kpList.length
@@ -344,8 +344,11 @@ export class StudyService {
 
     // ①②③④⑤⑥ 六段连续编号，每段一张卡。缺数据时也要有牌子，不能整段消失，
     // 否则用户又在界面上找不到第几段了。
+    // 六段式的主段标题用 h2，各部分用 h4 —— 层级要真的分出来。
+    // 之前主段和 parts 都是 h3，读屏软件和阅读模式看到的是 18 个平级标题，
+    // 用户也扫不出"这一节下面有 4 部分"。
     const sec = (num, title, body) => `<section class="sc-pf-sec">
-    <h3 class="sc-pf-h">${num}　${title}</h3>
+    <h2 class="sc-pf-h">${num}　${title}</h2>
     <div class="sc-pf-body">${body || '<div class="sc-muted">（这一部分还没有内容）</div>'}</div>
   </section>`
 
