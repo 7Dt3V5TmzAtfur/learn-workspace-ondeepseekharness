@@ -17,6 +17,12 @@ window.__ModuleLoader__.load({
 
     const API = '/study-copilot/api'
     const PANEL_ID = 'study-copilot'
+    /**
+     * apply() 收到的 ctx 存一份给组件用。
+     * 组件定义在工厂里、拿不到 apply 的参数，而「一键让 Agent 跑某个阶段」需要
+     * ctx.get('remote') 才能把消息投进当前会话。
+     */
+    let pluginCtx = null
 
     /* ------------------------------------------------------------ 样式 */
 
@@ -102,6 +108,11 @@ body[data-ds-dark-theme] .sc-root{
 .sc-tab[data-active=true]{color:var(--dsw-alias-label-primary);border-bottom-color:var(--dsw-alias-brand-primary)}
 .sc-tab i{font-style:normal;opacity:.55;margin-left:4px;font-size:var(--sc-fs-xs)}
 .sc-pane{flex:1;overflow:auto;padding:var(--sc-sp-4) var(--sc-sp-5)}
+/* ---- 阶段操作条：五个页签同一位置，左说明右按钮 ---- */
+.sc-stage-bar{display:flex;align-items:center;gap:var(--sc-sp-3);padding:8px var(--sc-sp-3);border-bottom:1px solid var(--dsw-alias-border-l1);background:var(--dsw-alias-bg-layer-1);flex:none}
+.sc-stage-txt{flex:1;min-width:0;color:var(--dsw-alias-label-secondary);font-size:var(--sc-fs-sm);line-height:1.6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc-stage-bar .sc-btn{flex:none}
+.sc-stage-bar .sc-btn[data-warn=true]{border-color:var(--dsw-alias-danger,#e5484d);color:var(--dsw-alias-danger,#e5484d)}
 .sc-stage{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 /* 阶段徽标：不再用 brand 填充。
  * 原来 .sc-pill[data-on]{background:brand;color:#fff} 在深色主题下
@@ -2449,6 +2460,111 @@ body[data-ds-dark-theme] .sc-root{
       )
     }
 
+    /* -------------------------------------------------- 阶段按钮：发消息 */
+
+    /** 每个阶段"做完没有"的判据。全是宿主已经算好的产物，界面不另立规则。 */
+    const stageDone = (p) => ({
+      preflight: Boolean(p?.preflight),
+      annotate: (p?.annotations?.length ?? 0) > 0,
+      map: (p?.relations?.edges?.length ?? 0) > 0,
+      recall: (p?.qa?.length ?? 0) > 0,
+      feynman: (p?.drills?.length ?? 0) > 0,
+    })
+
+    /** 按钮文案。有些阶段不是"生成一份文档"，措辞要跟着变。 */
+    const STAGE_WORD = {
+      preflight: ['生成读前建构', '重做读前建构'],
+      annotate: ['开始读中标注', '重新标注'],
+      map: ['生成知识图谱', '重画知识图谱'],
+      recall: ['生成读后自测', '重出自测'],
+      feynman: ['开始费曼考核', '重新考核'],
+    }
+
+    /**
+     * 当前会话 id。
+     * 面板是挂在 main slot 上的自定义视图，不一定是 session-scoped，
+     * 所以按"props → URL"的顺序找；都没有就返回 null，由调用方明说，
+     * 不猜、更不挑一个会话替用户发。
+     */
+    function currentSessionId(props) {
+      const fromProps = props?.sessionId ?? props?.session?.id ?? props?.session?.sessionId
+      if (typeof fromProps === 'string' && fromProps) return fromProps
+      try {
+        const url = new URL(window.location.href)
+        const fromQuery = url.searchParams.get('session') ?? url.searchParams.get('sessionId')
+        if (fromQuery) return fromQuery
+        const fromHash = (url.hash || '').match(/session[/=]([A-Za-z0-9_-]+)/)
+        if (fromHash) return fromHash[1]
+      } catch {
+        /* URL 解析失败就当没有 */
+      }
+      return null
+    }
+
+    /**
+     * 把一句话投进当前会话，等价于用户在输入框里回车。
+     * 走的是 composer 同一条 RPC（mode=queue：排在当前 turn 之后，不打断）。
+     */
+    async function promptAgent(text, sessionId) {
+      if (!sessionId) {
+        throw new Error('定位不到当前会话，没法替你发送。可以先把这句发到对话里：' + text)
+      }
+      const remote = pluginCtx?.get?.('remote')
+      if (!remote?.session?.prompt) {
+        throw new Error('当前客户端没有可用的 remote 接口，请在对话里发送：' + text)
+      }
+      const result = await remote.session.prompt({
+        requestId: crypto.randomUUID(),
+        sessionId,
+        mode: 'queue',
+        content: [{ type: 'text', text }],
+        clientTimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      })
+      if (!result?.ok) {
+        const code = result?.error?.code ?? 'unknown'
+        const message = result?.error?.message ?? ''
+        throw new Error(`没能发出去（${code}）${message ? '：' + message : ''}`)
+      }
+    }
+
+    /** 阶段操作条：五个页签同一位置。重做用就地二次确认，不弹窗。 */
+    function StageBar({ name, stageKey, done, busy, onRun }) {
+      const [confirming, setConfirming] = useState(false)
+      useEffect(() => {
+        if (!confirming) return undefined
+        const timer = setTimeout(() => setConfirming(false), 3000)
+        return () => clearTimeout(timer)
+      }, [confirming])
+      const [todoWord, redoWord] = STAGE_WORD[stageKey] ?? [`生成${name}`, `重做${name}`]
+      const label = busy ? '执行中…' : confirming ? '确认重做？' : done ? redoWord : todoWord
+      return h(
+        'div',
+        { className: 'sc-stage-bar' },
+        h(
+          'span',
+          { className: 'sc-stage-txt', title: done ? `${name}已有产物，点右侧可重做` : `${name}还没有产物` },
+          done ? `${name}：已有产物，可重做` : `${name}：还没有产物`,
+        ),
+        h(
+          'button',
+          {
+            className: 'sc-btn sc-btn-sm',
+            'data-warn': confirming ? 'true' : 'false',
+            disabled: busy,
+            onClick: () => {
+              if (done && !confirming) {
+                setConfirming(true)
+                return
+              }
+              setConfirming(false)
+              onRun()
+            },
+          },
+          label,
+        ),
+      )
+    }
+
     /**
      * 资料库的右键菜单。
      *
@@ -2626,6 +2742,13 @@ body[data-ds-dark-theme] .sc-root{
       useEffect(() => {
         if (mountReported) return
         mountReported = true
+        // 顺带探一次：面板到底能不能拿到会话 id。只报键名与布尔，不报 URL、不报值。
+        reportError({
+          kind: 'props',
+          keys: Object.keys(props ?? {}).join(','),
+          sessionLike: Object.keys(props ?? {}).filter((k) => /session/i.test(k)).join(','),
+          hasSessionId: Boolean(currentSessionId(props)),
+        })
         reportError({ kind: 'mount', message: 'Workbench mounted' })
       }, [])
 
@@ -2689,6 +2812,9 @@ body[data-ds-dark-theme] .sc-root{
       const [pathText, setPathText] = useState('')
       const [pathError, setPathError] = useState(null)
       const menuFileRef = useRef(null)
+      const [stageBusy, setStageBusy] = useState(null)
+      // 阶段跑完后要把详情重新拉一次；docId 没变，靠这个记号触发 effect
+      const [reloadTick, setReloadTick] = useState(0)
 
       const closeMenu = useCallback(() => setMenu(null), [])
 
@@ -2743,6 +2869,51 @@ body[data-ds-dark-theme] .sc-root{
         }
       }, [pathText, wsPath, handleImported])
 
+      /**
+       * 一键让 Agent 跑某个阶段。
+       *
+       * 发出去之后轮询 /project：产物出现即算完成；等不到就明说"没等到"，
+       * 而不是假装成功、也不是假装失败。归档会话会把消息静默吞掉，
+       * 这条超时提示就是为它准备的。
+       */
+      const runStage = useCallback(
+        async (stage) => {
+          if (!docId || !stage) return
+          const verb = stage.key === 'feynman' ? '开始' : '继续'
+          const text = `${verb} docId=${docId} 的「${stage.name}」，加载 ${stage.skill} 技能。`
+          setStageBusy(stage.key)
+          setError(null)
+          try {
+            await promptAgent(text, currentSessionId(props))
+            const startedAt = Date.now()
+            let finished = false
+            while (Date.now() - startedAt < 180000) {
+              await new Promise((r) => setTimeout(r, 2000))
+              let next = null
+              try {
+                next = await api(`/project/${encodeURIComponent(docId)}${q(wsPath)}`)
+              } catch {
+                continue
+              }
+              if (stageDone(next)[stage.key]) {
+                setProject(next)
+                setReloadTick((n) => n + 1)
+                finished = true
+                break
+              }
+            }
+            if (!finished) {
+              setError(`已把「${stage.name}」发给 Agent，但 3 分钟内没等到产物。它可能还在跑，去对话里看一眼。`)
+            }
+          } catch (e) {
+            setError(e.message)
+          } finally {
+            setStageBusy(null)
+          }
+        },
+        [docId, wsPath, props],
+      )
+
       useEffect(() => {
         // 必须显式不传参：不写成 onClick={refresh} 之类的地方，
         // 否则事件对象会被当成 preferId 塞进 setDocId
@@ -2761,7 +2932,8 @@ body[data-ds-dark-theme] .sc-root{
         return () => {
           alive = false
         }
-      }, [docId, wsPath])
+        // reloadTick：阶段刚跑完时 docId 没变，靠它把详情重新拉一次
+      }, [docId, wsPath, reloadTick])
 
       const ask = useCallback(
         async (term, segmentId) => {
@@ -2850,6 +3022,10 @@ body[data-ds-dark-theme] .sc-root{
       useEffect(() => {
         if (!tabTouched && project) setTab(nextTabKey)
       }, [nextTabKey, tabTouched, project])
+
+      // 当前页签对应的阶段与"做完没有"，供操作条使用
+      const currentStage = stageList?.find((s) => s.tab === tab) ?? null
+      const doneMap = stageDone(project)
 
       return h(
         'div',
@@ -3141,6 +3317,16 @@ body[data-ds-dark-theme] .sc-root{
                       ),
                     ),
                   ),
+                  // 五个页签共用同一条位置：左说明、右按钮
+                  project && currentStage
+                    ? h(StageBar, {
+                        name: currentStage.name,
+                        stageKey: currentStage.key,
+                        done: Boolean(doneMap[currentStage.key]),
+                        busy: stageBusy === currentStage.key,
+                        onRun: () => runStage(currentStage),
+                      })
+                    : null,
                   h(
                     'div',
                     { className: 'sc-pane', onClick: onBodyClick },
@@ -3280,6 +3466,8 @@ body[data-ds-dark-theme] .sc-root{
     return {
       inject: ['slots'],
       apply(ctx) {
+        // 组件里要发消息给 Agent，需要 remote；工厂里拿不到 apply 的参数，存一份
+        pluginCtx = ctx
         ctx.slots.inject('sidebar.panellist', () =>
           ctx.slots.register({ name: 'sidebar.panellist', id: PANEL_ID, order: 20, label: () => '学习工作台' }, BookIcon),
         )
