@@ -18,6 +18,7 @@ import {
   validateRelations,
   renderAnnotatedHtml,
   ATTENTION_TIERS,
+  summarizeAnnotations,
   ROLE_LABELS,
   RELATION_TYPES,
   STAGES,
@@ -287,8 +288,19 @@ export class StudyService {
         )
       : null
 
+    // 分档占比按标签现算：老项目保存时还没有 tierRatio，
+    // 而且标签归位后旧的 byTier 也不可信。图例与颜色必须同源。
+    const annotationStats = project.annotations
+      ? summarizeAnnotations(
+          project.annotations.items,
+          project.segments.reduce((a, s) => a + (s.chars || 0), 0),
+        )
+      : null
+
     return {
       ...project,
+      // stats 覆盖为现算值；其余（items/issues）保持原样
+      annotations: project.annotations ? { ...project.annotations, stats: annotationStats } : project.annotations,
       // fullProject 把文件信息放在 meta 键下，不摊平。
       // 不展开的话 stage 根本不在返回值里（前端读出来是 undefined），
       // 而 /projects 列表里却有 —— 同一份数据两个接口两个样子。
@@ -507,7 +519,8 @@ export class StudyService {
     for (const [tier, def] of Object.entries(ATTENTION_TIERS)) for (const label of def.labels) labelTier[label] = tier
     const normalized = (Array.isArray(items) ? items : []).map((it) => {
       const label = String(it?.label ?? '').replace(/^#/, '').toLowerCase()
-      return { ...it, label, tier: it?.tier ?? labelTier[label] ?? 'core' }
+      // 档位以标签为准：历史上显式传了错 tier 的，落库时归位（渲染侧也已按标签显示）
+      return { ...it, label, tier: labelTier[label] ?? it?.tier ?? 'core' }
     })
     const payload = {
       items: normalized,

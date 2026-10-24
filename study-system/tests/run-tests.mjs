@@ -561,6 +561,45 @@ await test('孤立知识点是错误，但可以用独立节点声明豁免', as
   assert.ok(r2.ok, `声明后应放行：${JSON.stringify(r2.issues)}`)
 })
 
+await test('标签决定档位：tier 写错也按标签归位', async () => {
+  // 真实数据里 217 条标注有 93 条的 #d（定义）被写成 ref，
+  // 于是徽标说"定义"、颜色是"参考"——用户只能怀疑颜色标错了。
+  const r = rules.validateAnnotation(
+    [{ segmentId: '¶2', label: 'd', tier: 'ref', title: '定义', quote: '关键短语2' }],
+    CTX,
+  )
+  assert.equal(r.stats.byTier.core, 1, '统计应按标签算进核心档')
+  assert.equal(r.stats.byTier.ref, 0, '不应按写错的 tier 算进参考档')
+  assert.ok(
+    r.issues.some((i) => i.code === 'tier-mismatch' && i.level === 'warn'),
+    '应保留一条说明档位被归位的 warn',
+  )
+})
+
+await test('分档占比按标签现算（老项目没有 tierRatio 也能显示）', async () => {
+  const stat = rules.summarizeAnnotations(
+    [
+      { label: 'd', tier: 'ref', quote: '关键短语2' },
+      { label: 'q', tier: 'core', quote: '关键短语4' },
+      { label: 'e', quote: '补充' },
+    ],
+    1000,
+  )
+  assert.deepEqual(stat.byTier, { core: 1, hard: 1, ref: 1 })
+  assert.equal(stat.tierRatio.core, 0.005)
+  assert.equal(stat.tierRatio.hard, 0.005)
+  assert.equal(stat.ratio, 0.01, '只有核心/攻坚计入注意力预算')
+})
+
+await test('渲染时颜色跟着标签走，不跟 tier', async () => {
+  const html = rules.renderAnnotatedHtml(
+    [{ id: '¶2', text: '关键短语2 是定义', html: '' }],
+    { items: [{ segmentId: '¶2', label: 'd', tier: 'ref', title: '定义', quote: '关键短语2' }] },
+  )
+  assert.ok(html.includes('data-tier="core"'), '段落档位没按标签归位')
+  assert.ok(html.includes('sc-hl-core'), '高亮颜色没按标签归位')
+})
+
 /* ------------------------------------------------------------ 6. 服务 */
 
 section('6. 服务端到端（真实落盘）')

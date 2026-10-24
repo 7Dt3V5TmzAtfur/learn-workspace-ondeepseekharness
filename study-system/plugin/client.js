@@ -35,8 +35,11 @@ window.__ModuleLoader__.load({
  * ============================================================ */
 .sc-root{
   /* 字号阶：7 档，正文 13.5px */
-  --sc-fs-xs:11px; --sc-fs-sm:12px; --sc-fs-base:13.5px;
-  --sc-fs-md:14px; --sc-fs-lg:16px; --sc-fs-xl:19px; --sc-fs-2xl:24px;
+  /* 字号随 --sc-scale 缩放：不同屏幕/视力下同一份正文的可读性不一样 */
+  --sc-scale:1;
+  --sc-fs-xs:calc(11px * var(--sc-scale)); --sc-fs-sm:calc(12px * var(--sc-scale)); --sc-fs-base:calc(13.5px * var(--sc-scale));
+  --sc-fs-md:calc(14px * var(--sc-scale)); --sc-fs-lg:calc(16px * var(--sc-scale));
+  --sc-fs-xl:calc(19px * var(--sc-scale)); --sc-fs-2xl:calc(24px * var(--sc-scale));
   /* 间距：4px 基栅 */
   --sc-sp-1:4px; --sc-sp-2:8px; --sc-sp-3:12px; --sc-sp-4:16px; --sc-sp-5:24px; --sc-sp-6:32px;
   /* 行高 */
@@ -82,6 +85,11 @@ body[data-ds-dark-theme] .sc-root{
 .sc-doc[data-active=true]{background:var(--dsw-alias-bg-layer-1);border-color:var(--dsw-alias-border-l2)}
 .sc-doc-name{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 /* ---- 资料库：标题行、常驻加号、右键菜单、内联路径框 ---- */
+.sc-zoom{display:inline-flex;align-items:center;gap:2px;margin-right:6px;border:1px solid var(--dsw-alias-border-l1);border-radius:var(--sc-r-sm);padding:0 2px}
+.sc-zoom-btn{border:0;background:transparent;color:var(--dsw-alias-label-secondary);font:inherit;font-size:var(--sc-fs-xs);line-height:1;padding:4px 6px;border-radius:var(--sc-r-sm);cursor:pointer}
+.sc-zoom-btn:hover:not(:disabled){background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary)}
+.sc-zoom-btn:disabled{opacity:.35;cursor:default}
+.sc-zoom-val{min-width:34px;text-align:center;font-size:var(--sc-fs-xs);color:var(--dsw-alias-label-secondary);font-variant-numeric:tabular-nums}
 .sc-side-head{display:flex;align-items:center;gap:6px;padding:2px 2px 8px 6px}
 .sc-side-title{flex:1;min-width:0;color:var(--dsw-alias-label-secondary);font-size:var(--sc-fs-sm)}
 .sc-side-add{width:22px;height:22px;flex:none;display:inline-flex;align-items:center;justify-content:center;padding:0;border:1px solid transparent;border-radius:var(--sc-r-sm);background:transparent;color:var(--dsw-alias-label-secondary);font-size:15px;line-height:1;cursor:pointer}
@@ -128,13 +136,23 @@ body[data-ds-dark-theme] .sc-root{
  *   2. 原文短语：三色加粗 + 同色下划线，字重和颜色都变
  * 行底色只有 7-9% 透明度，保证"一眼看出这段被标了"，但不会变成色斑。
  * ============================================================ */
-.sc-seg{border-left:3px solid transparent;padding:7px var(--sc-sp-3);border-radius:0 var(--sc-r-md) var(--sc-r-md) 0;margin-bottom:var(--sc-sp-2);scroll-margin-top:80px}
-.sc-seg[data-tier=core]{border-left-color:var(--sc-core-line);background:var(--sc-core-row)}
-.sc-seg[data-tier=hard]{border-left-color:var(--sc-hard-line);background:var(--sc-hard-row)}
-.sc-seg[data-tier=ref]{border-left-color:var(--sc-ref-line);background:var(--sc-ref-row)}
+/* 阅读区只保留"细左边线"表示这一段的档位，不再整段染色：
+ * 整段底色会让人以为整段都是核心，而三色标的是段内的短语。 */
+.sc-seg{position:relative;border-left:2px solid transparent;padding:10px var(--sc-sp-3) 10px 44px;margin-bottom:2px;scroll-margin-top:80px}
+.sc-seg[data-tier=core]{border-left-color:var(--sc-core-line)}
+.sc-seg[data-tier=hard]{border-left-color:var(--sc-hard-line)}
+.sc-seg[data-tier=ref]{border-left-color:var(--sc-ref-line)}
+.sc-seg:hover{background:var(--dsw-alias-bg-layer-1)}
+/* 段号只做定位用：平时几乎透明，鼠标停在这段才显出来 */
+.sc-seg-mark{position:absolute;left:4px;top:12px;width:34px;text-align:right;font-size:calc(10px * var(--sc-scale));color:var(--dsw-alias-label-secondary);opacity:.18;transition:opacity .15s;pointer-events:none;user-select:none}
+.sc-seg:hover .sc-seg-mark,.sc-seg:focus-within .sc-seg-mark{opacity:.7}
+/* 章节标题只在换节时出现一次，不再每段重复 */
+.sc-chapter{margin:22px 0 6px;padding-left:2px;font-size:var(--sc-fs-md);font-weight:600;letter-spacing:.01em}
 .sc-seg:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}
-.sc-seg p{margin:0 0 5px;line-height:var(--sc-lh-body)}
+.sc-seg p{margin:0 0 6px;line-height:var(--sc-lh-body);text-indent:2em}
 .sc-seg p:last-child{margin-bottom:0}
+.sc-seg li p,.sc-seg blockquote p,.sc-seg td p,.sc-seg th p{text-indent:0}
+.sc-seg h1,.sc-seg h2,.sc-seg h3,.sc-seg h4,.sc-seg h5,.sc-seg h6{text-indent:0}
 .sc-seg .sc-h{font-weight:600;margin:2px 0 5px}
 
 /* 三色短语：加粗 + 文字色 + 下划线三件事一起做。
@@ -157,6 +175,14 @@ body[data-ds-dark-theme] .sc-root{
 .sc-tag-t{background:rgba(249,115,22,.18)}
 .sc-tag-c{background:rgba(100,116,139,.20)}
 .sc-tag-v{background:rgba(13,148,136,.18)}
+/* 正文容器：宿主把每段渲染成 inline 文本 + <br>，没有 <p>，
+ * 所以首行缩进必须落在这个容器上，而不是 p 上。 */
+.sc-seg > div{text-indent:2em}
+.sc-seg > div > .sc-seg-note,.sc-seg-note,.sc-pause{text-indent:0}
+/* 角色徽标独占一行，但压到最轻：它是旁注，不是正文。
+ * 之前是带底色的胶囊挤在首行里，读起来像"段落编号后面的所属文字"。 */
+.sc-seg > .sc-tag{display:block;width:max-content;max-width:100%;margin:0 0 3px;padding:0;background:transparent;color:var(--dsw-alias-label-secondary);font-weight:400;opacity:.62;font-size:calc(11px * var(--sc-scale))}
+.sc-seg:hover > .sc-tag{opacity:.9}
 /* 段落备注：原来是裸文本，和正文同色分不清。
  * 现在左侧竖线 + 斜体 + 小一号，明确是批注不是原文。 */
 .sc-seg-note{margin-top:6px;padding:5px var(--sc-sp-2);border-left:2px solid var(--dsw-alias-border-l2);font-size:var(--sc-fs-sm);line-height:1.7;color:var(--dsw-alias-label-secondary);font-style:italic}
@@ -544,6 +570,47 @@ body[data-ds-dark-theme] .sc-root{
       return ws
     }
 
+    /**
+     * 正文字号缩放。面板里所有字号令牌都乘这个系数，Workbench 与停靠条共用一份，
+     * 写进 localStorage 以便下次打开还是这个大小。
+     */
+    const SCALE_KEY = 'study-copilot.scale'
+    const SCALE_MIN = 0.85
+    const SCALE_MAX = 1.6
+    const clampScale = (v) => Math.min(SCALE_MAX, Math.max(SCALE_MIN, Math.round(v * 100) / 100))
+    let currentScale = (() => {
+      try {
+        const raw = Number(window.localStorage.getItem(SCALE_KEY))
+        return Number.isFinite(raw) && raw > 0 ? clampScale(raw) : 1
+      } catch {
+        return 1
+      }
+    })()
+    const scaleListeners = new Set()
+
+    function setScaleValue(v) {
+      const next = clampScale(v)
+      if (next === currentScale) return
+      currentScale = next
+      try {
+        window.localStorage.setItem(SCALE_KEY, String(next))
+      } catch {
+        /* 隐私模式下不可写，忽略 */
+      }
+      scaleListeners.forEach((fn) => fn(next))
+    }
+
+    function useScale() {
+      const [value, setValue] = useState(currentScale)
+      useEffect(() => {
+        const listener = (v) => setValue(v)
+        scaleListeners.add(listener)
+        setValue(currentScale)
+        return () => scaleListeners.delete(listener)
+      }, [])
+      return value
+    }
+
     function apiUrl(path) {
       const needWs = currentWorkspace && !/[?&]ws=/.test(path)
       const glue = path.includes('?') ? '&' : '?'
@@ -682,6 +749,8 @@ body[data-ds-dark-theme] .sc-root{
     }
 
     const pct = (v) => `${Math.max(0, Math.min(100, Math.round((v ?? 0) * 100)))}%`
+    /** 占比显示：没有统计时给「—」，别把 0 和"没算"混在一起 */
+    const fmtPct = (v) => (typeof v === 'number' ? `${(v * 100).toFixed(1)}%` : '—')
 
     /* --------------------------------------------------------- 小组件 */
 
@@ -1607,9 +1676,26 @@ body[data-ds-dark-theme] .sc-root{
         h(
           'div',
           { className: 'sc-legend' },
-          h('span', null, h('i', { style: { background: 'var(--sc-core-line)' } }), '核心 ≤10%'),
-          h('span', null, h('i', { style: { background: 'var(--sc-hard-line)' } }), '攻坚 ≤8%'),
-          h('span', null, h('i', { style: { background: 'var(--sc-ref-line)' } }), '参考 不限'),
+          // 图例先说"实际占了多少"，再说"上限是多少"。
+          // 只写 ≤10% 会被读成"现在是 10%"，用户没法判断三色用得对不对。
+          h(
+            'span',
+            { title: '左边是实际高亮占比，右边是上限（按正文字数算）' },
+            h('i', { style: { background: 'var(--sc-core-line)' } }),
+            `核心 ${fmtPct(stats?.tierRatio?.core)} ≤10%`,
+          ),
+          h(
+            'span',
+            { title: '左边是实际高亮占比，右边是上限（按正文字数算）' },
+            h('i', { style: { background: 'var(--sc-hard-line)' } }),
+            `攻坚 ${fmtPct(stats?.tierRatio?.hard)} ≤8%`,
+          ),
+          h(
+            'span',
+            { title: '参考档不计入注意力预算' },
+            h('i', { style: { background: 'var(--sc-ref-line)' } }),
+            `参考 ${fmtPct(stats?.tierRatio?.ref)} 不限`,
+          ),
           stats
             ? h(
                 'span',
@@ -1671,14 +1757,20 @@ body[data-ds-dark-theme] .sc-root{
             onTouchEnd: () => setSelText(readSelection()),
             onKeyUp: () => setSelText(readSelection()),
           },
-          shown.map((seg) => {
+          shown.map((seg, i) => {
             const a = byId.get(seg.id)
             const inner = htmlBySeg.get(seg.id)
+            // 章节标题只在换节时出现一次：原来每段都带一行"章节名"，等于把目录
+            // 抄进了正文，读起来一直被打断。
+            const showChapter = Boolean(seg.chapter) && seg.chapter !== shown[i - 1]?.chapter
             return h(
-              'section',
-              {
-                key: seg.id,
-                className: 'sc-seg',
+              React.Fragment,
+              { key: seg.id },
+              showChapter ? h('h4', { className: 'sc-chapter' }, seg.chapter) : null,
+              h(
+                'section',
+                {
+                  className: 'sc-seg',
                 'data-seg': seg.id,
                 onClick: () => {
                   // 只有真的选中了词才弹追问层。
@@ -1690,15 +1782,8 @@ body[data-ds-dark-theme] .sc-root{
                   setAnswer(null)
                 },
               },
-              h(
-                'div',
-                { className: 'sc-seg-meta' },
-                a
-                  ? h('span', { className: `sc-tag sc-tag-${a.label}` }, `#${a.label}`)
-                  : h('span', { className: 'sc-tag' }, seg.id),
-                seg.chapter ? h('span', { className: 'sc-muted' }, seg.chapter) : null,
-                h('span', { className: 'sc-muted', style: { marginLeft: 'auto' } }, `${seg.chars} 字`),
-              ),
+              // 段号退到左侧留白里，只在悬停时显形：定位要用，但不是正文
+              h('span', { className: 'sc-seg-mark', 'aria-hidden': 'true' }, seg.id),
               // 有宿主渲染的高亮版就用它；否则退回纯文本 Markdown
               //
               // 暂停回顾：核心/攻坚档的段落在"看过的第一眼"之后会被盖上，
@@ -1741,6 +1826,7 @@ body[data-ds-dark-theme] .sc-root{
                 : inner !== undefined
                   ? h('div', { dangerouslySetInnerHTML: { __html: inner } })
                   : h('div', { dangerouslySetInnerHTML: { __html: seg.html || '' } }),
+              ),
             )
           }),
         ),
@@ -2594,6 +2680,7 @@ body[data-ds-dark-theme] .sc-root{
     function Workbench(props) {
       const { useWorkspaces } = props
       const snapshot = useWorkspaces ? useWorkspaces((s) => s) : null
+      const scale = useScale()
       // 手动指定的工作区要跨刷新保留，否则每次 F5 都退回默认目录
       const LS_KEY = 'study-copilot.workspace'
       const [manualWs, setManualWsRaw] = useState(() => {
@@ -2911,7 +2998,7 @@ body[data-ds-dark-theme] .sc-root{
 
       return h(
         'div',
-        { className: 'sc-root' },
+        { className: 'sc-root', style: { '--sc-scale': scale } },
         // 菜单里「导入资料…」用的隐藏输入框。单选：一次一份资料。
         h('input', {
           ref: menuFileRef,
@@ -2949,6 +3036,34 @@ body[data-ds-dark-theme] .sc-root{
           h('span', { className: 'sc-title' }, '学习工作台'),
           project ? h(StagePills, { progress: project.progress, stages: stageList }) : null,
           h('span', { style: { flex: 1 } }),
+          // 正文字号：不同屏幕与视力下需要不同的默认大小，改一次就记住
+          h(
+            'span',
+            { className: 'sc-zoom', role: 'group', 'aria-label': '正文字号' },
+            h(
+              'button',
+              {
+                className: 'sc-zoom-btn',
+                title: '缩小正文',
+                'aria-label': '缩小正文',
+                disabled: scale <= 0.85,
+                onClick: () => setScaleValue(scale - 0.1),
+              },
+              'A−',
+            ),
+            h('span', { className: 'sc-zoom-val', title: '当前缩放' }, `${Math.round(scale * 100)}%`),
+            h(
+              'button',
+              {
+                className: 'sc-zoom-btn',
+                title: '放大正文',
+                'aria-label': '放大正文',
+                disabled: scale >= 1.6,
+                onClick: () => setScaleValue(scale + 0.1),
+              },
+              'A+',
+            ),
+          ),
           // 包一层：直接把 refresh 交给 onClick 会把 MouseEvent 当成 preferId
           h('button', { className: 'sc-btn', onClick: () => refresh(), disabled: busy }, '刷新'),
           h(
@@ -3287,6 +3402,7 @@ body[data-ds-dark-theme] .sc-root{
       // 工作区只有一个来源（Workbench 解析出的那个），这里只订阅变化。
       // 以前自己取 workspaces[0]，手动指定过目录后，停靠条和面板会指向两处。
       const wsPath = useCurrentWorkspace()
+      const scale = useScale()
       const [current, setCurrent] = useState(null)
       const [stages, setStages] = useState(null)
 
@@ -3314,7 +3430,7 @@ body[data-ds-dark-theme] .sc-root{
       const idx = stageIndexOf(current.progress, stages)
       return h(
         'div',
-        { className: 'sc-dock' },
+        { className: 'sc-dock', style: { '--sc-scale': scale } },
         h('b', null, current.title),
         h(StagePills, { progress: current.progress, stages }),
         // 标注是脚本回填的，就在最显眼的位置说一句。

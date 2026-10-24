@@ -166,6 +166,50 @@ function tierOf(label) {
 }
 
 /**
+ * 标签 → 档位，唯一的映射入口。
+ *
+ * 曾经 label 和 tier 各存一份，217 条标注里 93 条的 `#d 定义` 被写成 ref，
+ * 于是徽标说"定义"、颜色是"参考"——用户只能怀疑颜色标错了。
+ * 标签承载语义，档位只是预算分桶，所以档位必须由标签推出来。
+ */
+export function tierOfLabel(label) {
+  return tierOf(String(label ?? '').replace(/^#/, '').toLowerCase())
+}
+
+/**
+ * 由标注项直接算出分档占比（口径与 validateAnnotation 一致：按 quote 字数）。
+ *
+ * 为什么需要单独一份：老项目的 annotations.stats 里没有 tierRatio，
+ * 界面图例只能显示"—"；而标签归位之后，旧 stats 的 byTier 也已经不可信。
+ * 每次读项目时按标签现算，图表与颜色才对得上。
+ */
+export function summarizeAnnotations(items, totalChars) {
+  const byTier = { core: 0, hard: 0, ref: 0 }
+  const tierChars = { core: 0, hard: 0, ref: 0 }
+  let highlightedChars = 0
+  for (const it of items ?? []) {
+    const tier = tierOfLabel(it?.label) ?? it?.tier
+    // 注意：用 in 判断，不能写 !byTier[tier] —— 计数从 0 开始，0 是假值，
+    // 那样每个档位的第一条都会被跳过（这个 bug 被下面的单测抓到过）。
+    if (!(tier in byTier)) continue
+    const chars = [...String(it?.quote ?? '')].length
+    byTier[tier] += 1
+    tierChars[tier] += chars
+    if (tier !== 'ref') highlightedChars += chars
+  }
+  const total = totalChars || 1
+  return {
+    total: (items ?? []).length,
+    byTier,
+    highlightedChars,
+    totalChars,
+    ratio: Number((highlightedChars / total).toFixed(4)),
+    tierRatio: Object.fromEntries(Object.keys(byTier).map((k) => [k, Number((tierChars[k] / total).toFixed(4))])),
+    tierChars,
+  }
+}
+
+/**
  * 校验段落标注。
  *
  * 关键：三色高亮的是**原文里的短语（quote）**，不是整段。
@@ -284,14 +328,19 @@ export function validateAnnotation(items, context) {
     }
 
     const expected = tierOf(label)
-    const tier = item.tier ?? expected
+    const tier = expected ?? item.tier
     if (!ATTENTION_TIERS[tier]) {
       issues.push(issue('error', 'bad-tier', `档位 "${item.tier}" 无效（core/hard/ref）`, where))
       continue
     }
     if (item.tier && item.tier !== expected) {
       issues.push(
-        issue('warn', 'tier-mismatch', `标签 ${label} 自然归属 ${expected}，这里标成 ${tier}；如确有必要请保留`, where),
+        issue(
+          'warn',
+          'tier-mismatch',
+          `标签 #${label} 属于「${ATTENTION_TIERS[expected]?.zh ?? expected}」，却写成了「${ATTENTION_TIERS[item.tier]?.zh ?? item.tier}」；已按标签归位。`,
+          where,
+        ),
       )
     }
     byTier[tier] += 1
@@ -793,7 +842,9 @@ export function renderAnnotatedHtml(segments, annotation) {
   return segments
     .map((seg) => {
       const a = byId.get(seg.id)
-      const tierClass = a ? TIER_CLASS[a.tier] ?? TIER_CLASS.core : ''
+      // 颜色跟着标签走，不信独立存的 tier（历史数据里有 93 条对不上）
+      const tier = a ? tierOfLabel(a.label) ?? a.tier : null
+      const tierClass = a ? TIER_CLASS[tier] ?? TIER_CLASS.core : ''
 
       // 段落角色徽标：#d 定义|Definition 形式（渐构要求的输出格式）
       let tag = ''
@@ -814,7 +865,7 @@ export function renderAnnotatedHtml(segments, annotation) {
 
       // 备注单独一行，不参与高亮
       const note = a?.note ? `<div class="sc-seg-note">${escHtml(a.note)}</div>` : ''
-      const tierAttr = a ? ` data-tier="${escHtml(a.tier ?? '')}"` : ''
+      const tierAttr = a ? ` data-tier="${escHtml(tier ?? '')}"` : ''
       return `<section class="sc-seg" data-id="${escHtml(seg.id)}"${tierAttr}>${tag}${body}${note}</section>`
     })
     .join('\n')
