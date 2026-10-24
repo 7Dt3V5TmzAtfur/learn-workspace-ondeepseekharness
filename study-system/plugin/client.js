@@ -3385,7 +3385,21 @@ body[data-ds-dark-theme] .sc-root{
           ctx.slots.register({ name: 'conversation.composer.dock', id: 'study-copilot-dock', order: 8 }, DockBar),
         )
       },
-      components: { Workbench, DockBar, BookIcon },
+      // 导出的组件同时是渲染冒烟的 seam（tests/audit-client-render.mjs）
+      components: {
+        Workbench,
+        DockBar,
+        BookIcon,
+        StagePills,
+        StageBar,
+        Entry,
+        PreflightPane,
+        ReadingPane,
+        GraphPane,
+        RecallPane,
+        QuizPane,
+        TermsCard,
+      },
     }
   },
 })
