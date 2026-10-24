@@ -542,6 +542,33 @@ export class StudyService {
    * archify 失败不阻塞保存——关系数据本身是有效的，
    * 图上不去只是少了一个视图，不能因此让用户丢数据。
    */
+  /**
+   * 按当前 relations.json 重新出图并重写 figures.json。
+   *
+   * 为什么需要单独一个方法：改了分组规则以后，磁盘上的图和数据里的记录
+   * 会各说各话 —— 实测 chapter4 的 figures.json 写着 6 张，
+   * 而目录里只剩 3 张 html（旧图已被清理）。界面照着记录列 6 张，
+   * 点第 4 张就是 404。
+   *
+   * 走的是和 saveRelations 完全相同的出图与写入路径，不另起一套。
+   */
+  async rebuildFigures(docId) {
+    const graph = await this.store.artifact(docId, 'relations.json').catch(() => null)
+    if (!graph?.nodes?.length) return { ok: false, reason: '还没有关系数据' }
+    const meta = await this.store.meta(docId)
+    const figures = await buildArchifyFigures(graph, {
+      workDir: this.store.dir(docId),
+      docTitle: meta?.title ?? docId,
+    })
+    if (figures.figures.length) {
+      await this.store.writeArtifact(docId, 'figures.json', {
+        generatedAt: new Date().toISOString(),
+        ...figures,
+      })
+    }
+    return figures
+  }
+
   async saveRelations(docId, graph) {
     const check = validateRelations(graph)
     await this.store.writeArtifact(docId, 'relations.json', { ...graph, check, savedAt: new Date().toISOString() })
@@ -552,9 +579,9 @@ export class StudyService {
       try {
         figures = await buildArchifyFigures(graph, {
           workDir: this.store.dir(docId),
-          outDir: this.store.dir(docId),
           docTitle: meta?.title ?? docId,
-          maxNodes: 18,
+          // 不在这里写死节点上限：上限是 splitGraph 的内部决策，
+          // 写死一份在这里就等于同一个概念存了两份，早晚漂移
         })
         if (figures.ok) {
           await this.store.writeArtifact(docId, 'figures.json', {

@@ -1979,6 +1979,70 @@ await test('没有标注时不说"可信"也不说"不可信"', async () => {
   assert.equal(p.reliable, false)
 })
 
+/* ------------------------------------------------------------- 图的分组
+ *
+ * 旧实现有两个被实测抓到的错误：同一个节点出现在多张图里（chapter4 有 9 个
+ * 节点跨 2~3 张图），以及 2 节点 0 条边的碎片图。
+ */
+await test('每个节点只属于一张图', async () => {
+  const graph = {
+    nodes: ['a', 'b', 'c', 'd'].map((id) => ({ id, label: id })),
+    edges: [
+      { from: 'a', to: 'b', relation: 'prerequisite' },
+      { from: 'a', to: 'c', relation: 'prerequisite' },
+      { from: 'b', to: 'd', relation: 'prerequisite' },
+    ],
+  }
+  const groups = splitGraph(graph, 2)
+  const seen = new Map()
+  for (const g of groups) for (const n of g.nodes) seen.set(n.id, (seen.get(n.id) ?? 0) + 1)
+  const dup = [...seen.entries()].filter(([, c]) => c > 1)
+  assert.equal(dup.length, 0, `节点被画进了多张图：${JSON.stringify(dup)}`)
+  assert.equal(seen.size, 4, '不能因为拆分而丢掉节点')
+})
+
+await test('没有边的散点不单独成图，并回有关系的组', async () => {
+  const graph = {
+    nodes: ['a', 'b', 'c', 'solo'].map((id) => ({ id, label: id })),
+    edges: [
+      { from: 'a', to: 'b', relation: 'prerequisite' },
+      { from: 'b', to: 'c', relation: 'prerequisite' },
+      // solo 只有一条弱边指向 a，没有依赖边
+      { from: 'solo', to: 'a', relation: 'application' },
+    ],
+  }
+  const groups = splitGraph(graph, 10)
+  const zeroEdge = groups.filter((g) => g.edges.length === 0)
+  assert.equal(
+    zeroEdge.length,
+    0,
+    `出现 ${zeroEdge.length} 张 0 边的图：${zeroEdge.map((g) => g.nodes.length).join(',')}`,
+  )
+})
+
+await test('整张图本来就没有关系时，不强行并成一张超限的图', async () => {
+  const graph = {
+    nodes: Array.from({ length: 6 }, (_, i) => ({ id: `n${i}`, label: `n${i}` })),
+    edges: [],
+  }
+  const groups = splitGraph(graph, 2)
+  assert.ok(groups.length > 1, '没有关系也要按上限拆开，否则超宽出不了图')
+  for (const g of groups) assert.ok(g.nodes.length <= 2, `某张图有 ${g.nodes.length} 个节点，超过上限 2`)
+})
+
+await test('分组不超过节点上限，也不丢节点', async () => {
+  const nodes = Array.from({ length: 40 }, (_, i) => ({ id: `n${i}`, label: `n${i}` }))
+  // 一条长链：最容易被切成超限的一组
+  const edges = nodes.slice(1).map((n, i) => ({ from: `n${i}`, to: n.id, relation: 'prerequisite' }))
+  const groups = splitGraph({ nodes, edges }, 7)
+  for (const g of groups) {
+    assert.ok(g.nodes.length <= 7, `某张图 ${g.nodes.length} 个节点 > 7，会被 archify 判字不可读`)
+  }
+  const total = groups.reduce((s, g) => s + g.nodes.length, 0)
+  assert.equal(total, 40, '拆完不能丢节点')
+})
+
+
 console.log(`\n${'─'.repeat(52)}`)
 console.log(`通过 ${passed}　失败 ${failed}`)
 

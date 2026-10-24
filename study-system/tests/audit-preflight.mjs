@@ -1,5 +1,8 @@
 /** 检查读前建构 HTML 的结构合法性：有没有非法嵌套、内容有没有丢。 */
-const BASE = 'http://127.0.0.1:52884/study-copilot/api'
+// DSH 的 Web 端口每次启动可能不同（实测从 52884 变到 52784），
+// 写死端口会让整套测试因为"连不上"而全军覆没，看起来像代码坏了。
+const HOST = process.env.DSH_WEB_HOST ?? 'http://127.0.0.1:52784'
+const BASE = `${HOST}/study-copilot/api`
 const WS = encodeURIComponent('D:\\learn')
 const DOC = process.argv[2] ?? 'chapter4-d6eaed'
 

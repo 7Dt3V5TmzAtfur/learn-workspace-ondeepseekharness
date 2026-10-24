@@ -322,6 +322,11 @@ export class StudyStore {
       annotatedCount: annotation?.items?.length ?? 0,
       // 只要标过"能复述的要点"，就算拿到了东西 —— 不值得等全标完
       keyPointCount: (annotation?.items ?? []).filter((a) => a?.tier === 'core').length,
+      // 这批标注是不是脚本回填的。
+      // 放在 progress 里是因为列表页与停靠条都要用到它，而它们已经调了 progressOf，
+      // 不该为同一个判断再读一遍 annotations.json。
+      // 注意：它不参与 stage 的推导（见 service.provenanceOf 的说明）。
+      backfilled: Boolean(String(annotation?.backfillNote ?? '').trim()),
       drillCount: drillRecords.length,
       qaCount: qa?.items?.length ?? 0,
       segmentCount: (await this.segments(docId)).length,

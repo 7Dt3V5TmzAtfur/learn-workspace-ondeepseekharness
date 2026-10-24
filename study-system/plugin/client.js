@@ -211,6 +211,8 @@ body[data-ds-dark-theme] .sc-root{
 .sc-dock b{color:var(--dsw-alias-label-primary);font-weight:500}
 .sc-dock-light{display:inline-flex;align-items:center;gap:5px;font-size:var(--sc-fs-xs);color:var(--dsw-alias-label-secondary);max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sc-dock-light-tag{flex:0 0 auto;padding:0 5px;border-radius:3px;background:var(--dsw-alias-bg-layer-2);border:1px solid var(--dsw-alias-border-l1);font-size:10px;line-height:1.5}
+/* 停靠条上的"标注是脚本回填的"：虚线边、低对比，不抢主推荐，但必须看见 */
+.sc-dock-prov{flex:0 0 auto;padding:0 6px;border-radius:3px;font-size:10px;line-height:1.6;color:var(--dsw-alias-label-secondary);border:1px dashed var(--dsw-alias-border-l2);cursor:help;white-space:nowrap}
 .sc-seg-meta{display:flex;align-items:center;gap:6px;margin-bottom:var(--sc-sp-1);font-size:var(--sc-fs-sm)}
 .sc-details{margin-top:var(--sc-sp-2)}.sc-details>summary{cursor:pointer;font-size:var(--sc-fs-sm);color:var(--dsw-alias-label-secondary);user-select:none}
 .sc-details>summary:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}
@@ -2681,7 +2683,14 @@ body[data-ds-dark-theme] .sc-root{
                       onClick: () => setDocId(p.id),
                     },
                     h('div', { className: 'sc-doc-name' }, p.title),
-                    h('div', { className: 'sc-muted' }, `${p.format} · ${p.chars} 字 · ${p.progress?.annotatedCount ?? 0}/${p.segmentCount} 段`),
+                    h(
+                      'div',
+                      { className: 'sc-muted' },
+                      `${p.format} · ${p.chars} 字 · ${p.progress?.annotatedCount ?? 0}/${p.segmentCount} 段`,
+                      // 数字旁边就说清这些标注是谁标的。只写 "182/182 段"
+                      // 会让人以为自己是读过的
+                      p.progress?.backfilled ? ' · 回填' : '',
+                    ),
                   ),
                 ),
           ),
@@ -2834,6 +2843,19 @@ body[data-ds-dark-theme] .sc-root{
         { className: 'sc-dock' },
         h('b', null, current.title),
         h(StagePills, { progress: current.progress }),
+        // 标注是脚本回填的，就在最显眼的位置说一句。
+        // 这句话不能只放在读中页的内部标签里 —— 用户在停靠条上看到"读中完成"，
+        // 却看不到"这批标注是机器凑的"，就会以为自己真的读过了。
+        current.progress?.backfilled
+          ? h(
+              'span',
+              {
+                className: 'sc-dock-prov',
+                title: '这批标注的 quote 是脚本从原文机械回填的，角色标签可能不对。能当骨架用，但别当成已经读懂。',
+              },
+              '标注是脚本回填的',
+            )
+          : null,
         h('span', { style: { flex: 1 } }),
         h('span', null, current.next?.message ?? ''),
         // 轻的那一步：让"不必读完也能先试"随时可见。

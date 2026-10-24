@@ -6,7 +6,9 @@ import { readFileSync, existsSync } from 'node:fs'
 import { join } from 'node:path'
 
 const WS = 'D:\\learn'
-const API = 'http://127.0.0.1:52884/study-copilot/api'
+// 端口每次启动可能不同，别写死（写死过一次，整套测试因为连不上而全红）
+const HOST = process.env.DSH_WEB_HOST ?? 'http://127.0.0.1:52784'
+const API = `${HOST}/study-copilot/api`
 
 const docId = process.argv[2] ?? 'chapter4-d6eaed'
 let pass = 0
@@ -160,9 +162,25 @@ for (const f of figures) {
   check(`第 ${f.index} 张图通过 archify 四道门`, f.ok === true, '门禁没过说明有版面问题')
   check(
     `第 ${f.index} 张图节点数适合阅读`,
-    f.nodeCount > 0 && f.nodeCount <= 18,
-    `节点 ${f.nodeCount} 个，超过 18 会字号过小`,
+    f.nodeCount > 0 && f.nodeCount <= 25,
+    `节点 ${f.nodeCount} 个。上限 25 是实测值（18/20/22/24/25/26 逐档跑 archify，四道门都过），` +
+      '不是猜的；超过它才需要担心字号',
   )
+  check(
+    `第 ${f.index} 张图有内容可看`,
+    (f.edgeCount ?? 0) > 0,
+    `这张图 ${f.nodeCount} 个节点但 0 条关系，画出来是几个互不相连的方块`,
+  )
+}
+
+// 同一个节点不能出现在两张图里 —— 用户会以为是两个不同的概念
+{
+  const seen = new Map()
+  for (const f of figures) {
+    for (const id of f.nodeIds ?? []) seen.set(id, (seen.get(id) ?? 0) + 1)
+  }
+  const dup = [...seen.entries()].filter(([, c]) => c > 1)
+  check('没有节点被画进多张图', dup.length === 0, `重复：${dup.map(([id]) => id).slice(0, 5).join(', ')}`)
 }
 
 // 界面必须用 iframe 嵌 archify 的 HTML，不能自己画
@@ -187,7 +205,7 @@ if (imgSegs.length === 0) {
   console.log(`    共 ${srcs.length} 个图片地址`)
   let okCount = 0
   for (const u of srcs.slice(0, 6)) {
-    const full = u.startsWith('/') ? `http://127.0.0.1:52884${u}${u.includes('?') ? '&' : '?'}ws=${ws}` : u
+    const full = u.startsWith('/') ? `${HOST}${u}${u.includes('?') ? '&' : '?'}ws=${ws}` : u
     try {
       const r = await fetch(full)
       if (r.ok) {
@@ -635,6 +653,29 @@ check(
   '只列挂上 segmentId 的节点，并说清有多少没落点',
   /linked\.length\}\/\$\{nodes\.length\}/.test(clientSrc) && /没有确切的原文落点/.test(clientSrc),
   '把没证据的节点也列成可点，点过去看到的是别的内容',
+)
+
+console.log('\n19. 脚本回填的标注在停靠条和列表里就说清')
+
+// 判定口径不改（stage 只表示"下一个动作是什么"），但"这批标注是机器凑的"
+// 必须出现在用户真正会看到的地方 —— 否则他看到"读中完成"就以为自己读过了。
+check(
+  '停靠条上有回填标记',
+  /sc-dock-prov/.test(clientSrc) && /progress\?\.backfilled/.test(clientSrc),
+  '只在读中页内部标一句，用户在停靠条上看不到',
+)
+check(
+  '资料列表的数字旁标注回填',
+  /backfilled \? ' · 回填'/.test(clientSrc),
+  '只写 182/182 段，会让人以为是自己标的',
+)
+check(
+  '回填标记不参与阶段推导',
+  /backfilled/.test(readFileSync(join('D:', 'learn', 'study-system', 'plugin', 'lib', 'store.js'), 'utf8')) &&
+    /annotated: Boolean\(annotation\?\.items\?\.length\)/.test(
+      readFileSync(join('D:', 'learn', 'study-system', 'plugin', 'lib', 'store.js'), 'utf8'),
+    ),
+  '把回填塞进 stage 判定，会让已有项目从已完成掉回没读，也等于逼人重标 182 段',
 )
 
 console.log('\n15. 「读不到」不能伪装成「你还没读」')

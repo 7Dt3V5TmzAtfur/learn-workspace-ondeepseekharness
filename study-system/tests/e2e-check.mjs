@@ -11,7 +11,9 @@
  * 3. QA 要能存能读
  * 4. 参考资料要按来源分组
  */
-const BASE = 'http://127.0.0.1:52884/study-copilot/api'
+// 端口每次启动可能不同，别写死（写死过一次，整套测试因为连不上而全红）
+const HOST = process.env.DSH_WEB_HOST ?? 'http://127.0.0.1:52784'
+const BASE = `${HOST}/study-copilot/api`
 const DOC = process.argv[2] ?? 'chapter4-d6eaed'
 
 let pass = 0
@@ -94,7 +96,7 @@ await check('project 返回 figures 列表', async () => {
 
 await check('每张图 HTTP 200 且是 HTML', async () => {
   for (const f of proj.figures) {
-    const r = await fetch(`http://127.0.0.1:52884${f.url}`)
+    const r = await fetch(`${HOST}${f.url}`)
     if (!r.ok) throw new Error(`${f.url} → HTTP ${r.status}`)
     const ct = r.headers.get('content-type') ?? ''
     if (!ct.includes('text/html')) throw new Error(`${f.url} content-type=${ct}`)
@@ -106,7 +108,7 @@ await check('每张图 HTTP 200 且是 HTML', async () => {
 
 await check('图里含真实节点标签', async () => {
   const f = proj.figures[0]
-  const body = await (await fetch(`http://127.0.0.1:52884${f.url}`)).text()
+  const body = await (await fetch(`${HOST}${f.url}`)).text()
   const labels = (proj.relations?.nodes ?? []).map((n) => n.label)
   const hit = labels.some((l) => l && body.includes(l))
   if (!hit) throw new Error('图里找不到任何节点标签')
