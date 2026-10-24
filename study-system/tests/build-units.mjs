@@ -24,16 +24,28 @@
  * 不做"每单元必须有 N 个知识点"这类配额。参考项目自己都承认
  * "不设数量上限"是它的优点 —— 一旦有配额，模型就会凑。
  */
-import { readFileSync, writeFileSync } from 'node:fs'
+import { readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { basename } from 'node:path'
 
-const DIR = 'D:/learn/.study/chapter4-d6eaed'
+// 目录可由参数指定，默认是第一个真实案例。
+// 做成参数是因为它不该只为一份资料服务 —— 换个 docId 就要改代码的脚本，
+// 第二个项目进来时一定会忘。
+const DIR = process.argv[2] ?? 'D:/learn/.study/chapter4-d6eaed'
+if (!existsSync(`${DIR}/segments.json`)) {
+  console.error(`找不到 ${DIR}/segments.json`)
+  process.exit(1)
+}
 
 const segs = JSON.parse(readFileSync(`${DIR}/segments.json`, 'utf8')).items
 const texts = new Map(
   JSON.parse(readFileSync(`${DIR}/segment-texts.json`, 'utf8')).items.map((t) => [t.id, String(t.text ?? '')]),
 )
-const ann = JSON.parse(readFileSync(`${DIR}/annotations.json`, 'utf8')).items
-const pre = JSON.parse(readFileSync(`${DIR}/preflight.json`, 'utf8'))
+// annotations / preflight 是可选输入：切块本身只需要原文。
+// 早期这里硬要求它们存在，导致一份刚导入、还没写标注的资料切不了块 ——
+// 而切块恰恰应该是导入后的第一件事，比标注更早。
+const readOptional = (f) => (existsSync(`${DIR}/${f}`) ? JSON.parse(readFileSync(`${DIR}/${f}`, 'utf8')) : null)
+const ann = readOptional('annotations.json')?.items ?? []
+const pre = readOptional('preflight.json')
 
 /** 整段只有一个加粗短语（可带结尾标点），视为小标题 */
 function boldHeading(raw) {
@@ -53,11 +65,38 @@ function mdHeading(raw) {
   return { level: m[1].length, title: m[2].replace(/\*\*/g, '').trim() }
 }
 
+/**
+ * 判断某段是否落在代码块里。
+ *
+ * 踩过：¶77–¶81 是 Python 代码里的注释
+ *     # 第一次迭代 - LLM 看到上述轨迹，生成响应
+ * 被 mdHeading 当成一级标题，于是「ReAct 循环」内部凭空多出 5 个"小节"，
+ * 而真正的 `### ReAct 循环` 下面 27 段 5530 字切不开。
+ *
+ * 做法：整段统计未闭合的 ``` 围栏。段文本里出现奇数个 ``` 就翻转状态。
+ * 这是近似判断 —— 但不判断的代价是拿代码注释当章节标题，更糟。
+ */
+function fenceToggles(raw) {
+  const hits = raw.match(/^\s*```/gm)
+  return hits ? hits.length : 0
+}
+const inCode = new Array(segs.length + 2).fill(false)
+{
+  let open = false
+  for (const s of segs) {
+    // 记录"这一段开始时"是否已在代码块内；段首若是 ``` 开栏，本段本身仍是内容
+    inCode[s.ordinal] = open
+    if (fenceToggles(texts.get(s.id) ?? '') % 2 === 1) open = !open
+  }
+}
+
 /** 扫出所有小节起点 */
 const byOrd = new Map(segs.map((s) => [s.ordinal, s]))
 const marks = []
 for (const s of segs) {
   const raw = texts.get(s.id) ?? ''
+  // 代码块里的 `# xxx` 是注释，不是标题
+  if (inCode[s.ordinal]) continue
   const md = mdHeading(raw)
   if (md) {
     marks.push({ id: s.id, ord: s.ordinal, title: md.title, level: md.level, kind: 'md' })
@@ -200,6 +239,16 @@ const widths = units.map((u) => u.chars).filter((n) => n > 0)
 const ratio = Math.max(...widths) / Math.min(...widths)
 if (ratio > 40) problems.push(`切分失衡：最大 ${Math.max(...widths)} 字 / 最小 ${Math.min(...widths)} 字 = ${ratio.toFixed(1)} 倍`)
 
+// 6. 标题不能来自代码块里的注释
+//    踩过：Python 代码里的 `# 第一次迭代 - …` 被当成一级标题，
+//    凭空多出 5 个"小节"，而真正的兄弟小节反而切不开。
+//    判据：标题文字若与该段原文（去掉 # 号）逐字相同，且该段在代码块内，就是误判。
+const codeTitles = units.filter((u) => {
+  const raw = (texts.get(u.id) ?? '').trim()
+  return /^#{1,6}\s/.test(raw) && inCode[segs.find((s) => s.id === u.id)?.ordinal ?? -1]
+})
+if (codeTitles.length) problems.push(`有小节标题取自代码块注释：${codeTitles.map((u) => u.title).join(', ')}`)
+
 if (problems.length) {
   console.error('单元切分校验不通过：')
   for (const p of problems) console.error('  ' + p)
@@ -207,7 +256,9 @@ if (problems.length) {
 }
 
 const out = {
-  docId: 'chapter4-d6eaed',
+  // 不能用常量：这份脚本要服务不止一个项目，
+  // 写死的话第二个项目生成的 units.json 会自称是 chapter4 的
+  docId: basename(DIR),
   generatedAt: new Date().toISOString(),
   // 单元是骨架：原文小节 ↔ 段落 ↔ 知识点 靠它串起来
   totalUnits: units.length,
@@ -230,9 +281,15 @@ for (const u of units) {
   console.log(`  ${u.title.slice(0, 26).padEnd(28)} ${String(u.segmentCount).padStart(2)}段 ${String(u.chars).padStart(5)}字${kp.padEnd(8)} ${bar}`)
 }
 
-// 超大单元提示
+// 超大单元提示。
+// 注意措辞：这里只报告"这一块偏长"，不主张一定要再切。
+// 原文若在这一节内部没有小标题，硬切就是编 —— 编出来的目录
+// 比"一块长一点"糟糕得多。所以只提示，由人判断。
 const big = units.filter((u) => u.chars > 3000)
 if (big.length) {
-  console.log(`\n注意：${big.length} 个单元超过 3000 字，可能需要再切`)
-  for (const u of big) console.log(`  ${u.title}（${u.chars} 字）`)
+  console.log(`\n${big.length} 个单元超过 3000 字（只是提示，不一定要动）：`)
+  for (const u of big) {
+    console.log(`  ${u.title}（${u.chars} 字 / ${u.segmentCount} 段）`)
+  }
+  console.log('  若原文在这一节内部有小标题，可以认它再切；没有就别切，编目录比块大更糟。')
 }

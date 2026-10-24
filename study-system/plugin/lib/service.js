@@ -218,6 +218,12 @@ export class StudyService {
 
     return {
       ...project,
+      // fullProject 把文件信息放在 meta 键下，不摊平。
+      // 不展开的话 stage 根本不在返回值里（前端读出来是 undefined），
+      // 而 /projects 列表里却有 —— 同一份数据两个接口两个样子。
+      ...project.meta,
+      // meta.stage 已由 fullProject 用 stageFromProgress 覆盖，这里再确保一次
+      stage: stageFromProgress(project.progress),
       segments,
       preflightHtml: project.preflight ? this.renderPreflightHtml(project.preflight) : null,
       quizHtml: project.quiz ? renderMarkdown(project.quiz) : null,

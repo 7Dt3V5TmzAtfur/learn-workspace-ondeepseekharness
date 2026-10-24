@@ -206,6 +206,38 @@ check(
   'part 标题是模型概括的，不挂单元就跟原文小节对不上',
 )
 
+/* ---------------------------------------------- 切块脚本的两个坑 */
+
+console.log('\n10. 切块脚本：代码注释不能当标题、docId 不能写死')
+
+const unitSrc = readFileSync('D:/learn/study-system/tests/build-units.mjs', 'utf8')
+
+check(
+  '识别代码围栏，代码块内的 # 注释不当标题',
+  /inCode\[/.test(unitSrc) && /fenceToggles/.test(unitSrc),
+  'Python 注释 `# 第一次迭代 - …` 会被当成一级标题，凭空多出小节',
+)
+check(
+  '标题误取自代码块时拒绝写文件',
+  /有小节标题取自代码块注释/.test(unitSrc),
+  '只做识别不做校验，将来改坏了也没人知道',
+)
+check(
+  'docId 取自目录名而非写死',
+  /docId: basename\(DIR\)/.test(unitSrc),
+  '写死的话第二个项目生成的 units.json 会自称是第一个项目的',
+)
+check(
+  '目录可由参数指定',
+  /process\.argv\[2\]/.test(unitSrc),
+  '换个项目就要改代码，第二个案例进来时一定忘',
+)
+check(
+  '超大单元只提示不主张硬切',
+  /只是提示，不一定要动/.test(unitSrc),
+  '原文内部没小标题时硬切就是编目录，比块大更糟',
+)
+
 console.log(`\n${'─'.repeat(60)}`)
 console.log(`通过 ${pass}　失败 ${fails.length}`)
 

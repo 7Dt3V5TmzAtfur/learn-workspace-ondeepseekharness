@@ -160,6 +160,26 @@ await check('refs 分原文/联网检索/我的知识', async () => {
   if (has.length < 2) throw new Error(`只找到 ${has.join(',')}，来源分组可能没生效`)
 })
 
+console.log('\n[7] 两个接口对同一个项目说的 stage 必须一样')
+await check('/projects 与 /project 的 stage 一致且等于 next.stage', async () => {
+  // 踩过：/projects 返回 stage='ingested'，/project/:docId 返回 stage=''。
+  // 因为 fullProject 把文件信息放在 meta 键下没摊平，
+  // project() 里 return {...project} 也就摊不出 stage。
+  const list = await get('/projects')
+  const ids = (list.items ?? []).map((x) => x.id).slice(0, 3)
+  if (!ids.length) throw new Error('没有项目可查')
+  const bad = []
+  for (const id of ids) {
+    const row = (list.items ?? []).find((x) => x.id === id)
+    const detail = await get(`/project/${encodeURIComponent(id)}`)
+    if (!detail.stage) bad.push(`${id}: 详情 stage 为空`)
+    else if (row.stage !== detail.stage) bad.push(`${id}: 列表「${row.stage}」≠ 详情「${detail.stage}」`)
+    else if (detail.stage !== detail.next?.stage) bad.push(`${id}: stage「${detail.stage}」≠ next「${detail.next?.stage}」`)
+    if (!detail.title) bad.push(`${id}: meta 没摊平，title 读不到`)
+  }
+  if (bad.length) throw new Error(bad.join('; '))
+})
+
 console.log('\n' + '='.repeat(56))
 console.log(`通过 ${pass}　失败 ${fail}`)
 if (fail) {
