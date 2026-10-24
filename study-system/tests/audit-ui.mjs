@@ -558,7 +558,8 @@ check(
   /function Entry\(props\)/.test(clientSrc) &&
     /ev\.dataTransfer\?\.files\?\.\[0\]/.test(clientSrc) &&
     /type: 'file'/.test(clientSrc) &&
-    /api\('\/ingest'/.test(clientSrc),
+    // 粘路径导入：请求可能带 ws 参数（`/ingest${q(workspace)}`），两种写法都要认
+    /api\((['`])\/ingest/.test(clientSrc),
   '拖拽 / 点选 / 粘路径 三条路缺一条，就有一类用户被挡住',
 )
 check(

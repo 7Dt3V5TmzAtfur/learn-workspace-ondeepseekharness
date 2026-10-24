@@ -595,6 +595,24 @@ export function apply(ctx, config = {}) {
             if (req.method === 'GET' && route === '/workspaces') {
               return send(res, 200, { items: await discoverWorkspaces() })
             }
+            // 图片等静态资源：/asset/<docId>/<相对路径>
+            if (req.method === 'GET' && route.startsWith('/asset/')) {
+              const rest = route.slice('/asset/'.length)
+              const slash = rest.indexOf('/')
+              if (slash < 0) return send(res, 400, { error: '缺少资源路径' })
+              const safeDecode = (v) => {
+                try {
+                  return decodeURIComponent(v)
+                } catch {
+                  return v
+                }
+              }
+              const docId = safeDecode(rest.slice(0, slash))
+              // route 来自 url.pathname，本身仍是百分号编码的，这里只需解码一次
+              const relPath = safeDecode(rest.slice(slash + 1))
+              await serveAsset(res, svcOf(url), docId, relPath)
+              return
+            }
             if (req.method === 'GET' && route === '/projects') {
               const raw = url.searchParams.get('ws')
               const svc = svcOf(url)

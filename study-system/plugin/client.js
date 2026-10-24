@@ -968,7 +968,7 @@ body[data-ds-dark-theme] .sc-root{
       { key: '②', label: '对我的帮助与目标', hint: '为什么学、学到什么程度' },
       { key: '③', label: '目标·要求·重点·难点', hint: '每一部分要盯住什么' },
       { key: '④', label: '考核方式与知识点', hint: '了解/理解/掌握/熟练掌握' },
-      { key: '⑤', label: '思考题与作业', hint: '费曼式自测' },
+      { key: '⑤', label: '思考题与作业', hint: '读完挑一题，讲给 Agent 听' },
       { key: '⑥', label: '参考资料', hint: '原文 / 联网检索 / 我的知识' },
     ]
 
@@ -2231,6 +2231,8 @@ body[data-ds-dark-theme] .sc-root{
             { style: { lineHeight: 1.8 } },
             '闭上书，按顺序过一遍下面的问答。先在心里答，再点开核对。',
             '答不上来的说明那段只是"看过"，不是"记住"——回到读中加工把那段的三色高亮再看一遍。',
+            // 两个页签的边界必须写出来，否则用户不知道"自测"和"考核"差在哪
+            h('div', { style: { marginTop: 6 } }, '这里只判"记没记住"（快问快答、对错分明）；要把整章讲给人听、被追问、拿评分，去「读后考核」。'),
           ),
           // 主指标是"拿到了什么"，不是"完成了多少"。
           // 依据：原则/反完成主义阅读 —— 一本书有一句话改变认知就回本，
@@ -2301,60 +2303,71 @@ body[data-ds-dark-theme] .sc-root{
       )
     }
 
-    function QuizPane({ project }) {
-      const [terms, setTerms] = useState(project.terms ?? [])
-      useEffect(() => setTerms(project.terms ?? []), [project.terms])
+    /**
+     * 术语追问记录：追问发生在读中，所以挂在精读页下面。
+     * 之前放在考核页——那里既不是它发生的地方，也让考核页变成了杂物抽屉。
+     */
+    function TermsCard({ project }) {
+      const terms = project.terms ?? []
+      if (!terms.length) return null
+      return h(
+        'div',
+        { className: 'sc-card', style: { marginTop: 'var(--sc-sp-4)' } },
+        h('h4', null, `术语追问记录（${terms.length}）`),
+        terms.map((t, i) =>
+          h(
+            'div',
+            { key: i, style: { marginBottom: 8, paddingBottom: 8, borderBottom: '1px solid var(--dsw-alias-border-l1)' } },
+            h('div', null, h('b', null, t.term), t.segmentId ? h('span', { className: 'sc-muted' }, `　${t.segmentId}`) : null),
+            h('div', { className: 'sc-muted' }, t.question),
+            t.answer ? h('div', { style: { marginTop: 4, lineHeight: 1.7 } }, t.answer) : null,
+          ),
+        ),
+      )
+    }
+
+    /**
+     * 读后考核：只回答一件事——你真的用自己的话讲过了吗。
+     *
+     * 题目不复制到这一页。思考题只有一份，在「读前建构 ⑤」：那里是计划，
+     * 这里是执行。同一份内容在两处渲染，改一处就会漂，用户也分不清该信哪个。
+     */
+    function QuizPane({ project, onOpenPlan }) {
+      const drills = project.drills ?? []
+      const counted = drills.filter((d) => d.valid).length
       return h(
         'div',
         null,
-        h(QaCard, { pairs: project.qa }),
-        // 参考资料：宿主早就渲染好了 refsHtml，但界面从来没显示过。
-        // 用户明确要求第 6 段要有参考资料清单并标注 原文/我的知识/联网检索。
         h(
           'div',
           { className: 'sc-card' },
-          h('h4', null, '参考资料（原文 / 联网检索 / 我的知识）'),
-          project.refsHtml
-            ? h('div', { className: 'sc-md', dangerouslySetInnerHTML: { __html: project.refsHtml } })
-            : h('div', { className: 'sc-muted' }, '还没有参考资料。让 Agent 做读前建构时会一并生成。'),
+          h('h4', null, '这一步做什么'),
+          h(
+            'div',
+            { style: { lineHeight: 1.8 } },
+            '合上书，挑一道思考题，用自己的话讲一遍。Agent 会追问、按要点判卷；只有有效复述才推进进度。',
+            '题目只在「读前建构 ⑤」有一份，这里不重复。',
+          ),
+          onOpenPlan
+            ? h('button', { className: 'sc-btn', style: { marginTop: 8 }, onClick: onOpenPlan }, '去读前建构挑一道题')
+            : null,
+          h(
+            'div',
+            { className: 'sc-muted', style: { marginTop: 8 } },
+            drills.length ? `有效复述 ${counted} / ${drills.length} 次` : '还没有复述记录。',
+          ),
         ),
         h(
           'div',
           { className: 'sc-card' },
-          h('h4', null, '思考题与费曼作业'),
-          project.quizHtml
-            ? h('div', { className: 'sc-md', dangerouslySetInnerHTML: { __html: project.quizHtml } })
-            : project.quiz
-              ? h('pre', { className: 'sc-pre' }, project.quiz)
-              : h('div', { className: 'sc-muted' }, '还没有生成考核材料。'),
-        ),
-        h(
-          'div',
-          { className: 'sc-card' },
-          h('h4', null, `术语追问记录（${terms.length}）`),
-          terms.length === 0
-            ? h('div', { className: 'sc-muted' }, '还没有追问记录。在精读页选中词后面板右下角可以「问选中的词」。')
-            : terms.map((t, i) =>
-                h(
-                  'div',
-                  { key: i, style: { marginBottom: 8, paddingBottom: 8, borderBottom: '1px solid var(--dsw-alias-border-l1)' } },
-                  h('div', null, h('b', null, t.term), t.segmentId ? h('span', { className: 'sc-muted' }, `　${t.segmentId}`) : null),
-                  h('div', { className: 'sc-muted' }, t.question),
-                  t.answer ? h('div', { style: { marginTop: 4, lineHeight: 1.7 } }, t.answer) : null,
-                ),
-              ),
-        ),
-        h(
-          'div',
-          { className: 'sc-card' },
-          h('h4', null, `我的复述记录（${(project.drills ?? []).length}）`),
-          (project.drills ?? []).length === 0
+          h('h4', null, `我的复述记录（${drills.length}）`),
+          drills.length === 0
             ? h(
                 'div',
                 { className: 'sc-muted' },
-                '还没有复述记录。请在对话里说「考考我」，用自己的话讲一遍；只有真的讲过，进度才会走到「考核」。',
+                '还没有复述记录。点上方「开始费曼考核」，或在对话里说「考考我」，用自己的话讲一遍。',
               )
-            : project.drills.map((d, i) =>
+            : drills.map((d, i) =>
                 h(
                   'div',
                   { key: i, className: 'sc-drill' + (d.valid ? '' : ' is-invalid') },
@@ -3291,14 +3304,25 @@ body[data-ds-dark-theme] .sc-root{
                     'div',
                     { className: 'sc-pane', onClick: onBodyClick },
                     tab === 'read'
-                      ? h(ReadingPane, { project, onAsk: ask, workspace: wsPath, jumpTo, onJumped: () => setJumpTo(null) })
+                      ? [
+                          h(ReadingPane, {
+                            key: 'read',
+                            project,
+                            onAsk: ask,
+                            workspace: wsPath,
+                            jumpTo,
+                            onJumped: () => setJumpTo(null),
+                          }),
+                          // 追问发生在读中，记录就放在读中
+                          h(TermsCard, { key: 'terms', project }),
+                        ]
                       : tab === 'plan'
                         ? h(PreflightPane, { project, onJump: setTab })
                         : tab === 'graph'
                           ? h(GraphPane, { project, onGoto: gotoSegment })
                           : tab === 'recall'
                             ? h(RecallPane, { project })
-                            : h(QuizPane, { project }),
+                            : h(QuizPane, { project, onOpenPlan: () => setTab('plan') }),
                   ),
                 )
               : // 分清"还没选"和"选了但正在读"。
