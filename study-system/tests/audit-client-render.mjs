@@ -227,6 +227,47 @@ for (const [name, props] of cases) {
 }
 
 console.log('\n' + '─'.repeat(62))
+/* ---------------------------------------------- 悬停提示的可读内容 */
+
+function findNode(node, predicate) {
+  if (!node || typeof node !== 'object') return null
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      const hit = findNode(item, predicate)
+      if (hit) return hit
+    }
+    return null
+  }
+  if (predicate(node)) return node
+  return findNode(node.props && node.props.children, predicate)
+}
+
+const annotated = {
+  ...project,
+  annotations: {
+    items: [{ segmentId: '¶1', label: 'd', tier: 'core', keyword: '判断标准', title: 'Agent 与普通对话的区别' }],
+    stats: { tierRatio: { core: 0.05, hard: 0, ref: 0 } },
+  },
+}
+
+try {
+  const tree = components.ReadingPane({
+    project: annotated,
+    onAsk: () => {},
+    jumpTo: null,
+    onJumped: () => {},
+  })
+  const section = findNode(tree, (n) => n && n.props && n.props.className === 'sc-seg')
+  check('段落节点存在', Boolean(section))
+  check(
+    '段落悬停提示带角色全称',
+    Boolean(section && section.props.title && section.props.title.includes('#d') && section.props.title.includes('判断标准')),
+    `title=${section && section.props.title}`,
+  )
+} catch (e) {
+  check('段落悬停提示带角色全称', false, String(e.stack).split(String.fromCharCode(10)).slice(0, 3).join(' | '))
+}
+
 if (fail > 0) {
   console.log('\n组件渲染失败：\n')
   problems.forEach((p, i) => console.log(`${i + 1}. ${p}`))

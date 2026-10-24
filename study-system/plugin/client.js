@@ -172,7 +172,11 @@ body[data-ds-dark-theme] .sc-root{
 .sc-seg > div > .sc-seg-note,.sc-seg-note,.sc-pause{text-indent:0}
 /* 角色徽标独占一行，但压到最轻：它是旁注，不是正文。
  * 之前是带底色的胶囊挤在首行里，读起来像"段落编号后面的所属文字"。 */
-.sc-seg-role{position:absolute;left:2px;top:30px;width:36px;text-align:right;font-size:calc(10px * var(--sc-scale));font-weight:600;letter-spacing:.02em;opacity:.5;transition:opacity .15s;pointer-events:none;user-select:none}
+.sc-seg-role{position:absolute;left:2px;top:30px;width:36px;text-align:right;font-size:calc(10px * var(--sc-scale));font-weight:600;letter-spacing:.02em;opacity:.5;transition:opacity .15s;cursor:help;user-select:none}
+/* 悬停整段就显示角色全称：只挂在小标记上时，鼠标几乎不可能正好停在 36px 里。
+ * 面板向上落在这段的上留白中，不遮挡正文。 */
+.sc-seg-role-full{display:none;position:absolute;left:44px;bottom:calc(100% + 4px);width:max-content;max-width:320px;padding:3px 8px;border:1px solid var(--dsw-alias-border-l1);border-radius:var(--sc-r-sm);background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary);font-size:var(--sc-fs-xs);font-weight:400;line-height:1.6;white-space:normal;box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:6;pointer-events:none}
+.sc-seg:hover .sc-seg-role-full,.sc-seg:focus-within .sc-seg-role-full{display:block}
 .sc-seg[data-tier=core] .sc-seg-role{color:var(--sc-core-fg)}
 .sc-seg[data-tier=hard] .sc-seg-role{color:var(--sc-hard-fg)}
 .sc-seg[data-tier=ref] .sc-seg-role{color:var(--sc-ref-fg)}
@@ -803,6 +807,12 @@ body[data-ds-dark-theme] .sc-root{
     const fmtPct = (v) => (typeof v === 'number' ? `${(v * 100).toFixed(1)}%` : '—')
 
     /* --------------------------------------------------------- 小组件 */
+
+    /** 角色的完整称呼：编号 + 关键词 + 标题，缺哪个就跳过哪个 */
+    const roleText = (a) => [`#${a?.label}`, a?.keyword, a?.title].filter(Boolean).join(' · ')
+
+    /** 没有关键词与标题时不弹面板，只留 #d 本身 */
+    const hasRoleDetail = (a) => Boolean(String(a?.keyword ?? '').trim() || String(a?.title ?? '').trim())
 
     function StagePills({ progress, stages }) {
       if (!stages?.length) return null
@@ -1822,6 +1832,7 @@ body[data-ds-dark-theme] .sc-root{
                 'section',
                 {
                   className: 'sc-seg',
+                  title: a ? roleText(a) : undefined,
                 'data-seg': seg.id,
                 onClick: () => {
                   // 只有真的选中了词才弹追问层。
@@ -1840,11 +1851,13 @@ body[data-ds-dark-theme] .sc-root{
                     'span',
                     {
                       className: 'sc-seg-role',
-                      title: [`#${a.label}`, a.keyword, a.title].filter(Boolean).join(' · '),
+                      title: roleText(a),
                     },
                     `#${a.label}`,
                   )
                 : null,
+              // 面板相对整段定位：挂在 36px 宽的标记里会被压成一列竖排文字
+              a && hasRoleDetail(a) ? h('span', { className: 'sc-seg-role-full' }, roleText(a)) : null,
               // 有宿主渲染的高亮版就用它；否则退回纯文本 Markdown
               //
               // 暂停回顾：核心/攻坚档的段落在"看过的第一眼"之后会被盖上，
