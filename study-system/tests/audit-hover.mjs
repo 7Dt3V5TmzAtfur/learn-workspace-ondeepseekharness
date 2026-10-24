@@ -53,9 +53,15 @@ const html = `<!doctype html>
   <div class="sc-md">
     <section class="sc-seg" data-id="¶3" data-tier="core">
       <span class="sc-seg-mark" aria-hidden="true">¶3</span>
-      <span class="sc-seg-role">#d</span>
-      <span class="sc-seg-role-full">#d · 全章的判断标准 · Agent 与普通对话的区别</span>
+      <span class="sc-seg-role sc-role-d">#d</span>
+      <span class="sc-seg-role-full"><b class="sc-role-text sc-role-d">#d</b> · 全章的判断标准 · Agent 与普通对话的区别</span>
       <div>这些产品的形态各异，但有一个共同点：它们不再是“你问一句、它答一句”的被动对话，而是能够自主规划执行步骤的智能系统。</div>
+    </section>
+    <section class="sc-seg" data-id="¶4" data-tier="hard">
+      <span class="sc-seg-mark" aria-hidden="true">¶4</span>
+      <span class="sc-seg-role sc-role-q">#q</span>
+      <span class="sc-seg-role-full"><b class="sc-role-text sc-role-q">#q</b> · 为什么 Agent 与 Environment 是闭环而不是组成</span>
+      <div>这里提出一个需要停下来想的问题。</div>
     </section>
   </div>
 </div>
@@ -112,13 +118,13 @@ try {
   const page = await browser.newPage({ viewport: { width: 900, height: 600 } })
   await page.setContent(html, { waitUntil: 'load' })
 
-  const panel = page.locator('.sc-seg-role-full')
+  const panel = page.locator('.sc-seg[data-id="¶3"] .sc-seg-role-full')
   check('未悬停时面板不可见', !(await panel.isVisible()))
 
-  const roleEvents = await page.locator('.sc-seg-role').evaluate((el) => getComputedStyle(el).pointerEvents)
+  const roleEvents = await page.locator('.sc-seg[data-id="¶3"] .sc-seg-role').evaluate((el) => getComputedStyle(el).pointerEvents)
   check('角色标记可被鼠标命中', roleEvents !== 'none', `pointer-events=${roleEvents}`)
 
-  await page.locator('.sc-seg').hover()
+  await page.locator('.sc-seg[data-id="¶3"]').hover()
   await page.waitForTimeout(120)
 
   check('悬停段落后面板出现', await panel.isVisible())
@@ -126,22 +132,32 @@ try {
   check('面板有实际尺寸', Boolean(box && box.width > 40 && box.height > 10), JSON.stringify(box))
 
   const overlaps = await page.evaluate(() => {
-    const p = document.querySelector('.sc-seg-role-full').getBoundingClientRect()
+    const p = document.querySelector('.sc-seg[data-id="¶3"] .sc-seg-role-full').getBoundingClientRect()
     const text = document.querySelector('.sc-seg > div').getBoundingClientRect()
     return p.bottom > text.top + 2 && p.top < text.top + 24
   })
   check('面板不遮挡正文首行', !overlaps)
   await page.close()
 
+  /* 角色本身要可分辨：#d 与 #q 不能同色（用户明确要求） */
+  const colorPage = await browser.newPage({ viewport: { width: 900, height: 600 } })
+  await colorPage.setContent(html)
+  const roleColors = await colorPage.evaluate(() => ({
+    d: getComputedStyle(document.querySelector('.sc-role-d')).color,
+    q: getComputedStyle(document.querySelector('.sc-role-q')).color,
+  }))
+  check('#d 与 #q 的角色颜色不同', roleColors.d !== roleColors.q, JSON.stringify(roleColors))
+  await colorPage.close()
+
   /* ---------- 2. 配色：明暗两套都必须读得清 */
 
   for (const theme of ['light', 'dark']) {
     const p = await browser.newPage({ viewport: { width: 900, height: 600 } })
     await p.setContent(theme === 'dark' ? html.replace('<body>', '<body data-ds-dark-theme>') : html)
-    await p.locator('.sc-seg').hover()
+    await p.locator('.sc-seg[data-id="¶3"]').hover()
     await p.waitForTimeout(120)
     const { bg, fg } = await p.evaluate(() => {
-      const cs = getComputedStyle(document.querySelector('.sc-seg-role-full'))
+      const cs = getComputedStyle(document.querySelector('.sc-seg[data-id="¶3"] .sc-seg-role-full'))
       return { bg: cs.backgroundColor, fg: cs.color }
     })
     const bgc = parseColor(bg)

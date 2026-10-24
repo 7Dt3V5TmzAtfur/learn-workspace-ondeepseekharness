@@ -57,6 +57,15 @@ window.__ModuleLoader__.load({
   --sc-pop-bg:#ffffff;
   --sc-pop-fg:#20242d;
   --sc-pop-border:#d8dee8;
+  /* 渐构角色配色：#d/#q/#e… 与"核心/攻坚/参考"三档是两套语义，
+   * 用户要求角色本身可分辨，不能全部画成同一个颜色。 */
+  --sc-role-d:#2563eb;
+  --sc-role-e:#0f766e;
+  --sc-role-q:#c026d3;
+  --sc-role-s:#b45309;
+  --sc-role-t:#16a34a;
+  --sc-role-c:#64748b;
+  --sc-role-v:#4f46e5;
 }
 /* 深色必须单独给值。原来全部靠 rgba(x,.10) 叠在深色底上，
  * 实测深底 #2c2c2e 上 10% 蓝 ≈ #313a4a，几乎看不见。 */
@@ -67,6 +76,13 @@ body[data-ds-dark-theme] .sc-root{
   --sc-pop-bg:#23262e;
   --sc-pop-fg:#e6eaf2;
   --sc-pop-border:#3a4252;
+  --sc-role-d:#93c5fd;
+  --sc-role-e:#5eead4;
+  --sc-role-q:#f0abfc;
+  --sc-role-s:#fdba74;
+  --sc-role-t:#86efac;
+  --sc-role-c:#a8b3c5;
+  --sc-role-v:#a5b4fc;
 }
 .sc-root{display:flex;flex-direction:column;height:100%;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font-size:var(--sc-fs-base)}
 .sc-head{display:flex;align-items:center;gap:var(--sc-sp-2);padding:10px var(--sc-sp-4);border-bottom:1px solid var(--dsw-alias-border-l1);flex:none}
@@ -185,9 +201,15 @@ body[data-ds-dark-theme] .sc-root{
  * 面板向上落在这段的上留白中，不遮挡正文。 */
 .sc-seg-role-full{display:none;position:absolute;left:44px;bottom:calc(100% + 4px);width:max-content;max-width:320px;padding:3px 8px;border:1px solid var(--sc-pop-border);border-radius:var(--sc-r-sm);background:var(--sc-pop-bg);color:var(--sc-pop-fg);font-size:var(--sc-fs-xs);font-weight:400;line-height:1.6;white-space:normal;box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:6;pointer-events:none}
 .sc-seg:hover .sc-seg-role-full,.sc-seg:focus-within .sc-seg-role-full{display:block}
-.sc-seg[data-tier=core] .sc-seg-role{color:var(--sc-core-fg)}
-.sc-seg[data-tier=hard] .sc-seg-role{color:var(--sc-hard-fg)}
-.sc-seg[data-tier=ref] .sc-seg-role{color:var(--sc-ref-fg)}
+.sc-role-d{--sc-role-current:var(--sc-role-d)}
+.sc-role-e{--sc-role-current:var(--sc-role-e)}
+.sc-role-q{--sc-role-current:var(--sc-role-q)}
+.sc-role-s{--sc-role-current:var(--sc-role-s)}
+.sc-role-t{--sc-role-current:var(--sc-role-t)}
+.sc-role-c{--sc-role-current:var(--sc-role-c)}
+.sc-role-v{--sc-role-current:var(--sc-role-v)}
+.sc-seg-role{color:var(--sc-role-current,var(--dsw-alias-label-secondary))}
+.sc-role-text{color:var(--sc-role-current);font-weight:600}
 .sc-seg:hover .sc-seg-role{opacity:.95}
 /* 窄屏没有余量放留白标记：直接收起，正文优先 */
 @media (max-width:760px){.sc-seg{padding-left:12px}.sc-seg-mark,.sc-seg-role{display:none}}
@@ -817,7 +839,8 @@ body[data-ds-dark-theme] .sc-root{
     /* --------------------------------------------------------- 小组件 */
 
     /** 角色的完整称呼：编号 + 关键词 + 标题，缺哪个就跳过哪个 */
-    const roleText = (a) => [`#${a?.label}`, a?.keyword, a?.title].filter(Boolean).join(' · ')
+    const roleDetail = (a) => [a?.keyword, a?.title].filter(Boolean).join(' · ')
+    const roleText = (a) => [`#${a?.label}`, roleDetail(a)].filter(Boolean).join(' · ')
 
     /** 没有关键词与标题时不弹面板，只留 #d 本身 */
     const hasRoleDetail = (a) => Boolean(String(a?.keyword ?? '').trim() || String(a?.title ?? '').trim())
@@ -1858,14 +1881,21 @@ body[data-ds-dark-theme] .sc-root{
                 ? h(
                     'span',
                     {
-                      className: 'sc-seg-role',
+                      className: `sc-seg-role sc-role-${a.label}`,
                       title: roleText(a),
                     },
                     `#${a.label}`,
                   )
                 : null,
               // 面板相对整段定位：挂在 36px 宽的标记里会被压成一列竖排文字
-              a && hasRoleDetail(a) ? h('span', { className: 'sc-seg-role-full' }, roleText(a)) : null,
+              a && hasRoleDetail(a)
+                ? h(
+                    'span',
+                    { className: 'sc-seg-role-full' },
+                    h('b', { className: `sc-role-text sc-role-${a.label}` }, `#${a.label}`),
+                    roleDetail(a) ? ` · ${roleDetail(a)}` : null,
+                  )
+                : null,
               // 有宿主渲染的高亮版就用它；否则退回纯文本 Markdown
               //
               // 暂停回顾：核心/攻坚档的段落在"看过的第一眼"之后会被盖上，
