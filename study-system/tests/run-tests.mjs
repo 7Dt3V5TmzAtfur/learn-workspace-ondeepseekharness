@@ -1934,6 +1934,51 @@ await test('peek：资料不存在时返回 null 而不是抛错', async () => {
   await rm(ws, { recursive: true, force: true })
 })
 
+/* -------------------------------------------------------------- 标注来源
+ *
+ * `annotated` 只看有没有标注条目，于是脚本批量回填出来的 182 条
+ * 也点亮了"读中完成"。chapter4 的 annotations.json 自己就写着
+ * "quote 由脚本从原文机械回填" —— 系统明知这些是机械产物，
+ * 却仍然对外说这一段读完了。
+ *
+ * 不改判定（那会让老项目从"已完成"掉回"没读"，而"读过"无法被机器验证），
+ * 但必须把来源如实报出来。
+ */
+await test('机械回填的标注不能被当成"逐段判读"', async () => {
+  const svc = new StudyService(tmpdir())
+  const p = svc.provenanceOf({
+    items: [{ segmentId: '¶1' }],
+    backfillNote: 'quote 由脚本从原文机械回填，建议让模型重新精标',
+  })
+  assert.equal(p.kind, 'backfilled')
+  assert.equal(p.reliable, false, '回填出来的标注不能标成可信')
+  assert.ok(p.advice, '要给出可执行的下一步')
+})
+
+await test('机械摘取的 quote 也要标出来', async () => {
+  const svc = new StudyService(tmpdir())
+  const p = svc.provenanceOf({
+    items: [{ segmentId: '¶1' }],
+    issues: [{ code: 'mechanical-quote', level: 'warn', message: 'x' }],
+  })
+  assert.equal(p.kind, 'mechanical')
+  assert.equal(p.reliable, false)
+})
+
+await test('人工逐段判读的标注才是可信的', async () => {
+  const svc = new StudyService(tmpdir())
+  const p = svc.provenanceOf({ items: [{ segmentId: '¶1', quote: 'q' }], issues: [] })
+  assert.equal(p.kind, 'judged')
+  assert.equal(p.reliable, true)
+})
+
+await test('没有标注时不说"可信"也不说"不可信"', async () => {
+  const svc = new StudyService(tmpdir())
+  const p = svc.provenanceOf(null)
+  assert.equal(p.kind, 'none')
+  assert.equal(p.reliable, false)
+})
+
 console.log(`\n${'─'.repeat(52)}`)
 console.log(`通过 ${passed}　失败 ${failed}`)
 

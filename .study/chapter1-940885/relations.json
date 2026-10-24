@@ -3,12 +3,17 @@
     {
       "id": "formula",
       "kind": "concept",
-      "label": "Agent = LLM + 上下文 + 工具"
+      "label": "Agent = LLM + 上下文 + 工具",
+      "segmentId": "¶7",
+      "segmentSource": "edge",
+      "segmentAmbiguous": true
     },
     {
       "id": "boundary",
       "kind": "concept",
-      "label": "Agent 与 Environment 的边界"
+      "label": "Agent 与 Environment 的边界",
+      "segmentId": "¶17",
+      "segmentSource": "edge"
     },
     {
       "id": "model-harness",
@@ -18,7 +23,10 @@
     {
       "id": "obs-act",
       "kind": "concept",
-      "label": "观察空间与动作空间"
+      "label": "观察空间与动作空间",
+      "segmentId": "¶18",
+      "segmentSource": "edge",
+      "segmentAmbiguous": true
     },
     {
       "id": "rl-map",
@@ -28,12 +36,17 @@
     {
       "id": "tool",
       "kind": "concept",
-      "label": "工具：Agent 的手脚"
+      "label": "工具：Agent 的手脚",
+      "segmentId": "¶35",
+      "segmentSource": "edge",
+      "segmentAmbiguous": true
     },
     {
       "id": "tool-call",
       "kind": "concept",
-      "label": "工具调用四步"
+      "label": "工具调用四步",
+      "segmentId": "¶35",
+      "segmentSource": "edge"
     },
     {
       "id": "tool-principle",
@@ -43,7 +56,9 @@
     {
       "id": "llm",
       "kind": "concept",
-      "label": "LLM：Agent 的大脑"
+      "label": "LLM：Agent 的大脑",
+      "segmentId": "¶52",
+      "segmentSource": "edge"
     },
     {
       "id": "inner-think",
@@ -58,42 +73,60 @@
     {
       "id": "learn-paths",
       "kind": "concept",
-      "label": "能力更新的三条路径"
+      "label": "能力更新的三条路径",
+      "segmentId": "¶203",
+      "segmentSource": "edge"
     },
     {
       "id": "context",
       "kind": "concept",
-      "label": "上下文：Agent 的眼睛"
+      "label": "上下文：Agent 的眼睛",
+      "segmentId": "¶58",
+      "segmentSource": "edge"
     },
     {
       "id": "five-parts",
       "kind": "concept",
-      "label": "上下文的五个组成部分"
+      "label": "上下文的五个组成部分",
+      "segmentId": "¶61",
+      "segmentSource": "edge",
+      "segmentAmbiguous": true
     },
     {
       "id": "prefix-traj",
       "kind": "concept",
-      "label": "静态前缀 + 轨迹"
+      "label": "静态前缀 + 轨迹",
+      "segmentId": "¶201",
+      "segmentSource": "edge"
     },
     {
       "id": "ablation",
       "kind": "concept",
-      "label": "消融实验 1-1"
+      "label": "消融实验 1-1",
+      "segmentId": "¶64",
+      "segmentSource": "edge"
     },
     {
       "id": "react",
       "kind": "concept",
-      "label": "ReAct 循环：想→做→看"
+      "label": "ReAct 循环：想→做→看",
+      "segmentId": "¶65",
+      "segmentSource": "heading"
     },
     {
       "id": "harness",
       "kind": "concept",
-      "label": "Harness 工程"
+      "label": "Harness 工程",
+      "segmentId": "¶96",
+      "segmentSource": "edge",
+      "segmentAmbiguous": true
     },
     {
       "id": "three-guards",
       "kind": "concept",
-      "label": "约束 / 验证 / 纠正"
+      "label": "约束 / 验证 / 纠正",
+      "segmentId": "¶212",
+      "segmentSource": "edge"
     },
     {
       "id": "evo-stages",
@@ -113,7 +146,10 @@
     {
       "id": "workflow",
       "kind": "concept",
-      "label": "工作流：确定性编排"
+      "label": "工作流：确定性编排",
+      "segmentId": "¶153",
+      "segmentSource": "edge",
+      "segmentAmbiguous": true
     },
     {
       "id": "autonomous",
@@ -123,22 +159,32 @@
     {
       "id": "adapter",
       "kind": "concept",
-      "label": "适配层"
+      "label": "适配层",
+      "segmentId": "¶149",
+      "segmentSource": "edge"
     },
     {
       "id": "guardrails",
       "kind": "concept",
-      "label": "护栏三层"
+      "label": "护栏三层",
+      "segmentId": "¶183",
+      "segmentSource": "edge",
+      "segmentAmbiguous": true
     },
     {
       "id": "hitl",
       "kind": "concept",
-      "label": "人工干预"
+      "label": "人工干预",
+      "segmentId": "¶183",
+      "segmentSource": "heading"
     },
     {
       "id": "design-patterns",
       "kind": "concept",
-      "label": "五个设计模式"
+      "label": "五个设计模式",
+      "segmentId": "¶199",
+      "segmentSource": "edge",
+      "segmentAmbiguous": true
     },
     {
       "id": "proposer-reviewer",
@@ -637,5 +683,27 @@
       }
     }
   },
-  "savedAt": "2026-10-24T06:25:53.046Z"
+  "savedAt": "2026-10-24T06:25:53.046Z",
+  "nodeLink": {
+    "updatedAt": "2026-10-24T07:09:34.404Z",
+    "rule": "只从带 quote 的边继承；证据不足留空，不猜（点错段比没有链接更糟）",
+    "covered": 19,
+    "total": 33,
+    "unresolved": [
+      "model-harness",
+      "rl-map",
+      "tool-principle",
+      "inner-think",
+      "model-as-agent",
+      "evo-stages",
+      "principles",
+      "model-choice",
+      "autonomous",
+      "proposer-reviewer",
+      "progressive",
+      "append-only",
+      "boundary-retention",
+      "min-diff"
+    ]
+  }
 }

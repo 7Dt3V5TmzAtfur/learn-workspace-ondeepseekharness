@@ -206,15 +206,38 @@ body[data-ds-dark-theme] .sc-root{
 .sc-issue[data-level=warn]{background:rgba(245,158,11,.14);border-left-color:var(--dsw-alias-state-warn-primary)}
 .sc-legend{display:flex;gap:var(--sc-sp-3);flex-wrap:wrap;font-size:var(--sc-fs-xs);color:var(--dsw-alias-label-secondary);margin-bottom:10px;align-items:center}
 .sc-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.sc-prov{padding:0 6px;border-radius:3px;font-size:10px;line-height:1.7;color:var(--dsw-alias-label-secondary);background:var(--dsw-alias-bg-layer-2);border:1px dashed var(--dsw-alias-border-l2);cursor:help}
 .sc-dock{display:flex;align-items:center;gap:var(--sc-sp-2);padding:6px 10px;border:1px solid var(--dsw-alias-border-l1);border-radius:var(--sc-r-md);background:var(--dsw-alias-bg-layer-1);font-size:var(--sc-fs-sm);color:var(--dsw-alias-label-secondary)}
 .sc-dock b{color:var(--dsw-alias-label-primary);font-weight:500}
 .sc-dock-light{display:inline-flex;align-items:center;gap:5px;font-size:var(--sc-fs-xs);color:var(--dsw-alias-label-secondary);max-width:320px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sc-dock-light-tag{flex:0 0 auto;padding:0 5px;border-radius:3px;background:var(--dsw-alias-bg-layer-2);border:1px solid var(--dsw-alias-border-l1);font-size:10px;line-height:1.5}
 .sc-seg-meta{display:flex;align-items:center;gap:6px;margin-bottom:var(--sc-sp-1);font-size:var(--sc-fs-sm)}
-.sc-details{margin-top:var(--sc-sp-2)}
-.sc-details>summary{cursor:pointer;font-size:var(--sc-fs-sm);color:var(--dsw-alias-label-secondary);user-select:none}
+.sc-details{margin-top:var(--sc-sp-2)}.sc-details>summary{cursor:pointer;font-size:var(--sc-fs-sm);color:var(--dsw-alias-label-secondary);user-select:none}
 .sc-details>summary:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:2px}
 .sc-details[open]>summary{margin-bottom:var(--sc-sp-1)}
+/* 知识点出处：图上的方块点不了，这里给出可点的落点。没有 segmentId 的节点不列。 */
+.sc-cite-list{display:flex;flex-direction:column;gap:2px;max-height:260px;overflow-y:auto}
+.sc-cite-row{display:flex;align-items:baseline;gap:8px;width:100%;text-align:left;background:none;border:none;border-radius:4px;padding:4px 6px;font:inherit;font-size:12px;color:var(--dsw-alias-label-primary);cursor:pointer}
+.sc-cite-row:hover{background:var(--dsw-alias-bg-layer-2)}
+.sc-cite-row:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:-2px}
+.sc-cite-label{flex:1;line-height:1.5}
+.sc-cite-seg{flex:none;color:var(--dsw-alias-label-secondary);font-variant-numeric:tabular-nums}
+/* 读中页的要求条：折叠时只占一行，展开才给细节。
+   它不是横幅、不是提醒，是"这一块该读到什么程度"的一句话。 */
+.sc-askbar{margin:0 0 8px;border:1px solid var(--dsw-alias-border-l1);border-radius:6px;background:var(--dsw-alias-bg-layer-1);font-size:var(--sc-fs-sm)}
+.sc-askbar>summary{display:flex;align-items:center;gap:8px;padding:6px 10px;cursor:pointer;user-select:none;line-height:1.6}
+.sc-askbar>summary:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:-2px;border-radius:6px}
+.sc-askbar-title{color:var(--dsw-alias-label-primary);font-weight:500}
+.sc-askbar-lv{flex:none;padding:0 6px;border-radius:3px;font-size:10px;line-height:1.6;border:1px solid var(--dsw-alias-border-l2);color:var(--dsw-alias-label-secondary)}
+.sc-askbar-lv[data-lv="熟练掌握"]{color:#0f766e;border-color:#14b8a6;background:rgba(20,184,166,.10)}
+.sc-askbar-lv[data-lv="掌握"]{color:#b45309;border-color:#f59e0b;background:rgba(245,158,11,.12)}
+.sc-askbar-lv[data-lv="理解"]{color:#a21caf;border-color:#c026d3;background:rgba(192,38,211,.10)}
+.sc-askbar-body{padding:2px 10px 9px;border-top:1px solid var(--dsw-alias-border-l1);display:flex;flex-direction:column;gap:6px}
+.sc-askbar-row{display:flex;gap:8px;font-size:var(--sc-fs-xs);line-height:1.7;color:var(--dsw-alias-label-secondary)}
+.sc-askbar-row>b{flex:0 0 76px;color:var(--dsw-alias-label-primary);font-weight:500}
+.sc-askbar-ul{margin:0;padding-left:16px;display:flex;flex-direction:column;gap:2px}
+/* 语音失败的提示：说明原因 + 一句兜底，不用"错误"这种吓人的词 */
+.sc-voice-err{margin-top:8px;padding:7px 10px;border-radius:6px;font-size:var(--sc-fs-xs);line-height:1.7;color:var(--dsw-alias-label-primary);background:var(--dsw-alias-bg-layer-1);border-left:3px solid var(--dsw-alias-state-warn-primary)}
 .sc-pop{max-width:min(460px,calc(100% - 32px));right:16px;bottom:16px;position:absolute;z-index:20;background:var(--dsw-alias-bg-overlay);border:1px solid var(--dsw-alias-border-l2);border-radius:var(--sc-r-md);padding:10px var(--sc-sp-3);box-shadow:0 8px 24px rgba(0,0,0,.18);font-size:var(--sc-fs-sm);min-width:200px}
 /* 复习到期横幅：只在真的到期时出现 */
 .sc-review{display:flex;flex-direction:column;gap:6px;padding:var(--sc-sp-3);margin-bottom:var(--sc-sp-3);border:1px solid var(--sc-core-line);border-radius:var(--sc-r-md);background:var(--sc-core-bg)}
@@ -1086,6 +1109,9 @@ body[data-ds-dark-theme] .sc-root{
       const [asking, setAsking] = useState(false)
       const [answer, setAnswer] = useState(null)
       const [listening, setListening] = useState(false)
+      // 语音识别失败的原因。语音依赖浏览器与厂商服务，失败是常态，
+      // 必须说出来，否则用户只看到按钮亮了一下。
+      const [voiceErr, setVoiceErr] = useState(null)
       const [unitList, setUnitList] = useState(null)
       const [activeUnit, setActiveUnit] = useState(null)
 
@@ -1100,8 +1126,76 @@ body[data-ds-dark-theme] .sc-root{
       const items = project.annotations?.items ?? []
       const stats = project.annotations?.stats
       const issues = project.annotations?.issues
+      // 标注来源（宿主判定）：'judged' 才是逐段判读出来的
+      const prov = project.provenance ?? null
       const byId = useMemo(() => new Map(items.map((it) => [it.segmentId, it])), [items])
       const segments = project.segments ?? []
+
+      /*
+       * 当前在看哪一块的"要求"。
+       *
+       * 原来读中页在读前建构面前是完全断开的：读前页写着这一部分要"掌握"、
+       * 要求能复述五类工具、难点是别把它当成 2×N 矩阵，然后点进正文，
+       * 这些字一个都不见了。用户只能靠记忆，或者切回读前页翻。
+       *
+       * 做法：preflight 的每个 part 都带 segmentIds，所以段落 → part 是精确映射，
+       * 不用再猜。滚动时算出当前可见的最上那一段，反查它属于哪个 part。
+       */
+      const parts = project.preflight?.parts ?? []
+      // part.segmentIds 只放了关键段落（chapter1 里只覆盖 16%），
+      // 真正的完整范围要顺着 unitIds 展开成单元的段号。
+      // 两路都收：segmentIds 精确，unitIds 补全，重合无害。
+      const partBySeg = useMemo(() => {
+        const m = new Map()
+        const unitSegs = new Map(
+          (unitList?.units ?? []).map((u) => [u.id, u.segmentIds ?? []]),
+        )
+        for (const p of parts) {
+          for (const id of p.segmentIds ?? []) m.set(id, p)
+          for (const uid of p.unitIds ?? []) {
+            for (const sid of unitSegs.get(uid) ?? []) m.set(sid, p)
+          }
+        }
+        return m
+      }, [parts, unitList])
+
+      const [currentSeg, setCurrentSeg] = useState(null)
+      useEffect(() => {
+        if (!partBySeg.size) return undefined
+        // 用一个"哪一段离视口中心最近"的观察者，而不是 IntersectionObserver 队列：
+        // 后者在快速滚动时给出一堆交叉记录，还要自己维护集合，容易选错。
+        let raf = 0
+        const onScroll = () => {
+          if (raf) return
+          raf = window.requestAnimationFrame(() => {
+            raf = 0
+            const nodes = document.querySelectorAll('[data-id]')
+            const mid = window.innerHeight / 2
+            let best = null
+            let bestD = Infinity
+            for (const el of nodes) {
+              const r = el.getBoundingClientRect()
+              if (r.bottom < 0 || r.top > window.innerHeight) continue
+              const d = Math.abs((r.top + r.bottom) / 2 - mid)
+              if (d < bestD) {
+                bestD = d
+                best = el.getAttribute('data-id')
+              }
+            }
+            if (best) setCurrentSeg(best)
+          })
+        }
+        // 面板是内部滚动容器，绑在 window 上要加捕获
+        window.addEventListener('scroll', onScroll, true)
+        onScroll()
+        return () => {
+          window.removeEventListener('scroll', onScroll, true)
+          if (raf) window.cancelAnimationFrame(raf)
+        }
+      }, [partBySeg])
+
+      // 跳转过来时也要立刻切换（滚动事件可能还没触发）
+      const currentPart = partBySeg.get(jumpTo ?? currentSeg ?? '') ?? null
 
       // 宿主已经把整篇渲染成带高亮的 HTML；这里按 ¶N 切回来以便逐段交互
       const htmlBySeg = useMemo(() => {
@@ -1294,7 +1388,10 @@ body[data-ds-dark-theme] .sc-root{
 
       const startVoice = () => {
         const Ctor = window.SpeechRecognition || window.webkitSpeechRecognition
-        if (!Ctor) return
+        if (!Ctor) {
+          setVoiceErr('这个浏览器没有语音识别能力（只有 Chrome / Edge 提供）。手打一个词也一样能问。')
+          return
+        }
         const rec = new Ctor()
         recRef.current = rec
         rec.lang = 'zh-CN'
@@ -1304,25 +1401,51 @@ body[data-ds-dark-theme] .sc-root{
           const said = String(e.results?.[0]?.[0]?.transcript ?? '').trim()
           setListening(false)
           recRef.current = null
+          setVoiceErr(null)
           if (said) {
             setSelText(said)
             if (sel) doAsk(said, sel.seg.id)
           }
         }
-        rec.onerror = () => {
+        /**
+         * 失败必须说出来。
+         *
+         * 原来这里是个空函数：麦克风按钮点下去亮一下、又灭了，
+         * 用户完全不知道是自己没说话、没给权限，还是浏览器不支持。
+         * 语音识别依赖厂商云服务，失败是常态而不是异常，
+         * 所以每一种失败都要给出对应的下一步动作，而不是统一沉默。
+         */
+        rec.onerror = (ev) => {
           recRef.current = null
           setListening(false)
+          const code = ev?.error ?? ''
+          const why =
+            code === 'not-allowed' || code === 'service-not-allowed'
+              ? '麦克风权限被拒绝了。请在地址栏左侧的站点设置里允许麦克风，然后重试。'
+              : code === 'no-speech'
+                ? '没有听到声音。再点一次麦克风，说完稍等一下。'
+                : code === 'audio-capture'
+                  ? '找不到可用的麦克风。检查一下设备是否插好、是否被别的程序占用。'
+                  : code === 'network'
+                    ? '语音识别要连厂商的服务器，这次没连上。手打一个词照样能问。'
+                    : code === 'aborted'
+                      ? null // 用户自己按停的，不用报错
+                      : `语音识别失败${code ? `（${code}）` : ''}。手打一个词也一样能问。`
+          setVoiceErr(why)
         }
         rec.onend = () => {
           recRef.current = null
           setListening(false)
         }
+        setVoiceErr(null)
         setListening(true)
         try {
           rec.start()
-        } catch {
+        } catch (e) {
           recRef.current = null
           setListening(false)
+          // start() 抛错通常是上一次还没结束就再点了，或权限被策略拦住
+          setVoiceErr(`没能启动录音：${String(e?.message ?? e)}。手打一个词也一样能问。`)
         }
       }
 
@@ -1369,6 +1492,66 @@ body[data-ds-dark-theme] .sc-root{
               ),
             )
           : null,
+        // ---- 当前这一块的要求：读的时候就看得到 ----
+        // 收起时不占地方，只露一行「这一块要掌握什么」；展开给出要求、难点、重点。
+        currentPart
+          ? h(
+              'details',
+              { className: 'sc-askbar', open: false },
+              h(
+                'summary',
+                null,
+                h('span', { className: 'sc-askbar-lv', 'data-lv': currentPart.assessment?.level ?? '' },
+                  currentPart.assessment?.level ?? '未定'),
+                h('span', { className: 'sc-askbar-title' }, currentPart.title),
+                h('span', { className: 'sc-muted' }, '这一块要达到什么'),
+              ),
+              h(
+                'div',
+                { className: 'sc-askbar-body' },
+                currentPart.assessment?.requirement
+                  ? h(
+                      'div',
+                      { className: 'sc-askbar-row' },
+                      h('b', null, '读完要能做到'),
+                      h('span', null, currentPart.assessment.requirement),
+                    )
+                  : null,
+                currentPart.assessment?.purpose
+                  ? h(
+                      'div',
+                      { className: 'sc-askbar-row' },
+                      h('b', null, '为什么重要'),
+                      h('span', null, currentPart.assessment.purpose),
+                    )
+                  : null,
+                (currentPart.difficulties ?? []).length
+                  ? h(
+                      'div',
+                      { className: 'sc-askbar-row' },
+                      h('b', null, '难点'),
+                      h(
+                        'ul',
+                        { className: 'sc-askbar-ul' },
+                        currentPart.difficulties.map((d, i) => h('li', { key: i }, d)),
+                      ),
+                    )
+                  : null,
+                (currentPart.keyPoints ?? []).length
+                  ? h(
+                      'div',
+                      { className: 'sc-askbar-row' },
+                      h('b', null, '重点'),
+                      h(
+                        'ul',
+                        { className: 'sc-askbar-ul' },
+                        currentPart.keyPoints.map((k, i) => h('li', { key: i }, k)),
+                      ),
+                    )
+                  : null,
+              ),
+            )
+          : null,
         // ---- 顶部图例：三色语义 + 预算进度 ----
         // 颜色必须跟 CSS 里的 --sc-*-line 一致，否则用户看到的图例和正文对不上
         h(
@@ -1386,6 +1569,15 @@ body[data-ds-dark-theme] .sc-root{
                   : `已标 ${stats.total}/${segments.length} 段`,
               )
             : h('span', { className: 'sc-muted' }, '还没有标注'),
+          // 标注是脚本回填的就说出来。不说的话，用户会以为这些标签是读过之后判的，
+          // 而实际上它们可能连角色都标错了。
+          prov && !prov.reliable
+            ? h(
+                'span',
+                { className: 'sc-prov', title: prov.note || prov.advice || prov.label },
+                prov.label,
+              )
+            : null,
           h(
             'label',
             { style: { marginLeft: 'auto', cursor: 'pointer', userSelect: 'none' } },
@@ -1569,6 +1761,19 @@ body[data-ds-dark-theme] .sc-root{
                   '手动输入',
                 ),
               ),
+              // 语音失败的原因：说清是权限、没听到，还是浏览器不行
+              voiceErr
+                ? h(
+                    'div',
+                    { className: 'sc-voice-err', role: 'alert' },
+                    voiceErr,
+                    h(
+                      'button',
+                      { className: 'sc-linkbtn', style: { marginLeft: 6 }, onClick: () => setVoiceErr(null) },
+                      '知道了',
+                    ),
+                  )
+                : null,
               answer
                 ? h(
                     'div',
@@ -1655,6 +1860,55 @@ body[data-ds-dark-theme] .sc-root{
     }
 
     /**
+     * 知识点 → 原文。图里的方块由 archify 自己渲染，界面插不进手，
+     * 所以"回到原文"这件事改在这里做：一个可折叠的清单，
+     * 每个知识点后面跟着它的出处，点一下就跳到读中页的那一段。
+     *
+     * 只列挂上了 segmentId 的：点错段比没有链接更糟。
+     * 没挂上的数量如实说出来，不做"全部可点"的假象。
+     */
+    function NodeCitePane({ project, onGoto }) {
+      const nodes = project.relations?.nodes ?? []
+      if (!nodes.length) return null
+      const linked = nodes.filter((n) => n.segmentId)
+      const missing = nodes.length - linked.length
+      return h(
+        'details',
+        { className: 'sc-details' },
+        h(
+          'summary',
+          null,
+          `知识点出处（${linked.length}/${nodes.length} 个能回到原文）`,
+        ),
+        missing
+          ? h(
+              'div',
+              { className: 'sc-muted', style: { fontSize: 12, margin: '4px 0 8px' } },
+              `另有 ${missing} 个知识点没有确切的原文落点（标签是改写过的说法，原文里找不到对应那一段）。` +
+                `不硬指一段，免得点过去看到的是别的内容。`,
+            )
+          : null,
+        h(
+          'div',
+          { className: 'sc-cite-list' },
+          linked.map((n) =>
+            h(
+              'button',
+              {
+                key: n.id,
+                className: 'sc-cite-row',
+                onClick: () => onGoto?.(n.segmentId),
+                title: `跳到 ${n.segmentId}`,
+              },
+              h('span', { className: 'sc-cite-label' }, n.label),
+              h('span', { className: 'sc-cite-seg' }, n.segmentId),
+            ),
+          ),
+        ),
+      )
+    }
+
+    /**
      * 知识图谱面板。
      *
      * 用户明确要求「知识点之间的逻辑衔接图用 archify 技能实现」，
@@ -1664,7 +1918,7 @@ body[data-ds-dark-theme] .sc-root{
      * 关系图节点多时 archify 会拆成多张（保证字号可读），
      * so 这里做成多张切换，而不是硬塞一张大图。
      */
-    function GraphPane({ project }) {
+    function GraphPane({ project, onGoto }) {
       const figures = project.figures ?? []
       const [active, setActive] = useState(0)
       const nodes = project.relations?.nodes ?? []
@@ -1762,6 +2016,9 @@ body[data-ds-dark-theme] .sc-root{
               ),
             )
           : null,
+
+        // ---- 每个知识点回到原文 ----
+        h(NodeCitePane, { project, onGoto }),
       )
     }
 
@@ -2485,7 +2742,7 @@ body[data-ds-dark-theme] .sc-root{
                       : tab === 'plan'
                         ? h(PreflightPane, { project, onJump: setTab, onGotoSegment: gotoSegment })
                         : tab === 'graph'
-                          ? h(GraphPane, { project })
+                          ? h(GraphPane, { project, onGoto: gotoSegment })
                           : tab === 'recall'
                             ? h(RecallPane, { project })
                             : h(QuizPane, { project }),

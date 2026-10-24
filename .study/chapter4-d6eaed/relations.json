@@ -8,7 +8,9 @@
     {
       "id": "agent-goal",
       "kind": "premise",
-      "label": "Agent 的目标（而非底层 API 操作）"
+      "label": "Agent 的目标（而非底层 API 操作）",
+      "segmentId": "¶2",
+      "segmentSource": "edge"
     },
     {
       "id": "form-spectrum",
@@ -18,7 +20,9 @@
     {
       "id": "gen-default",
       "kind": "principle",
-      "label": "默认取向：通用优于专用"
+      "label": "默认取向：通用优于专用",
+      "segmentId": "¶21",
+      "segmentSource": "edge"
     },
     {
       "id": "dedicated-cases",
@@ -38,7 +42,10 @@
     {
       "id": "four-dims",
       "kind": "method",
-      "label": "四个决策维度"
+      "label": "四个决策维度",
+      "segmentId": "¶26",
+      "segmentSource": "edge",
+      "segmentAmbiguous": true
     },
     {
       "id": "skill-4dims",
@@ -68,17 +75,23 @@
     {
       "id": "lazy-index",
       "kind": "method",
-      "label": "层次化组织与按需加载（只暴露索引）"
+      "label": "层次化组织与按需加载（只暴露索引）",
+      "segmentId": "¶60",
+      "segmentSource": "edge"
     },
     {
       "id": "retrieval-prefilter",
       "kind": "method",
-      "label": "检索式预筛选"
+      "label": "检索式预筛选",
+      "segmentId": "¶70",
+      "segmentSource": "edge"
     },
     {
       "id": "active-discovery",
       "kind": "method",
-      "label": "主动工具发现"
+      "label": "主动工具发现",
+      "segmentId": "¶62",
+      "segmentSource": "edge"
     },
     {
       "id": "skill-as-doc",
@@ -108,12 +121,16 @@
     {
       "id": "five-types",
       "kind": "taxonomy",
-      "label": "五类工具（感知/执行/协作/事件触发/用户沟通）"
+      "label": "五类工具（感知/执行/协作/事件触发/用户沟通）",
+      "segmentId": "¶5",
+      "segmentSource": "edge"
     },
     {
       "id": "perception",
       "kind": "tool-type",
-      "label": "感知工具"
+      "label": "感知工具",
+      "segmentId": "¶94",
+      "segmentSource": "heading"
     },
     {
       "id": "smart-summary",
@@ -123,12 +140,16 @@
     {
       "id": "execution",
       "kind": "tool-type",
-      "label": "执行工具"
+      "label": "执行工具",
+      "segmentId": "¶113",
+      "segmentSource": "heading"
     },
     {
       "id": "proposer-reviewer",
       "kind": "method",
-      "label": "提议者-审核者（事前审批/事后验证）"
+      "label": "提议者-审核者（事前审批/事后验证）",
+      "segmentId": "¶128",
+      "segmentSource": "edge"
     },
     {
       "id": "sidecar",
@@ -148,7 +169,9 @@
     {
       "id": "collaboration",
       "kind": "tool-type",
-      "label": "协作工具"
+      "label": "协作工具",
+      "segmentId": "¶158",
+      "segmentSource": "heading"
     },
     {
       "id": "lifecycle-primitives",
@@ -631,5 +654,35 @@
       ],
       "why": "文中把工具描述之于 LLM 类比于说明书之于人，属修辞性类比而非结构关系。"
     }
+  },
+  "nodeLink": {
+    "updatedAt": "2026-10-24T07:09:34.348Z",
+    "rule": "只从带 quote 的边继承；证据不足留空，不猜（点错段比没有链接更糟）",
+    "covered": 11,
+    "total": 33,
+    "unresolved": [
+      "aci",
+      "form-spectrum",
+      "dedicated-cases",
+      "granularity",
+      "read-document",
+      "skill-4dims",
+      "tool-description",
+      "silent-conversion",
+      "disclosure",
+      "tool-explosion",
+      "skill-as-doc",
+      "proxy-tool",
+      "mcp",
+      "skill-hub",
+      "trust-boundary",
+      "smart-summary",
+      "sidecar",
+      "exec-verify-loop",
+      "side-effect-unknown",
+      "lifecycle-primitives",
+      "hitl",
+      "hitl-timeout"
+    ]
   }
 }

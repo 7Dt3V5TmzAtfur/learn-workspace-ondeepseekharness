@@ -309,6 +309,9 @@ export class StudyService {
       // next 保持原样（很多地方在用它），另加 light 作为"轻的那一步"
       next: nextStepOf(project.progress),
       light: recommendFrom(project.progress).light,
+      // 标注来源：界面据此在统计行旁边标一句"脚本回填"，
+      // 免得用户以为自己读得挺好，实际上那些标签是机器凑的
+      provenance: this.provenanceOf(project.annotations),
       vocabulary: this.vocabulary(),
     }
   }
@@ -1137,9 +1140,55 @@ export class StudyService {
         subsections: u.subsections ?? [],
         touched,
         done: touched >= u.segmentIds.length,
+        // 暴露段号清单：读中页要据此判断"当前这一段属于哪个 part"。
+        // 只给 sourceRange 不够 —— 单元的 from/to 是按标题序号推的，
+        // 而 part 的 unitIds 指的是单元标题段，两者对不上时就会算空。
+        segmentIds: u.segmentIds,
       }
     })
     return { totalUnits: units.length, totalSegments: raw.totalSegments, units }
+  }
+
+  /**
+   * 标注是怎么来的。
+   *
+   * 这一项解决的是一个不会报错的谎：`annotated` 只看"有没有标注条目"，
+   * 于是脚本批量回填出来的 182 条也点亮了"读中完成"。
+   * chapter4 的 annotations.json 自己就写着
+   * backfillNote: "quote 由脚本从原文机械回填，建议让模型重新精标" ——
+   * 也就是说系统明知这些标注是机械产物，却仍然对外说这一段读完了。
+   *
+   * 为什么不改判定：改 `annotated` 的定义会让已有项目从"已完成"掉回"没读"，
+   * 而"读过"本身无法被机器验证。用一个更严的判据去替代一个宽松的判据，
+   * 只是把一种形式主义换成另一种。
+   *
+   * 所以这里不评判，只如实标注来源，让看到的人自己决定信几分。
+   */
+  provenanceOf(annotations) {
+    if (!annotations?.items?.length) return { kind: 'none', label: '还没有标注', reliable: false }
+    const note = String(annotations.backfillNote ?? '').trim()
+    const issues = annotations.issues ?? []
+    const mech = issues.filter((i) => i.code === 'mechanical-quote').length
+    // backfillNote 存在就说明这份标注是脚本补齐的，不是逐段判读出来的
+    if (note) {
+      return {
+        kind: 'backfilled',
+        label: '脚本回填（不是逐段判读）',
+        note,
+        reliable: false,
+        // 模型据此应当提议重新精标，而不是接着往后推进阶段
+        advice: 'quote 是机械回填的，角色标签可能不对。要当骨架用可以，但别当成"已经读懂"。',
+      }
+    }
+    if (mech) {
+      return {
+        kind: 'mechanical',
+        label: `有 ${mech} 条 quote 是机械摘取的`,
+        reliable: false,
+        advice: '这些 quote 未必是作者真正想强调的那句，建议重标。',
+      }
+    }
+    return { kind: 'judged', label: '逐段判读', reliable: true }
   }
 
   async status(docId) {
@@ -1196,6 +1245,8 @@ export class StudyService {
         terms: terms.length,
         drills: drills.length,
       },
+      // 标注是怎么来的：机械回填来的，就不能对外说"这一段读完了"
+      provenance: this.provenanceOf(annotations),
       // 高亮预算实测值：模型应该据此判断要不要缩短 quote
       highlight: annotations?.stats
         ? {

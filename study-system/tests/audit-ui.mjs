@@ -581,6 +581,62 @@ check(
   '"不必读完也能先试"必须随时可见，读不动的人才知道还有别的路',
 )
 
+console.log('\n16. 读的时候看得见「这一块要达到什么」')
+
+// 原来读中页完全不读 preflight：读前页写着这一部分要"掌握"、要求能复述五类工具、
+// 难点是别把它当成 2×N 矩阵，一点进正文这些字全没了。
+check(
+  '读中页渲染当前部分的要求',
+  /sc-askbar/.test(clientSrc) && /currentPart\.assessment/.test(clientSrc),
+  '读的时候看不到考核要求，等于读前白建了',
+)
+check(
+  '要求条会随滚动切换所属部分',
+  /setCurrentSeg/.test(clientSrc) && /partBySeg\.get/.test(clientSrc),
+  '整页只显示第一个部分的要求，后半本就全错了',
+)
+check(
+  '部分覆盖不靠 segmentIds 单打独斗，也展开 unitIds',
+  /unitIds/.test(clientSrc) && /unitSegs/.test(clientSrc),
+  'chapter1 的 part.segmentIds 只覆盖 16% 段落，不展开单元就会大半时候不显示',
+)
+
+console.log('\n17. 语音失败必须说出来')
+
+// 原来 rec.onerror 是个空函数：麦克风点了亮一下又灭，用户不知道是没说话、
+// 没给权限，还是浏览器不支持。语音依赖厂商服务，失败是常态而非异常。
+check(
+  '语音错误分类型给出原因',
+  /code === 'not-allowed'/.test(clientSrc) &&
+    /code === 'no-speech'/.test(clientSrc) &&
+    /code === 'audio-capture'/.test(clientSrc),
+  '统一回一句"失败"，用户无法知道下一步该做什么',
+)
+check(
+  '语音失败有可见提示且带兜底',
+  /sc-voice-err/.test(clientSrc) && /手打一个词/.test(clientSrc),
+  '只写进 console 等于没说',
+)
+check(
+  '不支持语音时不留死按钮',
+  /此浏览器不支持语音/.test(clientSrc),
+  '点了没反应的按钮比不显示更糟',
+)
+
+console.log('\n18. 图上的知识点能回到原文')
+
+// 33 个节点原来 0 个挂 segmentId，图上每个方块点下去都没有下文。
+check(
+  '知识点出处清单存在',
+  /function NodeCitePane/.test(clientSrc) && /sc-cite-row/.test(clientSrc),
+  '图里的方块由 archify 渲染，界面插不进手，必须在清单里给出可点落点',
+)
+check(
+  '只列挂上 segmentId 的节点，并说清有多少没落点',
+  /linked\.length\}\/\$\{nodes\.length\}/.test(clientSrc) && /没有确切的原文落点/.test(clientSrc),
+  '把没证据的节点也列成可点，点过去看到的是别的内容',
+)
+
 console.log('\n15. 「读不到」不能伪装成「你还没读」')
 
 // RecallPane 的主指标来自 /harvested。原来 harvest 为 null 时
