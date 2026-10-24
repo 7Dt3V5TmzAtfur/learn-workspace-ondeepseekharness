@@ -158,12 +158,13 @@ check(
   `STAGES 里的名字有重复：${canonical.join(', ')}`,
 )
 
-// 界面兜底数组里的名字必须与 STAGES 完全一致
-const fallbackNames = [...client.matchAll(/label: '([^']+)', stage:/g)].map((m) => m[1])
+// 界面不再自带阶段表：名字、顺序、判据、按钮文案全部来自宿主 /stages。
+// （曾经这里比对的是"界面兜底数组 vs STAGES"，但兜底数组本身就是第二份真相，
+//  它已经导致过漏掉 recalled、annotations 判据失效的问题。）
 check(
-  '界面的兜底页签与 STAGES 同名同序',
-  fallbackNames.join('|') === canonical.join('|'),
-  `界面兜底是 [${fallbackNames.join(', ')}]，STAGES 是 [${canonical.join(', ')}]`,
+  '客户端不自带阶段表（只读宿主 /stages）',
+  !/const STAGES = \[/.test(client) && /progressKey/.test(client),
+  'client.js 里又出现了本地 STAGES 数组，或没有使用宿主给的 progressKey',
 )
 
 // 服务端的提示语不能自己写死旧名字

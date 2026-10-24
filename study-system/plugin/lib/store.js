@@ -225,19 +225,6 @@ export class StudyStore {
     const file = join(this.dir(docId), name)
     if (!existsSync(file)) return null
     if (name.endsWith('.json')) return readJson(file)
-    if (name.endsWith('.jsonl')) {
-      const text = await readFile(file, 'utf8')
-      return text
-        .split('\n')
-        .filter(Boolean)
-        .map((line) => {
-          try {
-            return JSON.parse(line)
-          } catch {
-            return { raw: line }
-          }
-        })
-    }
     return readFile(file, 'utf8')
   }
 

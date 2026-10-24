@@ -495,7 +495,6 @@ export class StudyService {
     if (plan?.exercises?.length) {
       await this.store.writeArtifact(docId, 'quiz.md', this.renderExercises(plan.exercises, plan.summary))
     }
-    await this.store.saveMeta(docId, { stage: check.ok ? 'planned' : 'ingested' })
     return { docId, check, next: nextStepOf(await this.store.progressOf(docId)), segmentCount: segments.length }
   }
 
@@ -530,7 +529,6 @@ export class StudyService {
     await this.store.writeArtifact(docId, 'annotations.json', payload)
     const md = await this.renderAnnotatedMarkdown(docId, segments, items)
     await this.store.writeArtifact(docId, 'annotated.md', md)
-    await this.store.saveMeta(docId, { stage: 'annotated' })
     return { docId, check, next: nextStepOf(await this.store.progressOf(docId)), accepted: true }
   }
 
@@ -571,7 +569,15 @@ export class StudyService {
 
   async saveRelations(docId, graph) {
     const check = validateRelations(graph)
-    await this.store.writeArtifact(docId, 'relations.json', { ...graph, check, savedAt: new Date().toISOString() })
+    /**
+     * 校验不过不能写正式产物。
+     *
+     * progressOf 用"relations.json 在不在"判定图谱完成；如果被规则判错的图也写这个
+     * 文件名，阶段会直接跳到 mapped，next 立刻把人赶去做读后巩固。
+     * 标注一直是这么处理的（拒绝就只留 .rejected），两个阶段必须同一套语义。
+     */
+    const name = check.ok ? 'relations.json' : 'relations.rejected.json'
+    await this.store.writeArtifact(docId, name, { ...graph, check, savedAt: new Date().toISOString() })
 
     let figures = null
     if (check.ok) {
@@ -592,7 +598,6 @@ export class StudyService {
       } catch (e) {
         figures = { ok: false, figures: [], reason: `archify 生成失败：${e?.message ?? e}` }
       }
-      await this.store.saveMeta(docId, { stage: 'mapped' })
     }
 
     return {
@@ -722,10 +727,9 @@ export class StudyService {
     }
     await this.store.appendJsonl(docId, 'drills.jsonl', record)
 
-    // 只有"有效"的复述才推进到 drilled。无效的照样存下来（是宝贵的记录），
-    // 但进度不动——否则门槛形同虚设。
-    if (valid) await this.store.saveMeta(docId, { stage: 'drilled' })
-
+    // 只有"有效"的复述才推进到 drilled —— 这个判定由 progressOf 从 drills.jsonl
+    // 现算（它只数 valid !== false 的记录）。不要再往 meta.stage 里写一份：
+    // 那个字段没有读取方，写进去只会让人以为存在第二个真相。
     const progress = await this.store.progressOf(docId)
 
     // ---- 4. 复习调度 ----
@@ -1336,7 +1340,7 @@ export class StudyService {
     const text = String(answer ?? '').trim()
     if (!clean) throw new Error('缺少 term')
     if (!text) throw new Error('缺少 answer')
-    const all = (await this.store.artifact(docId, 'terms.jsonl').catch(() => null)) ?? []
+    const all = await this.store.jsonl(docId, 'terms.jsonl')
     let idx = -1
     for (let i = all.length - 1; i >= 0; i -= 1) {
       const r = all[i]
@@ -1361,12 +1365,12 @@ export class StudyService {
    * 全算进来的话界面会永远显示几十条待答。
    */
   async pendingTerms(docId) {
-    const all = (await this.store.artifact(docId, 'terms.jsonl').catch(() => null)) ?? []
+    const all = await this.store.jsonl(docId, 'terms.jsonl')
     return all.filter((r) => !r.answer && r.source === 'ui')
   }
 
   async searchTerms(docId, term) {
-    const all = (await this.store.artifact(docId, 'terms.jsonl')) ?? []
+    const all = await this.store.jsonl(docId, 'terms.jsonl')
     const q = String(term ?? '').trim().toLowerCase()
     if (!q) return all
     return all.filter((r) => String(r.term ?? '').toLowerCase().includes(q))

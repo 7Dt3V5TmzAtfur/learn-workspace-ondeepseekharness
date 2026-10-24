@@ -72,11 +72,60 @@ export const SUMMARY_TOLERANCE = 0.4
  * 界面和提示语都从这里取。
  */
 export const STAGES = Object.freeze({
-  preflight: { key: 'preflight', tab: 'plan', name: '读前建构', skill: 'study-preflight' },
-  annotate: { key: 'annotate', tab: 'read', name: '读中加工', skill: 'study-annotate' },
-  map: { key: 'map', tab: 'graph', name: '知识图谱', skill: 'study-map', full: '知识点逻辑衔接图' },
-  recall: { key: 'recall', tab: 'recall', name: '读后巩固', skill: 'study-recall' },
-  feynman: { key: 'feynman', tab: 'quiz', name: '读后考核', skill: 'study-feynman' },
+  // progressKey：这个阶段在 progress 里的字段名（阶段完成的唯一判据）
+  // short：进度胶囊上的两字标签
+  // action / redo：阶段按钮的文案。界面不再自己写一份，否则改了这里不生效
+  preflight: {
+    key: 'preflight',
+    tab: 'plan',
+    name: '读前建构',
+    skill: 'study-preflight',
+    progressKey: 'planned',
+    short: '读前',
+    action: '生成读前建构',
+    redo: '重做读前建构',
+  },
+  annotate: {
+    key: 'annotate',
+    tab: 'read',
+    name: '读中加工',
+    skill: 'study-annotate',
+    progressKey: 'annotated',
+    short: '读中',
+    action: '开始读中标注',
+    redo: '重新标注',
+  },
+  map: {
+    key: 'map',
+    tab: 'graph',
+    name: '知识图谱',
+    skill: 'study-map',
+    full: '知识点逻辑衔接图',
+    progressKey: 'mapped',
+    short: '图谱',
+    action: '生成知识图谱',
+    redo: '重画知识图谱',
+  },
+  recall: {
+    key: 'recall',
+    tab: 'recall',
+    name: '读后巩固',
+    skill: 'study-recall',
+    progressKey: 'recalled',
+    short: '巩固',
+    action: '生成读后自测',
+    redo: '重出自测',
+  },
+  feynman: {
+    key: 'feynman',
+    tab: 'quiz',
+    name: '读后考核',
+    skill: 'study-feynman',
+    progressKey: 'drilled',
+    short: '考核',
+    action: '开始费曼考核',
+    redo: '重新考核',
+  },
 })
 
 /** 按技能名反查阶段（nextStepOf 用） */

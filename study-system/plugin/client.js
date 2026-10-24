@@ -615,32 +615,30 @@ body[data-ds-dark-theme] .sc-root{
       }
     }
 
-    const STAGES = [
-      { key: 'ingested', label: '导入' },
-      { key: 'planned', label: '读前' },
-      { key: 'annotated', label: '读中' },
-      { key: 'mapped', label: '图谱' },
-      { key: 'drilled', label: '考核' },
-    ]
-
-    function stageIndex(progress) {
-      if (!progress) return -1
-      let idx = 0
-      for (let i = 0; i < STAGES.length; i += 1) if (progress[STAGES[i].key]) idx = i
-      return progress.ingested ? idx : -1
+    /**
+     * 阶段一律以宿主 /stages 为准（rules.js STAGES 是唯一真值）。
+     *
+     * 这里曾经存过一份本地阶段表，结果漏了 recalled、还把 annotations 当数组判完成，
+     * 导致「读中加工」的阶段条恒说"还没有产物"。不再存第二份。
+     */
+    function stageIndexOf(progress, stages) {
+      if (!progress?.ingested) return -1
+      return (stages ?? []).filter((s) => progress[s.progressKey]).length
     }
 
     const pct = (v) => `${Math.max(0, Math.min(100, Math.round((v ?? 0) * 100)))}%`
 
     /* --------------------------------------------------------- 小组件 */
 
-    function StagePills({ progress }) {
-      const idx = stageIndex(progress)
+    function StagePills({ progress, stages }) {
+      if (!stages?.length) return null
+      const idx = stageIndexOf(progress, stages)
+      const pills = [{ key: 'ingested', short: '导入' }, ...stages]
       return h(
         'div',
         { className: 'sc-stage' },
-        STAGES.map((s, i) =>
-          h('span', { key: s.key, className: 'sc-pill', 'data-on': i <= idx && idx >= 0 }, s.label),
+        pills.map((s, i) =>
+          h('span', { key: s.key, className: 'sc-pill', 'data-on': i <= idx }, s.short ?? s.name),
         ),
       )
     }
@@ -2496,24 +2494,6 @@ body[data-ds-dark-theme] .sc-root{
 
     /* -------------------------------------------------- 阶段按钮：发消息 */
 
-    /** 每个阶段"做完没有"的判据。全是宿主已经算好的产物，界面不另立规则。 */
-    const stageDone = (p) => ({
-      preflight: Boolean(p?.preflight),
-      annotate: (p?.annotations?.length ?? 0) > 0,
-      map: (p?.relations?.edges?.length ?? 0) > 0,
-      recall: (p?.qa?.length ?? 0) > 0,
-      feynman: (p?.drills?.length ?? 0) > 0,
-    })
-
-    /** 按钮文案。有些阶段不是"生成一份文档"，措辞要跟着变。 */
-    const STAGE_WORD = {
-      preflight: ['生成读前建构', '重做读前建构'],
-      annotate: ['开始读中标注', '重新标注'],
-      map: ['生成知识图谱', '重画知识图谱'],
-      recall: ['生成读后自测', '重出自测'],
-      feynman: ['开始费曼考核', '重新考核'],
-    }
-
     /**
      * 让宿主替我们发起一个阶段：把「继续/开始 某阶段」投进用户正在用的会话，
      * 并立刻起一轮 turn。用宿主自己的接口而不是客户端 RPC ——
@@ -2532,15 +2512,15 @@ body[data-ds-dark-theme] .sc-root{
     }
 
     /** 阶段操作条：五个页签同一位置。重做用就地二次确认，不弹窗。 */
-    function StageBar({ name, stageKey, done, busy, onRun }) {
+    function StageBar({ name, action, redo, done, busy, onRun }) {
       const [confirming, setConfirming] = useState(false)
       useEffect(() => {
         if (!confirming) return undefined
         const timer = setTimeout(() => setConfirming(false), 3000)
         return () => clearTimeout(timer)
       }, [confirming])
-      const [todoWord, redoWord] = STAGE_WORD[stageKey] ?? [`生成${name}`, `重做${name}`]
-      const label = busy ? '执行中…' : confirming ? '确认重做？' : done ? redoWord : todoWord
+      // 文案来自宿主 /stages：改词只改 rules.js 一处
+      const label = busy ? '执行中…' : confirming ? '确认重做？' : done ? (redo ?? `重做${name}`) : (action ?? `生成${name}`)
       return h(
         'div',
         { className: 'sc-stage-bar' },
@@ -2895,7 +2875,7 @@ body[data-ds-dark-theme] .sc-root{
               } catch {
                 continue
               }
-              if (stageDone(next)[stage.key]) {
+              if (next?.progress?.[stage.progressKey]) {
                 setProject(next)
                 setReloadTick((n) => n + 1)
                 finished = true
@@ -2980,30 +2960,9 @@ body[data-ds-dark-theme] .sc-root{
         }
       }, [])
 
-      const tabs = useMemo(() => {
-        const STAGE_TO_STAGE_KEY = {
-          preflight: 'planned',
-          annotate: 'annotated',
-          map: 'mapped',
-          recall: 'recalled',
-          feynman: 'drilled',
-        }
-        if (stageList?.length) {
-          return stageList.map((s) => ({
-            key: s.tab,
-            label: s.name,
-            stage: STAGE_TO_STAGE_KEY[s.key],
-          }))
-        }
-        // 兜底：与 STAGES 保持同样的名字与顺序
-        return [
-          { key: 'plan', label: '读前建构', stage: 'planned' },
-          { key: 'read', label: '读中加工', stage: 'annotated' },
-          { key: 'graph', label: '知识图谱', stage: 'mapped' },
-          { key: 'recall', label: '读后巩固', stage: 'recalled' },
-          { key: 'quiz', label: '读后考核', stage: 'drilled' },
-        ]
-      }, [stageList])
+      // 页签的名字、顺序、tab 键全部来自宿主 /stages。
+      // 曾经在这里存过一份兜底数组，结果它成了第二份阶段表。
+      const tabs = useMemo(() => (stageList ?? []).map((s) => ({ key: s.tab, label: s.name })), [stageList])
 
       // 默认落在"下一步该做的那一步"上，用户打开就知道从哪开始
       const nextTabKey = useMemo(() => {
@@ -3025,7 +2984,6 @@ body[data-ds-dark-theme] .sc-root{
 
       // 当前页签对应的阶段与"做完没有"，供操作条使用
       const currentStage = stageList?.find((s) => s.tab === tab) ?? null
-      const doneMap = stageDone(project)
 
       return h(
         'div',
@@ -3065,7 +3023,7 @@ body[data-ds-dark-theme] .sc-root{
           'div',
           { className: 'sc-head' },
           h('span', { className: 'sc-title' }, '学习工作台'),
-          project ? h(StagePills, { progress: project.progress }) : null,
+          project ? h(StagePills, { progress: project.progress, stages: stageList }) : null,
           h('span', { style: { flex: 1 } }),
           // 包一层：直接把 refresh 交给 onClick 会把 MouseEvent 当成 preferId
           h('button', { className: 'sc-btn', onClick: () => refresh(), disabled: busy }, '刷新'),
@@ -3321,8 +3279,9 @@ body[data-ds-dark-theme] .sc-root{
                   project && currentStage
                     ? h(StageBar, {
                         name: currentStage.name,
-                        stageKey: currentStage.key,
-                        done: Boolean(doneMap[currentStage.key]),
+                        action: currentStage.action,
+                        redo: currentStage.redo,
+                        done: Boolean(project?.progress?.[currentStage.progressKey]),
                         busy: stageBusy === currentStage.key,
                         onRun: () => runStage(currentStage),
                       })
@@ -3407,6 +3366,17 @@ body[data-ds-dark-theme] .sc-root{
       const snapshot = useWorkspaces ? useWorkspaces((s) => s) : null
       const wsPath = snapshot?.workspaces?.[0]?.path ?? null
       const [current, setCurrent] = useState(null)
+      const [stages, setStages] = useState(null)
+
+      useEffect(() => {
+        let alive = true
+        api('/stages')
+          .then((d) => alive && setStages(Array.isArray(d?.stages) ? d.stages : []))
+          .catch(() => {})
+        return () => {
+          alive = false
+        }
+      }, [])
 
       useEffect(() => {
         let alive = true
@@ -3419,12 +3389,12 @@ body[data-ds-dark-theme] .sc-root{
       }, [wsPath])
 
       if (!current) return null
-      const idx = stageIndex(current.progress)
+      const idx = stageIndexOf(current.progress, stages)
       return h(
         'div',
         { className: 'sc-dock' },
         h('b', null, current.title),
-        h(StagePills, { progress: current.progress }),
+        h(StagePills, { progress: current.progress, stages }),
         // 标注是脚本回填的，就在最显眼的位置说一句。
         // 这句话不能只放在读中页的内部标签里 —— 用户在停靠条上看到"读中完成"，
         // 却看不到"这批标注是机器凑的"，就会以为自己真的读过了。
@@ -3455,7 +3425,7 @@ body[data-ds-dark-theme] .sc-root{
           ? h(
               'span',
               { style: { width: 60 } },
-              h('div', { className: 'sc-bar' }, h('i', { style: { width: pct((idx + 1) / STAGES.length) } })),
+              h('div', { className: 'sc-bar' }, h('i', { style: { width: pct(stages?.length ? (idx + 1) / (stages.length + 1) : 0) } })),
             )
           : null,
       )

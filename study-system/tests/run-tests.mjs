@@ -659,6 +659,30 @@ await test('关系图拒绝凭空连线（缺原文出处）', async () => {
   assert.ok(res.check.issues.some((i) => i.code === 'edge-no-evidence'))
 })
 
+await test('关系图校验失败：只留失败痕迹，不写正式产物、不推进阶段', async () => {
+  // 曾经 relations.json 无条件落盘，而 progressOf 用"文件在不在"判 mapped，
+  // 于是被规则判错的图也会把阶段推到 mapped，下一步直接建议去做读后巩固。
+  const ws = await mkdtemp(join(tmpdir(), 'study-reject-'))
+  const svc = new StudyService(ws)
+  const ing = await svc.ingest(join(FIXTURES, 'sample.md'), { title: '拒绝落盘' })
+  const res = await svc.saveRelations(ing.docId, {
+    nodes: [{ id: 'a', label: '内在负荷' }, { id: 'b', label: '设计原则' }],
+    edges: [{ id: 'e1', from: 'a', to: 'b', relation: 'cause' }],
+    relationReview: reviewOf({ cause: ['e1'] }),
+  })
+  assert.equal(res.check.ok, false)
+
+  const dir = join(ws, '.study', ing.docId)
+  assert.equal(await readFile(join(dir, 'relations.json'), 'utf8').catch(() => null), null, '校验失败却写了正式产物')
+  const rejected = await readFile(join(dir, 'relations.rejected.json'), 'utf8').catch(() => null)
+  assert.ok(rejected, '失败产物没有留痕')
+  assert.equal(JSON.parse(rejected).check.ok, false)
+
+  const proj = await svc.project(ing.docId)
+  assert.equal(proj.progress.mapped, false, '阶段不应推进到 mapped')
+  assert.notEqual(proj.stage, 'mapped')
+})
+
 await test('术语追问带上下文落库并可检索', async () => {
   const svc = new StudyService(workspace)
   const proj = await loadProject(svc)
