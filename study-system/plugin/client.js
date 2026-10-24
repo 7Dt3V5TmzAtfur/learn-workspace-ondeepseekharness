@@ -81,6 +81,20 @@ body[data-ds-dark-theme] .sc-root{
 .sc-doc:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:-2px}
 .sc-doc[data-active=true]{background:var(--dsw-alias-bg-layer-1);border-color:var(--dsw-alias-border-l2)}
 .sc-doc-name{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ---- 资料库：标题行、常驻加号、右键菜单、内联路径框 ---- */
+.sc-side-head{display:flex;align-items:center;gap:6px;padding:2px 2px 8px 6px}
+.sc-side-title{flex:1;min-width:0;color:var(--dsw-alias-label-secondary);font-size:var(--sc-fs-sm)}
+.sc-side-add{width:22px;height:22px;flex:none;display:inline-flex;align-items:center;justify-content:center;padding:0;border:1px solid transparent;border-radius:var(--sc-r-sm);background:transparent;color:var(--dsw-alias-label-secondary);font-size:15px;line-height:1;cursor:pointer}
+.sc-side-add:hover{background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary)}
+.sc-side-add:focus-visible{outline:2px solid var(--dsw-alias-brand-primary);outline-offset:1px}
+.sc-menu{position:fixed;z-index:80;min-width:212px;max-width:280px;padding:6px;background:var(--dsw-alias-bg-overlay);border:1px solid var(--dsw-alias-border-l2);border-radius:var(--sc-r-md);box-shadow:0 10px 30px rgba(0,0,0,.22)}
+.sc-menu-item{display:flex;width:100%;align-items:center;gap:8px;padding:7px 10px;border:0;border-radius:var(--sc-r-sm);background:transparent;color:var(--dsw-alias-label-primary);font:inherit;font-size:var(--sc-fs-sm);text-align:left;cursor:pointer;white-space:nowrap}
+.sc-menu-item:hover,.sc-menu-item:focus-visible{background:var(--dsw-alias-bg-layer-2);outline:none}
+.sc-menu-sep{height:1px;margin:5px 4px;background:var(--dsw-alias-border-l1)}
+.sc-menu-note{padding:5px 10px 3px;color:var(--dsw-alias-label-secondary);font-size:var(--sc-fs-xs);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-path-row{display:flex;gap:6px;margin:0 0 6px;padding:6px;border:1px solid var(--dsw-alias-border-l1);border-radius:var(--sc-r-sm);background:var(--dsw-alias-bg-layer-1)}
+.sc-path-row input{flex:1;min-width:0;padding:0;border:0;background:transparent;color:var(--dsw-alias-label-primary);font:inherit;font-size:var(--sc-fs-sm);outline:none}
+.sc-path-hint{margin:0 0 6px;padding:0 6px;color:var(--dsw-alias-danger,#e5484d);font-size:var(--sc-fs-xs);line-height:1.7}
 .sc-tabs{display:flex;gap:2px;padding:6px var(--sc-sp-3) 0;border-bottom:1px solid var(--dsw-alias-border-l1);flex:none;overflow-x:auto}
 .sc-tab{border:none;background:none;color:var(--dsw-alias-label-secondary);padding:7px var(--sc-sp-3);border-radius:6px 6px 0 0;cursor:pointer;font:inherit;border-bottom:2px solid transparent;white-space:nowrap}
 .sc-tab:hover{color:var(--dsw-alias-label-primary)}
@@ -662,7 +676,7 @@ body[data-ds-dark-theme] .sc-root{
      * 只该看到那个框。
      */
     function Entry(props) {
-      const { onImported, onAsk, busyHint } = props
+      const { onImported, onAsk, busyHint, workspace } = props
       const [dragOver, setDragOver] = useState(false)
       const [pathInput, setPathInput] = useState('')
       // 只有一个布尔量。原来还多一个 stage='done'，但它从来没被读过 ——
@@ -680,7 +694,7 @@ body[data-ds-dark-theme] .sc-root{
           setBusy(true)
           try {
             const res = await fetch(
-              `${API}/ingest-upload?name=${encodeURIComponent(file.name)}`,
+              `${API}/ingest-upload?name=${encodeURIComponent(file.name)}${workspace ? `&ws=${encodeURIComponent(workspace)}` : ''}`,
               { method: 'POST', body: file },
             )
             const body = await res.json().catch(() => ({}))
@@ -702,7 +716,7 @@ body[data-ds-dark-theme] .sc-root{
         setErr(null)
         setBusy(true)
         try {
-          const body = await api('/ingest', { method: 'POST', body: JSON.stringify({ path: p }) })
+          const body = await api(`/ingest${q(workspace)}`, { method: 'POST', body: JSON.stringify({ path: p }) })
           setPathInput('')
           onImported?.(body)
         } catch (e) {
@@ -2435,6 +2449,109 @@ body[data-ds-dark-theme] .sc-root{
       )
     }
 
+    /**
+     * 资料库的右键菜单。
+     *
+     * 自绘而不是调宿主原生菜单：内置插件都是自绘，样式与暗色主题天然一致，
+     * 也不依赖没有公开承诺的接口。既然自绘，键盘就必须补齐 ——
+     * 只能鼠标点的菜单，等于把功能藏起来。
+     */
+    function SideMenu({ x, y, items, note, onClose }) {
+      const ref = useRef(null)
+      const [pos, setPos] = useState({ left: x, top: y })
+
+      // 贴着鼠标点打开；靠近右/下边缘时翻转，别跑到屏幕外
+      useEffect(() => {
+        const el = ref.current
+        if (!el) return
+        const rect = el.getBoundingClientRect()
+        const left = Math.max(8, Math.min(x, window.innerWidth - rect.width - 8))
+        const top = Math.max(8, Math.min(y, window.innerHeight - rect.height - 8))
+        setPos({ left, top })
+        const first = el.querySelector('.sc-menu-item')
+        if (first && typeof first.focus === 'function') first.focus()
+      }, [x, y])
+
+      useEffect(() => {
+        const onDown = (e) => {
+          if (!ref.current?.contains(e.target)) onClose()
+        }
+        const onKey = (e) => {
+          if (e.key === 'Escape') {
+            e.preventDefault()
+            e.stopPropagation()
+            onClose()
+          }
+        }
+        // 滚动、失焦、改窗口大小都会让菜单和它的锚点错位，直接关掉比飘着强
+        const onScroll = () => onClose()
+        document.addEventListener('mousedown', onDown, true)
+        document.addEventListener('keydown', onKey, true)
+        window.addEventListener('scroll', onScroll, true)
+        window.addEventListener('blur', onScroll)
+        window.addEventListener('resize', onScroll)
+        return () => {
+          document.removeEventListener('mousedown', onDown, true)
+          document.removeEventListener('keydown', onKey, true)
+          window.removeEventListener('scroll', onScroll, true)
+          window.removeEventListener('blur', onScroll)
+          window.removeEventListener('resize', onScroll)
+        }
+      }, [onClose])
+
+      const onKeyDown = (e) => {
+        const nodes = [...(ref.current?.querySelectorAll('.sc-menu-item') ?? [])]
+        const at = nodes.indexOf(document.activeElement)
+        if (e.key === 'ArrowDown') {
+          e.preventDefault()
+          nodes[(at + 1) % nodes.length]?.focus()
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault()
+          nodes[(at - 1 + nodes.length) % nodes.length]?.focus()
+        } else if (e.key === 'Home') {
+          e.preventDefault()
+          nodes[0]?.focus()
+        } else if (e.key === 'End') {
+          e.preventDefault()
+          nodes[nodes.length - 1]?.focus()
+        } else if (e.key === 'Tab') {
+          // 菜单是临时层，Tab 不该把它留在屏幕上
+          onClose()
+        }
+      }
+
+      return h(
+        'div',
+        {
+          ref,
+          className: 'sc-menu',
+          role: 'menu',
+          'aria-label': '资料库操作',
+          style: { left: pos.left, top: pos.top },
+          onKeyDown,
+          onContextMenu: (e) => e.preventDefault(),
+        },
+        items.map((it) =>
+          h(
+            'button',
+            {
+              key: it.key,
+              className: 'sc-menu-item',
+              role: 'menuitem',
+              onClick: () => {
+                onClose()
+                it.onSelect?.()
+              },
+            },
+            it.label,
+          ),
+        ),
+        note
+          ? [h('div', { key: 'sep', className: 'sc-menu-sep' }), h('div', { key: 'note', className: 'sc-menu-note', title: note }, note)]
+          : null,
+      )
+    }
+
     function Workbench(props) {
       const { useWorkspaces } = props
       const snapshot = useWorkspaces ? useWorkspaces((s) => s) : null
@@ -2544,6 +2661,87 @@ body[data-ds-dark-theme] .sc-root{
         },
         [wsPath, docId, manualWs, setManualWs],
       )
+
+      /**
+       * 导入成功后的统一收尾：刷新列表 → 选中新项目 → 取 30 秒预览。
+       * 空态 Entry 与资料库菜单共用这一段，避免两处行为分叉。
+       */
+      const handleImported = useCallback(
+        async (out) => {
+          // 明确指定选中新导入的这份：不传的话 refresh 会去选列表第一项，
+          // 那份很可能是旧的另一份资料，于是预览和右侧选中的对不上
+          if (!out?.docId) return refresh()
+          refresh(out.docId)
+          try {
+            const p = await api(`/peek/${encodeURIComponent(out.docId)}${q(wsPath)}`)
+            setPreview({ docId: out.docId, peek: p.peek })
+          } catch {
+            // 预览拿不到不该拦住用户：正文已经能看了
+            setPreview(null)
+          }
+        },
+        [refresh, wsPath],
+      )
+
+      /* ---- 资料库右键菜单 ---- */
+      const [menu, setMenu] = useState(null)
+      const [pathOpen, setPathOpen] = useState(false)
+      const [pathText, setPathText] = useState('')
+      const [pathError, setPathError] = useState(null)
+      const menuFileRef = useRef(null)
+
+      const closeMenu = useCallback(() => setMenu(null), [])
+
+      const importFile = useCallback(
+        async (file) => {
+          if (!file) return
+          setBusy(true)
+          setError(null)
+          try {
+            const res = await fetch(
+              `${API}/ingest-upload?name=${encodeURIComponent(file.name)}${wsPath ? `&ws=${encodeURIComponent(wsPath)}` : ''}`,
+              { method: 'POST', body: file },
+            )
+            const body = await res.json().catch(() => ({}))
+            if (!res.ok) throw new Error(body.error ?? `导入失败（${res.status}）`)
+            await handleImported(body)
+          } catch (e) {
+            setError(e.message)
+          } finally {
+            setBusy(false)
+          }
+        },
+        [wsPath, handleImported],
+      )
+
+      // 只认绝对路径：后端的 resolve() 是相对**进程工作目录**的，而那是 DSH 的
+      // profile 目录，不是用户的工作区。放行相对路径等于把资料导到看不见的地方。
+      const isAbsolutePath = (p) => /^(?:[a-zA-Z]:[\\/]|\\\\)/.test(p)
+
+      const submitPath = useCallback(async () => {
+        const p = pathText.trim()
+        if (!p) return
+        if (!isAbsolutePath(p)) {
+          setPathError('请填绝对路径，例如 D:\\资料\\chapter1.md')
+          return
+        }
+        setBusy(true)
+        setError(null)
+        setPathError(null)
+        try {
+          const out = await api(`/ingest${q(wsPath)}`, {
+            method: 'POST',
+            body: JSON.stringify({ path: p }),
+          })
+          setPathOpen(false)
+          setPathText('')
+          await handleImported(out)
+        } catch (e) {
+          setError(e.message)
+        } finally {
+          setBusy(false)
+        }
+      }, [pathText, wsPath, handleImported])
 
       useEffect(() => {
         // 必须显式不传参：不写成 onClick={refresh} 之类的地方，
@@ -2656,6 +2854,37 @@ body[data-ds-dark-theme] .sc-root{
       return h(
         'div',
         { className: 'sc-root' },
+        // 菜单里「导入资料…」用的隐藏输入框。单选：一次一份资料。
+        h('input', {
+          ref: menuFileRef,
+          type: 'file',
+          accept: '.pdf,.docx,.pptx,.xlsx,.epub,.md,.txt,.rtf,.doc,.html',
+          style: { display: 'none' },
+          onChange: (e) => {
+            const file = e.target.files?.[0]
+            e.target.value = ''
+            if (file) importFile(file)
+          },
+        }),
+        menu
+          ? h(SideMenu, {
+              x: menu.x,
+              y: menu.y,
+              note: wsPath ? `导入到 ${wsPath}` : '导入到默认工作区',
+              items: [
+                { key: 'file', label: '导入资料…', onSelect: () => menuFileRef.current?.click() },
+                {
+                  key: 'path',
+                  label: '粘贴路径…',
+                  onSelect: () => {
+                    setPathOpen(true)
+                    setPathError(null)
+                  },
+                },
+              ],
+              onClose: closeMenu,
+            })
+          : null,
         h(
           'div',
           { className: 'sc-head' },
@@ -2757,8 +2986,77 @@ body[data-ds-dark-theme] .sc-root{
           { className: 'sc-body' },
           h(
             'div',
-            { className: 'sc-side' },
-            h('div', { className: 'sc-muted', style: { padding: '4px 6px 8px' } }, `资料库（${projects.length}）`),
+            {
+              className: 'sc-side',
+              onContextMenu: (e) => {
+                // 只接管资料库的空白处与标题行。条目上的右键留给以后单独设计，
+                // 免得一条菜单里混进「删除」这种不可逆动作。
+                if (e.target?.closest?.('.sc-doc, .sc-btn, input, a')) return
+                e.preventDefault()
+                setMenu({ x: e.clientX, y: e.clientY })
+              },
+              onKeyDown: (e) => {
+                // Shift+F10 与菜单键：键盘用户也要能打开这个菜单
+                if (e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) {
+                  e.preventDefault()
+                  const r = e.currentTarget.getBoundingClientRect()
+                  setMenu({ x: r.left + 12, y: r.top + 44 })
+                }
+              },
+            },
+            h(
+              'div',
+              { className: 'sc-side-head' },
+              h('span', { className: 'sc-side-title' }, `资料库（${projects.length}）`),
+              h(
+                'button',
+                {
+                  className: 'sc-side-add',
+                  title: '导入资料（也可以在下方空白处右键）',
+                  'aria-haspopup': 'menu',
+                  'aria-expanded': menu ? 'true' : 'false',
+                  disabled: busy,
+                  onClick: (e) => {
+                    const r = e.currentTarget.getBoundingClientRect()
+                    setMenu({ x: r.right - 8, y: r.bottom + 4 })
+                  },
+                },
+                '＋',
+              ),
+            ),
+            pathOpen
+              ? h(
+                  'div',
+                  null,
+                  h(
+                    'div',
+                    { className: 'sc-path-row' },
+                    h('input', {
+                      autoFocus: true,
+                      placeholder: 'D:\\资料\\chapter1.md',
+                      'aria-label': '资料绝对路径',
+                      value: pathText,
+                      onChange: (e) => {
+                        setPathText(e.target.value)
+                        if (pathError) setPathError(null)
+                      },
+                      onKeyDown: (e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault()
+                          submitPath()
+                        } else if (e.key === 'Escape') {
+                          e.preventDefault()
+                          setPathOpen(false)
+                          setPathText('')
+                          setPathError(null)
+                        }
+                      },
+                    }),
+                    h('button', { className: 'sc-btn sc-btn-sm', disabled: busy, onClick: submitPath }, '导入'),
+                  ),
+                  pathError ? h('div', { className: 'sc-path-hint' }, pathError) : null,
+                )
+              : null,
             projects.length === 0
               ? h(
                   'div',
@@ -2869,22 +3167,9 @@ body[data-ds-dark-theme] .sc-root{
                   )
                 : h(Entry, {
                     busyHint: '正在读这份资料…',
-                    onImported: async (out) => {
-                      // 导入完成后不直接跳进读前建构。
-                      // 先给一份 30 秒预览，回答"这值不值得看" ——
-                      // 不合胃口的资料应当当场止损，而不是读完 14000 字才知道。
-                      if (!out?.docId) return refresh()
-                      // 明确指定选中新导入的这份：不传的话 refresh 会去选列表第一项，
-                      // 那份很可能是旧的另一份资料，于是预览和右侧选中的对不上
-                      refresh(out.docId)
-                      try {
-                        const p = await api(`/peek/${encodeURIComponent(out.docId)}${q(wsPath)}`)
-                        setPreview({ docId: out.docId, peek: p.peek })
-                      } catch {
-                        // 预览拿不到不该拦住用户：正文已经能看了
-                        setPreview(null)
-                      }
-                    },
+                    workspace: wsPath,
+                    // 与资料库菜单共用同一段收尾：刷新 → 选中新项目 → 30 秒预览
+                    onImported: handleImported,
                     onAsk: () => {
                       // 没有文件的人：把光标送到对话框，让他说想解决什么。
                       //
