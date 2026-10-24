@@ -1,0 +1,918 @@
+{
+  "docId": "chapter4-d6eaed",
+  "generatedAt": "2026-10-24T06:12:07.014Z",
+  "totalUnits": 25,
+  "totalSegments": 182,
+  "units": [
+    {
+      "id": "¶1",
+      "title": "工具",
+      "level": 1,
+      "kind": "md",
+      "segmentIds": [
+        "¶1",
+        "¶2",
+        "¶3"
+      ],
+      "segmentCount": 3,
+      "chars": 523,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶1",
+        "to": "¶3"
+      }
+    },
+    {
+      "id": "¶4",
+      "title": "工具的分类",
+      "level": 2,
+      "kind": "md",
+      "segmentIds": [
+        "¶4",
+        "¶5",
+        "¶6",
+        "¶7",
+        "¶8",
+        "¶9",
+        "¶10",
+        "¶11",
+        "¶12",
+        "¶13"
+      ],
+      "segmentCount": 10,
+      "chars": 1670,
+      "keyPoints": [
+        {
+          "segmentId": "¶5",
+          "title": "五类工具的审视特征",
+          "quote": "可以从两个特征来审视它们"
+        },
+        {
+          "segmentId": "¶8",
+          "title": "感知工具：主动获取信息",
+          "quote": "是 Agent 主动获取信息、感知世界的方式"
+        },
+        {
+          "segmentId": "¶9",
+          "title": "执行工具：改变外部世界",
+          "quote": "是 Agent 改变外部世界的方式"
+        },
+        {
+          "segmentId": "¶10",
+          "title": "协作工具：与其他 Agent 和人类协作",
+          "quote": "是 Agent 与其他 Agent 及人类协作的方式"
+        },
+        {
+          "segmentId": "¶11",
+          "title": "用户沟通工具：主动传递信息",
+          "quote": "是 Agent 主动向用户传递信息的方式"
+        },
+        {
+          "segmentId": "¶12",
+          "title": "事件触发工具：外部驱动",
+          "quote": "是外部世界驱动 Agent 行动的方式"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶4",
+        "to": "¶13"
+      }
+    },
+    {
+      "id": "¶14",
+      "title": "工具设计的通用原则",
+      "level": 2,
+      "kind": "md",
+      "segmentIds": [
+        "¶14",
+        "¶15"
+      ],
+      "segmentCount": 2,
+      "chars": 305,
+      "keyPoints": [
+        {
+          "segmentId": "¶15",
+          "title": "ACI：工具应对应 Agent 的目标",
+          "quote": "工具设计的早期形态是直接的 API 封装——把每"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶14",
+        "to": "¶15"
+      }
+    },
+    {
+      "id": "¶16",
+      "title": "能力的表达形式：专用工具、通用执行器与 Skill",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶16",
+        "¶17",
+        "¶18",
+        "¶19",
+        "¶20",
+        "¶21",
+        "¶22",
+        "¶23",
+        "¶24",
+        "¶25",
+        "¶26",
+        "¶27",
+        "¶28",
+        "¶29"
+      ],
+      "segmentCount": 14,
+      "chars": 3273,
+      "keyPoints": [
+        {
+          "segmentId": "¶18",
+          "title": "三种形态的取舍",
+          "quote": "结构化的函数调用，确定性高、可测试、参数受 schema 约束"
+        },
+        {
+          "segmentId": "¶20",
+          "title": "本节问的是形态不是数量",
+          "quote": "一次让模型看见多少条能力"
+        },
+        {
+          "segmentId": "¶22",
+          "title": "粒度应偏向整合",
+          "quote": "判断是否应该整合的核心标准是"
+        },
+        {
+          "segmentId": "¶25",
+          "title": "Skill 的优点：对人类友好",
+          "quote": "无论是否会编程，人们都可以编写和修改 Skill"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶16",
+        "to": "¶29"
+      }
+    },
+    {
+      "id": "¶30",
+      "title": "工具描述的艺术",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶30",
+        "¶31",
+        "¶32",
+        "¶33",
+        "¶34",
+        "¶35",
+        "¶36",
+        "¶37",
+        "¶38"
+      ],
+      "segmentCount": 9,
+      "chars": 1181,
+      "keyPoints": [
+        {
+          "segmentId": "¶31",
+          "title": "描述决定准确性",
+          "quote": "使用工具的准确性"
+        },
+        {
+          "segmentId": "¶38",
+          "title": "这一节也适用于 Skill",
+          "quote": "不管工具使用何种表达方式，都需要清晰的描述文档"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶30",
+        "to": "¶38"
+      }
+    },
+    {
+      "id": "¶39",
+      "title": "参数传递的保真性",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶39",
+        "¶40",
+        "¶41",
+        "¶42",
+        "¶43",
+        "¶44"
+      ],
+      "segmentCount": 6,
+      "chars": 909,
+      "keyPoints": [
+        {
+          "segmentId": "¶44",
+          "title": "根本原则：不能有系统性偏差",
+          "quote": "模型感知到的世界与工具操作的世界之间，不能存在系统性的偏差"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶39",
+        "to": "¶44"
+      }
+    },
+    {
+      "id": "¶45",
+      "title": "工具生态：MCP 与 Skill Hub",
+      "level": 2,
+      "kind": "md",
+      "segmentIds": [
+        "¶45",
+        "¶46",
+        "¶47",
+        "¶48",
+        "¶49",
+        "¶50",
+        "¶51",
+        "¶52",
+        "¶53",
+        "¶54",
+        "¶55",
+        "¶56",
+        "¶57",
+        "¶58",
+        "¶59"
+      ],
+      "segmentCount": 15,
+      "chars": 3165,
+      "keyPoints": [
+        {
+          "segmentId": "¶50",
+          "title": "资源与工具分离",
+          "quote": "这种分离使 Agent 能够区分"
+        },
+        {
+          "segmentId": "¶52",
+          "title": "MCP 的生态价值：一次开发处处可用",
+          "quote": "一个 MCP 服务器可以同时被 Cursor、Claude Desktop、OpenClaw 等任何兼容的客户端使用"
+        },
+        {
+          "segmentId": "¶53",
+          "title": "Skill Hub：不需要协议",
+          "quote": "一个 skill 就是一个装着"
+        },
+        {
+          "segmentId": "¶58",
+          "title": "怎么防：把 description 当不可信输入",
+          "quote": "把 description 当作不可信输入来审计"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶45",
+        "to": "¶59"
+      }
+    },
+    {
+      "id": "¶60",
+      "title": "工具太多怎么办：层次化组织与主动工具发现",
+      "level": 2,
+      "kind": "md",
+      "segmentIds": [
+        "¶60",
+        "¶61",
+        "¶62"
+      ],
+      "segmentCount": 3,
+      "chars": 425,
+      "keyPoints": [
+        {
+          "segmentId": "¶61",
+          "title": "这一节问的是：一次该看见多少",
+          "quote": "一次该让模型看见多少"
+        },
+        {
+          "segmentId": "¶62",
+          "title": "四层应对手段总纲",
+          "quote": "答案有三层，一层比一层更“按需”"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶60",
+        "to": "¶62"
+      }
+    },
+    {
+      "id": "¶63",
+      "title": "层次化组织与按需加载",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶63",
+        "¶64",
+        "¶65",
+        "¶66",
+        "¶67",
+        "¶68",
+        "¶69",
+        "¶70"
+      ],
+      "segmentCount": 8,
+      "chars": 1546,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶63",
+        "to": "¶70"
+      }
+    },
+    {
+      "id": "¶71",
+      "title": "模型原生的主动工具发现",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶71",
+        "¶72",
+        "¶73",
+        "¶74",
+        "¶75",
+        "¶76",
+        "¶77",
+        "¶78",
+        "¶79",
+        "¶80",
+        "¶81",
+        "¶82",
+        "¶83",
+        "¶84",
+        "¶85"
+      ],
+      "segmentCount": 15,
+      "chars": 2978,
+      "keyPoints": [
+        {
+          "segmentId": "¶73",
+          "title": "从被动选择到主动发现",
+          "quote": "让 Agent 从被动接受者变为主动发现者"
+        },
+        {
+          "segmentId": "¶77",
+          "title": "两层匹配把搜索空间压下来",
+          "quote": "把搜索空间从 “数千个工具” 缩小为 “数十个服务器 × 每个服务器数十个工具”"
+        },
+        {
+          "segmentId": "¶78",
+          "title": "schema 固定后前缀仍可复用",
+          "quote": "首次加载后的 schema 固定在轨迹原位置"
+        },
+        {
+          "segmentId": "¶80",
+          "title": "动态加载的代价：破坏 KV Cache",
+          "quote": "主动发现有一个微妙的工程代价"
+        },
+        {
+          "segmentId": "¶83",
+          "title": "“工具定义必须在最前面”不再是铁律",
+          "quote": "工具定义必须在上下文最前面"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶71",
+        "to": "¶85"
+      }
+    },
+    {
+      "id": "¶86",
+      "title": "Skills：把工具发现变成“按需查阅”",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶86",
+        "¶87",
+        "¶88",
+        "¶89",
+        "¶90",
+        "¶91",
+        "¶92",
+        "¶93"
+      ],
+      "segmentCount": 8,
+      "chars": 1300,
+      "keyPoints": [
+        {
+          "segmentId": "¶87",
+          "title": "Skill 也是一种工具发现范式",
+          "quote": "把它看作一种工具发现范式"
+        },
+        {
+          "segmentId": "¶88",
+          "title": "渐进式披露在工具侧的变体",
+          "quote": "这是第一章命名的渐进式披露模式在工具侧的变体"
+        },
+        {
+          "segmentId": "¶93",
+          "title": "通用问题讲完，转入逐类设计",
+          "quote": "以上都是所有工具共通的问题"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶86",
+        "to": "¶93"
+      }
+    },
+    {
+      "id": "¶94",
+      "title": "感知工具",
+      "level": 2,
+      "kind": "md",
+      "segmentIds": [
+        "¶94",
+        "¶95",
+        "¶96",
+        "¶97",
+        "¶98",
+        "¶99",
+        "¶100",
+        "¶101"
+      ],
+      "segmentCount": 8,
+      "chars": 1493,
+      "keyPoints": [
+        {
+          "segmentId": "¶95",
+          "title": "感知工具的定位",
+          "quote": "感知工具是 Agent 获取外部信息的主要渠道，"
+        },
+        {
+          "segmentId": "¶96",
+          "title": "感知工具的通病：返回太多",
+          "quote": "它常常面临返回信息量远超 Agent 处理能力的挑战"
+        },
+        {
+          "segmentId": "¶97",
+          "title": "搜索类：返回候选列表而非全文",
+          "quote": "让 Agent 先浏览候选，再决定深入读取哪一条"
+        },
+        {
+          "segmentId": "¶98",
+          "title": "读取类：offset/limit 与截断",
+          "quote": "read 类工具应支持 offset/limit 参数"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶94",
+        "to": "¶101"
+      }
+    },
+    {
+      "id": "¶102",
+      "title": "多模态感知",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶102",
+        "¶103"
+      ],
+      "segmentCount": 2,
+      "chars": 110,
+      "keyPoints": [
+        {
+          "segmentId": "¶103",
+          "title": "多模态感知的三条路径",
+          "quote": "有三条路径可以实现多模态感知"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶102",
+        "to": "¶103"
+      }
+    },
+    {
+      "id": "¶104",
+      "title": "原生多模态处理",
+      "level": 4,
+      "kind": "md",
+      "segmentIds": [
+        "¶104",
+        "¶105"
+      ],
+      "segmentCount": 2,
+      "chars": 331,
+      "keyPoints": [
+        {
+          "segmentId": "¶105",
+          "title": "原生多模态的原理",
+          "quote": "通过专门的编码器将不同类型的数据全部映射到统一的高维语义空间"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶104",
+        "to": "¶105"
+      }
+    },
+    {
+      "id": "¶106",
+      "title": "提取为文本",
+      "level": 4,
+      "kind": "md",
+      "segmentIds": [
+        "¶106",
+        "¶107",
+        "¶108"
+      ],
+      "segmentCount": 3,
+      "chars": 304,
+      "keyPoints": [
+        {
+          "segmentId": "¶107",
+          "title": "提取为文本是两阶段过程",
+          "quote": "先通过专门工具（如 OCR 服务、音频转录服务）将非文本内容转为纯文本"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶106",
+        "to": "¶108"
+      }
+    },
+    {
+      "id": "¶109",
+      "title": "工具化多模态分析",
+      "level": 4,
+      "kind": "md",
+      "segmentIds": [
+        "¶109",
+        "¶110",
+        "¶111",
+        "¶112"
+      ],
+      "segmentCount": 4,
+      "chars": 642,
+      "keyPoints": [
+        {
+          "segmentId": "¶110",
+          "title": "工具化分析优于提取为文本",
+          "quote": "是一种比提取为文本更好的方法"
+        },
+        {
+          "segmentId": "¶111",
+          "title": "工具化只留问题与结果",
+          "quote": "仅在上下文中保留简短的问题和分析结果"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶109",
+        "to": "¶112"
+      }
+    },
+    {
+      "id": "¶113",
+      "title": "执行工具",
+      "level": 2,
+      "kind": "md",
+      "segmentIds": [
+        "¶113",
+        "¶114",
+        "¶115",
+        "¶116",
+        "¶117",
+        "¶118",
+        "¶119",
+        "¶120",
+        "¶121",
+        "¶122",
+        "¶123",
+        "¶124",
+        "¶125",
+        "¶126",
+        "¶127",
+        "¶128",
+        "¶129",
+        "¶130",
+        "¶131",
+        "¶132",
+        "¶133",
+        "¶134",
+        "¶135",
+        "¶136",
+        "¶137",
+        "¶138"
+      ],
+      "segmentCount": 26,
+      "chars": 3726,
+      "keyPoints": [
+        {
+          "segmentId": "¶113",
+          "title": "执行工具这一节讲什么",
+          "quote": "执行工具"
+        },
+        {
+          "segmentId": "¶114",
+          "title": "执行工具的错误代价极高",
+          "quote": "误删的文件无法恢复，错误的系统命令可能导致服务中断"
+        },
+        {
+          "segmentId": "¶116",
+          "title": "为什么不能只靠一层",
+          "quote": "执行工具的安全不应依赖单一机制，而应构建多层防护体系"
+        },
+        {
+          "segmentId": "¶117",
+          "title": "第一层：输入验证",
+          "quote": "发现异常输入时立即拒绝，不尝试“智能”修正"
+        },
+        {
+          "segmentId": "¶118",
+          "title": "第二层：权限控制",
+          "quote": "黑名单只是最基础的防护层，不应作为唯一手段"
+        },
+        {
+          "segmentId": "¶120",
+          "title": "提议者-审核者范式",
+          "quote": "用独立的第二视角检验第一视角的产出"
+        },
+        {
+          "segmentId": "¶123",
+          "title": "提示词：规则同、关注点异",
+          "quote": "两个模型的底层规则和约束必须完全一致"
+        },
+        {
+          "segmentId": "¶125",
+          "title": "事前审批的适用范围",
+          "quote": "不可逆的、影响重大的操作"
+        },
+        {
+          "segmentId": "¶126",
+          "title": "事后验证的要诀：模态切换",
+          "quote": "而是在不同的模态下检验结果"
+        },
+        {
+          "segmentId": "¶128",
+          "title": "Sidecar 解决的是另一个问题",
+          "quote": "操作执行时如何实时校验安全性和可靠性"
+        },
+        {
+          "segmentId": "¶133",
+          "title": "拒绝熔断器",
+          "quote": "当分类器连续多次拒绝操作时，系统不应无限重试"
+        }
+      ],
+      "subsections": [
+        "安全机制的层次化设计",
+        "提议者-审核者：独立模型的安全审查",
+        "Sidecar 机制：与主思考并行的安全校验"
+      ],
+      "sourceRange": {
+        "from": "¶113",
+        "to": "¶138"
+      }
+    },
+    {
+      "id": "¶139",
+      "title": "自动验证与反馈闭环",
+      "level": 9,
+      "kind": "bold",
+      "segmentIds": [
+        "¶139",
+        "¶140",
+        "¶141"
+      ],
+      "segmentCount": 3,
+      "chars": 288,
+      "keyPoints": [
+        {
+          "segmentId": "¶140",
+          "title": "可验证就该自动验证",
+          "quote": "如果操作结果可以被验证，就应该自动验证"
+        },
+        {
+          "segmentId": "¶141",
+          "title": "执行-验证-反馈成闭环",
+          "quote": "这就创建了一个"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶139",
+        "to": "¶141"
+      }
+    },
+    {
+      "id": "¶142",
+      "title": "长输出的截断与持久化",
+      "level": 9,
+      "kind": "bold",
+      "segmentIds": [
+        "¶142",
+        "¶143",
+        "¶144"
+      ],
+      "segmentCount": 3,
+      "chars": 275,
+      "keyPoints": [
+        {
+          "segmentId": "¶143",
+          "title": "超过阈值就只写头尾",
+          "quote": "当检测到输出超过阈值"
+        },
+        {
+          "segmentId": "¶144",
+          "title": "头尾各留 50 行",
+          "quote": "通常包含最终错误信息或成功标志"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶142",
+        "to": "¶144"
+      }
+    },
+    {
+      "id": "¶145",
+      "title": "执行环境的隔离与沙盒",
+      "level": 9,
+      "kind": "bold",
+      "segmentIds": [
+        "¶145",
+        "¶146",
+        "¶147",
+        "¶148",
+        "¶149",
+        "¶150"
+      ],
+      "segmentCount": 6,
+      "chars": 809,
+      "keyPoints": [
+        {
+          "segmentId": "¶147",
+          "title": "隔离强度递增",
+          "quote": "按隔离强度递增排列"
+        },
+        {
+          "segmentId": "¶150",
+          "title": "按输入可信度选层级",
+          "quote": "根据部署环境和安全需求选择隔离层级"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶145",
+        "to": "¶150"
+      }
+    },
+    {
+      "id": "¶151",
+      "title": "工具执行的可观测性",
+      "level": 9,
+      "kind": "bold",
+      "segmentIds": [
+        "¶151",
+        "¶152"
+      ],
+      "segmentCount": 2,
+      "chars": 183,
+      "keyPoints": [
+        {
+          "segmentId": "¶152",
+          "title": "可观测性四项内容",
+          "quote": "用于监控、审计和调试 Agent 的执行行为"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶151",
+        "to": "¶152"
+      }
+    },
+    {
+      "id": "¶153",
+      "title": "幂等性与取消语义",
+      "level": 9,
+      "kind": "bold",
+      "segmentIds": [
+        "¶153",
+        "¶154",
+        "¶155",
+        "¶156",
+        "¶157"
+      ],
+      "segmentCount": 5,
+      "chars": 1052,
+      "keyPoints": [
+        {
+          "segmentId": "¶155",
+          "title": "幂等性的两种做法",
+          "quote": "同一个操作执行一次和执行多次，对外部世界的影响完全相同"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶153",
+        "to": "¶157"
+      }
+    },
+    {
+      "id": "¶158",
+      "title": "协作工具",
+      "level": 2,
+      "kind": "md",
+      "segmentIds": [
+        "¶158",
+        "¶159",
+        "¶160",
+        "¶161",
+        "¶162",
+        "¶163",
+        "¶164",
+        "¶165",
+        "¶166",
+        "¶167",
+        "¶168",
+        "¶169",
+        "¶170",
+        "¶171",
+        "¶172",
+        "¶173",
+        "¶174"
+      ],
+      "segmentCount": 17,
+      "chars": 2250,
+      "keyPoints": [
+        {
+          "segmentId": "¶159",
+          "title": "协作工具解决什么",
+          "quote": "当任务超出单个 Agent 的能力边界时"
+        },
+        {
+          "segmentId": "¶161",
+          "title": "子 Agent 的核心价值是专业化分工",
+          "quote": "与其构建一个“全能”的 Agent，不如构建一组各自专精的 Agent"
+        },
+        {
+          "segmentId": "¶162",
+          "title": "子 Agent 提示词的四个要素",
+          "quote": "子 Agent 提示词的关键要素"
+        },
+        {
+          "segmentId": "¶168",
+          "title": "协作的三组原语",
+          "quote": "协作工具的接口可以归纳为三组原语"
+        },
+        {
+          "segmentId": "¶171",
+          "title": "为什么还需要人",
+          "quote": "有些判断本质上需要人类的价值观或领域专业知识"
+        }
+      ],
+      "subsections": [
+        "子 Agent 的设计哲学",
+        "子 Agent 提示词的关键要素",
+        "Agent 间的协作机制",
+        "人工介入的艺术"
+      ],
+      "sourceRange": {
+        "from": "¶158",
+        "to": "¶174"
+      }
+    },
+    {
+      "id": "¶175",
+      "title": "本章小结",
+      "level": 2,
+      "kind": "md",
+      "segmentIds": [
+        "¶175",
+        "¶176",
+        "¶177",
+        "¶178",
+        "¶179",
+        "¶180"
+      ],
+      "segmentCount": 6,
+      "chars": 658,
+      "keyPoints": [
+        {
+          "segmentId": "¶176",
+          "title": "本章小结：两个决策 + 两条渠道",
+          "quote": "一次让模型看见多少条能力"
+        },
+        {
+          "segmentId": "¶177",
+          "title": "本章只讲了三类",
+          "quote": "由 Agent 主动调用的三类"
+        },
+        {
+          "segmentId": "¶178",
+          "title": "三类工具的设计关键汇总",
+          "quote": "- **感知工具**：关键在于粒度权衡、上下文感"
+        }
+      ],
+      "sourceRange": {
+        "from": "¶175",
+        "to": "¶180"
+      }
+    },
+    {
+      "id": "¶181",
+      "title": "思考题",
+      "level": 2,
+      "kind": "md",
+      "segmentIds": [
+        "¶181",
+        "¶182"
+      ],
+      "segmentCount": 2,
+      "chars": 435,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶181",
+        "to": "¶182"
+      }
+    }
+  ]
+}

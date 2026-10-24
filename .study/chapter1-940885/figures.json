@@ -1,0 +1,80 @@
+{
+  "generatedAt": "2026-10-24T06:26:00.906Z",
+  "ok": true,
+  "cli": "C:\\Users\\x\\.dsh\\skills\\archify-2\\bin\\archify.mjs",
+  "figures": [
+    {
+      "index": 1,
+      "file": "graph-1.html",
+      "nodeCount": 18,
+      "edgeCount": 21,
+      "nodeIds": [
+        "formula",
+        "boundary",
+        "rl-map",
+        "tool",
+        "llm",
+        "context",
+        "model-harness",
+        "obs-act",
+        "tool-call",
+        "tool-principle",
+        "inner-think",
+        "model-as-agent",
+        "learn-paths",
+        "five-parts",
+        "react",
+        "harness",
+        "min-diff",
+        "prefix-traj"
+      ],
+      "ok": true,
+      "produced": true,
+      "failedStage": null,
+      "diagnostics": [],
+      "sizeBytes": 832011
+    },
+    {
+      "index": 2,
+      "file": "graph-2.html",
+      "nodeCount": 6,
+      "edgeCount": 5,
+      "nodeIds": [
+        "design-patterns",
+        "proposer-reviewer",
+        "progressive",
+        "append-only",
+        "boundary-retention",
+        "min-diff"
+      ],
+      "ok": true,
+      "produced": true,
+      "failedStage": null,
+      "diagnostics": [],
+      "sizeBytes": 811972
+    },
+    {
+      "index": 3,
+      "file": "graph-3.html",
+      "nodeCount": 10,
+      "edgeCount": 4,
+      "nodeIds": [
+        "ablation",
+        "three-guards",
+        "evo-stages",
+        "principles",
+        "model-choice",
+        "workflow",
+        "autonomous",
+        "adapter",
+        "guardrails",
+        "hitl"
+      ],
+      "ok": true,
+      "produced": true,
+      "failedStage": null,
+      "diagnostics": [],
+      "sizeBytes": 815042
+    }
+  ]
+}

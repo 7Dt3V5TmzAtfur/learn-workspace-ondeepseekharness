@@ -1,0 +1,1762 @@
+{
+  "docId": "chapter1-940885",
+  "savedAt": "2026-10-24T06:31:08.282Z",
+  "stats": {
+    "total": 217,
+    "byTier": {
+      "core": 870,
+      "hard": 690,
+      "ref": 1856
+    },
+    "highlightedChars": 3416,
+    "totalChars": 35270,
+    "ratio": 0.0968528494471222,
+    "labelCounts": {
+      "c": 22,
+      "e": 37,
+      "d": 90,
+      "t": 23,
+      "s": 33,
+      "q": 4,
+      "v": 8
+    }
+  },
+  "items": [
+    {
+      "segmentId": "¶1",
+      "label": "c",
+      "tier": "ref",
+      "title": "AI Agent 入门",
+      "quote": "AI Agent 入门",
+      "note": "全章标题"
+    },
+    {
+      "segmentId": "¶2",
+      "label": "e",
+      "tier": "ref",
+      "title": "五个已经在用的 Agent",
+      "quote": "你已经在使用 AI Agent 了",
+      "note": "用读者自己的使用经验切入"
+    },
+    {
+      "segmentId": "¶3",
+      "label": "d",
+      "tier": "core",
+      "title": "Agent 与普通对话的区别",
+      "quote": "能够自主规划执行步骤、调用各种工具完成任务，并根据结果不断调整策略",
+      "note": "全章的判断标准：自主规划 + 调用工具 + 按结果调整，缺一就不是 Agent"
+    },
+    {
+      "segmentId": "¶4",
+      "label": "t",
+      "tier": "ref",
+      "title": "本章学习路径",
+      "quote": "从实践出发理解 AI Agent 的核心组成",
+      "note": "体验 → 原理 → 设计模式"
+    },
+    {
+      "segmentId": "¶5",
+      "label": "c",
+      "tier": "ref",
+      "title": "阅读提示：这是概念地图",
+      "quote": "初次阅读时不必逐一记住所有概念",
+      "note": "作者明确授权不要精读，先建立整体印象"
+    },
+    {
+      "segmentId": "¶6",
+      "label": "d",
+      "tier": "core",
+      "title": "核心公式",
+      "quote": "现代 Agent = LLM + 上下文 + 工具",
+      "note": "全章地基。原文标题即公式本身"
+    },
+    {
+      "segmentId": "¶7",
+      "label": "d",
+      "tier": "core",
+      "title": "公式的两个限定",
+      "quote": "这里的加号表示工程组件的组合，而不是强化学习中的形式化定义",
+      "note": "两个限定都要记住：①加号是工程组合 ②不包含 Environment"
+    },
+    {
+      "segmentId": "¶8",
+      "label": "d",
+      "tier": "ref",
+      "title": "三组件的广义定义",
+      "quote": "它不只是一组模型参数，而是 Agent 的整个决策内核",
+      "note": "每个词都\"广义但边界清楚\"：LLM 不止参数，上下文不止输入文本，工具不止函数调用"
+    },
+    {
+      "segmentId": "¶9",
+      "label": "d",
+      "tier": "core",
+      "title": "大脑 + 眼睛 + 手脚",
+      "quote": "Agent = 大脑 + 眼睛 + 手脚",
+      "note": "同一公式的直觉版。记不住术语时想这三个器官"
+    },
+    {
+      "segmentId": "¶10",
+      "label": "d",
+      "tier": "hard",
+      "title": "Agent 与 Environment 是两方",
+      "quote": "Agent 与 Environment 是闭环交互的两方，而不是彼此的组成部分",
+      "note": "最容易记错。环境不是 Agent 的一部分，是闭环的另一方"
+    },
+    {
+      "segmentId": "¶11",
+      "label": "c",
+      "tier": "ref",
+      "title": "图1-1",
+      "quote": "图1-1 Agent 与 Environment 的闭环交互",
+      "note": "一张图两个层次：外层 Agent↔Environment，内层 Model↔Harness"
+    },
+    {
+      "segmentId": "¶12",
+      "label": "d",
+      "tier": "core",
+      "title": "Model 与 Harness 的分工",
+      "quote": "Harness 可以创建、隔离或代理一个环境",
+      "note": "堵住\"Harness 也算环境\"的滑坡：能操纵环境，不等于它就是环境"
+    },
+    {
+      "segmentId": "¶13",
+      "label": "s",
+      "tier": "ref",
+      "title": "公式重新展开",
+      "quote": "构成最小 Harness",
+      "note": "把公式翻译成 Harness 语言：LLM→Model，上下文+工具→最小 Harness"
+    },
+    {
+      "segmentId": "¶14",
+      "label": "c",
+      "tier": "hard",
+      "title": "映射不是等同",
+      "quote": "但不是严格的一一等同关系",
+      "note": "三个组件能映射到 RL 概念，但上下文≠整个观察空间"
+    },
+    {
+      "segmentId": "¶15",
+      "label": "d",
+      "tier": "ref",
+      "title": "三组件 ↔ 学术概念对照表",
+      "quote": "Agent 决定“下一步做什么”的决策逻辑",
+      "note": "大脑→策略，眼睛→观察与历史，手脚→观察/行动接口"
+    },
+    {
+      "segmentId": "¶16",
+      "label": "d",
+      "tier": "ref",
+      "title": "观察空间与动作空间",
+      "quote": "观察空间与动作空间",
+      "note": "本节主题"
+    },
+    {
+      "segmentId": "¶17",
+      "label": "d",
+      "tier": "core",
+      "title": "边界就是能力上限",
+      "quote": "对模型来说就像不存在",
+      "note": "解释了为什么\"模型太笨\"常是误判——信息根本没进来"
+    },
+    {
+      "segmentId": "¶18",
+      "label": "s",
+      "tier": "core",
+      "title": "全章最实用的判断",
+      "quote": "许多看似需要“更聪明模型”的问题，其实只是接口问题",
+      "note": "最有迁移价值的一句。下次觉得 AI 笨，先查是眼睛还是手脚的问题"
+    },
+    {
+      "segmentId": "¶19",
+      "label": "e",
+      "tier": "ref",
+      "title": "Manus：合并三个空间",
+      "quote": "取三类 Agent 观察空间与动作空间的并集",
+      "note": "Manus 的突破不是换模型，是把三条产品线的空间并起来"
+    },
+    {
+      "segmentId": "¶20",
+      "label": "e",
+      "tier": "ref",
+      "title": "OpenClaw：接口延伸到数字生活",
+      "quote": "本地优先的 OpenClaw 跨越了更大的数据边界",
+      "note": "把观察空间从云端沙盒推到本地文件与消息渠道"
+    },
+    {
+      "segmentId": "¶21",
+      "label": "c",
+      "tier": "ref",
+      "title": "脚注：产品资料出处",
+      "quote": "Manus 的官方资料",
+      "note": "一手来源，可核对"
+    },
+    {
+      "segmentId": "¶22",
+      "label": "t",
+      "tier": "ref",
+      "title": "展开顺序",
+      "quote": "我们从最具体的手脚",
+      "note": "工具 → LLM → 上下文，由具体到抽象"
+    },
+    {
+      "segmentId": "¶23",
+      "label": "e",
+      "tier": "ref",
+      "title": "五个产品的三维对照",
+      "quote": "Agent 产品",
+      "note": "把框架套到真实产品上，是最快检验理解的方式"
+    },
+    {
+      "segmentId": "¶24",
+      "label": "s",
+      "tier": "hard",
+      "title": "三个共同特征",
+      "quote": "不是从有限的几个按钮中选择，而是能生成任意自然语言和代码",
+      "note": "开放式动作空间 + 内部思考 + 持续交互，正是三组件协同的结果"
+    },
+    {
+      "segmentId": "¶25",
+      "label": "d",
+      "tier": "ref",
+      "title": "工具：Agent 的手脚",
+      "quote": "工具：Agent 的手脚",
+      "note": "本节主题"
+    },
+    {
+      "segmentId": "¶26",
+      "label": "d",
+      "tier": "ref",
+      "title": "工具是桥梁",
+      "quote": "没有工具，Agent 只能“纸上谈兵”",
+      "note": "感知类承载观察、执行类承载行动"
+    },
+    {
+      "segmentId": "¶27",
+      "label": "t",
+      "tier": "ref",
+      "title": "五类工具的划分",
+      "quote": "把工具分为五类",
+      "note": "先建立整体印象，后面逐类展开"
+    },
+    {
+      "segmentId": "¶28",
+      "label": "e",
+      "tier": "ref",
+      "title": "感知工具",
+      "quote": "搜索引擎提供实时网络数据，文件系统读取本地文档",
+      "note": "搜索引擎、文件系统、API、数据库"
+    },
+    {
+      "segmentId": "¶29",
+      "label": "e",
+      "tier": "ref",
+      "title": "执行工具",
+      "quote": "代码执行、文件操作、系统命令、外部 API 调用",
+      "note": "代码执行、文件操作、系统命令——决策变成实际行动"
+    },
+    {
+      "segmentId": "¶30",
+      "label": "e",
+      "tier": "ref",
+      "title": "协作工具",
+      "quote": "委托子 Agent 完成专项任务，在关键决策点请求人类确认",
+      "note": "委托子 Agent、请求人类确认、多 Agent 协调"
+    },
+    {
+      "segmentId": "¶31",
+      "label": "d",
+      "tier": "hard",
+      "title": "事件触发工具的特殊性",
+      "quote": "它们不是 Agent 主动调用的",
+      "note": "五类里唯一\"不主动\"的一类，最容易和前三类混为一谈"
+    },
+    {
+      "segmentId": "¶32",
+      "label": "e",
+      "tier": "ref",
+      "title": "用户沟通工具",
+      "quote": "是 Agent 主动与用户建立连接、传递信息的渠道",
+      "note": "只传递信息，不改变外部世界"
+    },
+    {
+      "segmentId": "¶33",
+      "label": "s",
+      "tier": "hard",
+      "title": "工具设计决定 Agent 能走多远",
+      "quote": "工具设计的质量直接决定了 Agent 能走多远",
+      "note": "三个具体后果：接口不清→乱用，错误处理不到位→死锁，权限太宽→后果难挽回"
+    },
+    {
+      "segmentId": "¶34",
+      "label": "d",
+      "tier": "ref",
+      "title": "工具调用 = Function Calling",
+      "quote": "让模型能够通过结构化的方式调用外部工具",
+      "note": "统一术语：本书一律叫\"工具调用\"，不叫 Function Calling"
+    },
+    {
+      "segmentId": "¶35",
+      "label": "d",
+      "tier": "core",
+      "title": "工具调用的四步",
+      "quote": "工具调用的流程分为四步",
+      "note": "这四步就是后文 ReAct 的基础，先记住这个顺序"
+    },
+    {
+      "segmentId": "¶36",
+      "label": "t",
+      "tier": "ref",
+      "title": "查天气例子",
+      "quote": "以一个查天气的场景为例",
+      "note": "进入 API 层面的具体表示"
+    },
+    {
+      "segmentId": "¶37",
+      "label": "e",
+      "tier": "ref",
+      "title": "第一步与第二步的 API 表示",
+      "quote": "第一步：声明工具",
+      "note": "声明工具 → 模型决定调用"
+    },
+    {
+      "segmentId": "¶38",
+      "label": "e",
+      "tier": "ref",
+      "title": "第三、四步的 API 表示",
+      "quote": "第三步：结果追加到上下文",
+      "note": "结果入上下文 → 模型基于结果回复"
+    },
+    {
+      "segmentId": "¶39",
+      "label": "s",
+      "tier": "ref",
+      "title": "开发者的分工",
+      "quote": "开发者只需要定义工具和执行工具调用",
+      "note": "开发者只管定义工具和执行，决策交给模型"
+    },
+    {
+      "segmentId": "¶40",
+      "label": "t",
+      "tier": "hard",
+      "title": "从最窄能力起步",
+      "quote": "先从任务所需的最窄能力起步",
+      "note": "通用性也扩大出错和攻击面：沙盒、禁网、限时限额"
+    },
+    {
+      "segmentId": "¶41",
+      "label": "t",
+      "tier": "ref",
+      "title": "单一日志 vs 虚拟工作目录",
+      "quote": "受控的虚拟工作目录",
+      "note": "长程任务需要能保存计划、中间结果、日志与产物"
+    },
+    {
+      "segmentId": "¶42",
+      "label": "s",
+      "tier": "core",
+      "title": "工具设计的核心原则",
+      "quote": "通用基础能力用于组合与探索",
+      "note": "一句话道尽取舍：通用的用于探索，专用的用于约束高风险操作"
+    },
+    {
+      "segmentId": "¶43",
+      "label": "d",
+      "tier": "ref",
+      "title": "LLM：Agent 的大脑",
+      "quote": "LLM：Agent 的大脑",
+      "note": "本节主题"
+    },
+    {
+      "segmentId": "¶44",
+      "label": "d",
+      "tier": "core",
+      "title": "LLM 是决策核心",
+      "quote": "它需要先解析真实意图",
+      "note": "理解-规划-执行。注意括号里那句：用户说的往往不是他真正想要的"
+    },
+    {
+      "segmentId": "¶45",
+      "label": "d",
+      "tier": "core",
+      "title": "内部思考",
+      "quote": "先进行规划与推演",
+      "note": "与传统 RL Agent 的关键区别：不是盲目随机探索，而是在结构化知识上展开"
+    },
+    {
+      "segmentId": "¶46",
+      "label": "d",
+      "tier": "ref",
+      "title": "模型即 Agent",
+      "quote": "模型即 Agent",
+      "note": "一个子节标题，新范式的名字"
+    },
+    {
+      "segmentId": "¶47",
+      "label": "d",
+      "tier": "hard",
+      "title": "Harness = 马具",
+      "quote": "把这种力量引导到正确的方向上",
+      "note": "最有说服力的比喻：缰绳不是限制马的奔跑，是把力量导向正确方向"
+    },
+    {
+      "segmentId": "¶48",
+      "label": "s",
+      "tier": "hard",
+      "title": "模型自主越多，越需要约束",
+      "quote": "模型自主决策的空间越大，出错时的影响面也越大",
+      "note": "模型越强 Harness 越关键。厂商的优势是协同优化，不是让框架变薄"
+    },
+    {
+      "segmentId": "¶49",
+      "label": "q",
+      "tier": "hard",
+      "title": "悬着的问题：Harness 会被吃掉吗",
+      "quote": "如果模型持续变强",
+      "note": "作者引用《苦涩的教训》自问，立场是\"方向认同，节奏务实\"——不回避矛盾"
+    },
+    {
+      "segmentId": "¶50",
+      "label": "c",
+      "tier": "ref",
+      "title": "脚注：The Bitter Lesson",
+      "quote": "The Bitter Lesson",
+      "note": "Sutton 2019 原文链接"
+    },
+    {
+      "segmentId": "¶51",
+      "label": "d",
+      "tier": "ref",
+      "title": "Agent 的学习机制",
+      "quote": "Agent 的学习机制",
+      "note": "子节标题"
+    },
+    {
+      "segmentId": "¶52",
+      "label": "d",
+      "tier": "core",
+      "title": "能力更新的三条路径",
+      "quote": "任务内的上下文适应、跨任务的外部产物（artifact）更新，以及训练周期中的参数更新",
+      "note": "按更新发生在哪、持续多久划分：上下文 / 外部产物 / 参数"
+    },
+    {
+      "segmentId": "¶53",
+      "label": "c",
+      "tier": "ref",
+      "title": "图1-2",
+      "quote": "Agent 能力更新的三个层次",
+      "note": "三条路径的时间尺度对照图"
+    },
+    {
+      "segmentId": "¶54",
+      "label": "d",
+      "tier": "ref",
+      "title": "路径一：上下文适应",
+      "quote": "示例、状态和检索结果进入上下文后，模型可以立即调整行为",
+      "note": "当前任务内生效，快且便宜，受窗口限制"
+    },
+    {
+      "segmentId": "¶55",
+      "label": "d",
+      "tier": "ref",
+      "title": "路径二：外部产物",
+      "quote": "把事实和经验整理为知识文档",
+      "note": "可审计可修订，跨越任务保留"
+    },
+    {
+      "segmentId": "¶56",
+      "label": "s",
+      "tier": "core",
+      "title": "三条路径不是互斥分类",
+      "quote": "三条路径因此不是互斥分类",
+      "note": "不同时间尺度上的协同：上下文管临场，产物管积累，参数管内化"
+    },
+    {
+      "segmentId": "¶57",
+      "label": "d",
+      "tier": "ref",
+      "title": "上下文：Agent 的眼睛",
+      "quote": "上下文：Agent 的眼睛",
+      "note": "本节主题"
+    },
+    {
+      "segmentId": "¶58",
+      "label": "d",
+      "tier": "core",
+      "title": "上下文是每个决策点能看到的一切",
+      "quote": "上下文是 Agent 在每个决策点能看到的全部信息",
+      "note": "不是输入的那段文本，而是\"视野\"。由五部分构成"
+    },
+    {
+      "segmentId": "¶59",
+      "label": "d",
+      "tier": "ref",
+      "title": "五部分之上半：系统提示词与工具定义",
+      "quote": "相当于 Agent 的",
+      "note": "系统提示词是岗位说明书，工具定义声明可用工具"
+    },
+    {
+      "segmentId": "¶60",
+      "label": "d",
+      "tier": "ref",
+      "title": "五部分之下半：工具执行结果",
+      "quote": "这些结果是 Agent 下一步思考的直接依据",
+      "note": "注意三者不一定同时出现：调工具时是 reasoning+tool_calls"
+    },
+    {
+      "segmentId": "¶61",
+      "label": "d",
+      "tier": "core",
+      "title": "静态前缀 vs 动态消息历史",
+      "quote": "前两项（系统提示词 + 工具定义）是静态前缀",
+      "note": "五部分二分：前两项静态前缀，后三项随交互增长。这是后文轨迹概念的基础"
+    },
+    {
+      "segmentId": "¶62",
+      "label": "d",
+      "tier": "ref",
+      "title": "消融实验是什么",
+      "quote": "就像医生诊断时逐一排除病因",
+      "note": "像医生逐一排除病因：去掉一个组件看系统是否还正常"
+    },
+    {
+      "segmentId": "¶63",
+      "label": "v",
+      "tier": "ref",
+      "title": "实验 1-1 的设计",
+      "quote": "一组保留全部组件的完整基线，再加上四组各缺失一个组件的对照",
+      "note": "四组件各缺失一次 + 完整基线。系统提示词不参与消融"
+    },
+    {
+      "segmentId": "¶64",
+      "label": "v",
+      "tier": "core",
+      "title": "实验 1-1 的核心洞察",
+      "quote": "上下文决定了 Agent 能看到什么",
+      "note": "两个洞察：①组件不等价，标准是信息能否别处重建 ②\"给出了回答\"≠\"完成了任务\""
+    },
+    {
+      "segmentId": "¶65",
+      "label": "d",
+      "tier": "ref",
+      "title": "ReAct 循环",
+      "quote": "ReAct 循环",
+      "note": "本节主题"
+    },
+    {
+      "segmentId": "¶66",
+      "label": "t",
+      "tier": "ref",
+      "title": "从组件到协同",
+      "quote": "它们如何协同工作",
+      "note": "自然的问题：三个组件怎么串起来"
+    },
+    {
+      "segmentId": "¶67",
+      "label": "d",
+      "tier": "core",
+      "title": "ReAct 的三个环节",
+      "quote": "实际循环包含三个环节",
+      "note": "名字只有两个词却有三个环节。\"观察\"最容易被漏掉"
+    },
+    {
+      "segmentId": "¶68",
+      "label": "d",
+      "tier": "core",
+      "title": "上下文 = 静态前缀 + 轨迹",
+      "quote": "每一次调用 LLM 时，它接收的完整上下文由",
+      "note": "本章最该背的一条等式，同时解释了上下文为何会涨"
+    },
+    {
+      "segmentId": "¶69",
+      "label": "c",
+      "tier": "ref",
+      "title": "图1-4",
+      "quote": "Agent 轨迹",
+      "note": "轨迹结构示意"
+    },
+    {
+      "segmentId": "¶70",
+      "label": "d",
+      "tier": "ref",
+      "title": "最小运行骨架",
+      "quote": "Model 只负责决定下一步",
+      "note": "三分工：Model 决策、Harness 组装与校验、Environment 产生变化"
+    },
+    {
+      "segmentId": "¶71",
+      "label": "e",
+      "tier": "ref",
+      "title": "伪代码：初始化轨迹",
+      "quote": "trajectory = [user_request]",
+      "note": "轨迹从用户请求开始"
+    },
+    {
+      "segmentId": "¶72",
+      "label": "e",
+      "tier": "ref",
+      "title": "伪代码：循环主体",
+      "quote": "context = stable_prefix + trajectory",
+      "note": "一行写出本章的等式"
+    },
+    {
+      "segmentId": "¶73",
+      "label": "e",
+      "tier": "ref",
+      "title": "伪代码：终止条件",
+      "quote": "return decision.answer",
+      "note": "没有工具调用就返回答案"
+    },
+    {
+      "segmentId": "¶74",
+      "label": "e",
+      "tier": "ref",
+      "title": "伪代码：执行工具",
+      "quote": "Harness.validate(call)",
+      "note": "校验 → 执行 → 追加。校验在 Harness 这一层"
+    },
+    {
+      "segmentId": "¶75",
+      "label": "t",
+      "tier": "ref",
+      "title": "看看轨迹里保存了什么",
+      "quote": "轨迹中保存了什么",
+      "note": "从机制转向数据结构"
+    },
+    {
+      "segmentId": "¶76",
+      "label": "e",
+      "tier": "ref",
+      "title": "轨迹示例：用户消息",
+      "quote": "根据公司季度收入",
+      "note": "多币种汇总任务"
+    },
+    {
+      "segmentId": "¶77",
+      "label": "e",
+      "tier": "ref",
+      "title": "第一次迭代",
+      "quote": "第一次迭代",
+      "note": "模型决定调汇率转换工具"
+    },
+    {
+      "segmentId": "¶78",
+      "label": "e",
+      "tier": "ref",
+      "title": "工具结果入轨迹",
+      "quote": "Agent 框架执行工具，添加结果到轨迹",
+      "note": "三个币种的换算结果"
+    },
+    {
+      "segmentId": "¶79",
+      "label": "e",
+      "tier": "ref",
+      "title": "第二次迭代",
+      "quote": "第二次迭代",
+      "note": "有了换算结果，改用代码解释器做汇总"
+    },
+    {
+      "segmentId": "¶80",
+      "label": "e",
+      "tier": "ref",
+      "title": "汇总结果入轨迹",
+      "quote": "Total: $9,602,895.73, Average: $2,400,723.93",
+      "note": "总收入与平均值"
+    },
+    {
+      "segmentId": "¶81",
+      "label": "e",
+      "tier": "ref",
+      "title": "第三次迭代：最终答案",
+      "quote": "第三次迭代",
+      "note": "信息齐了，直接给出答案"
+    },
+    {
+      "segmentId": "¶82",
+      "label": "c",
+      "tier": "hard",
+      "title": "静态前缀不在轨迹里",
+      "quote": "它们作为静态前缀",
+      "note": "容易看漏：轨迹里看不到系统提示词和工具定义，因为每次调用都自动拼在前面"
+    },
+    {
+      "segmentId": "¶83",
+      "label": "s",
+      "tier": "ref",
+      "title": "规模感",
+      "quote": "整个过程只用了 3 次迭代",
+      "note": "3 次迭代、4 次工具调用——比想象中少"
+    },
+    {
+      "segmentId": "¶84",
+      "label": "s",
+      "tier": "hard",
+      "title": "追加式设计的三个好处",
+      "quote": "上下文是不断追加的",
+      "note": "可解释可调试、可分析行为模式、可沉淀进知识库"
+    },
+    {
+      "segmentId": "¶85",
+      "label": "t",
+      "tier": "ref",
+      "title": "转向实验",
+      "quote": "通过两个实验来感受",
+      "note": "从原理转向体验"
+    },
+    {
+      "segmentId": "¶86",
+      "label": "v",
+      "tier": "ref",
+      "title": "实验 1-2：Kimi K3 原生 Agent",
+      "quote": "可以把 MoE 想象成一个专家团队",
+      "note": "MoE 的比喻：面对不同问题自动选专家"
+    },
+    {
+      "segmentId": "¶87",
+      "label": "v",
+      "tier": "hard",
+      "title": "ReAct 循环仍由客户端驱动",
+      "quote": "ReAct 循环仍由客户端代码驱动",
+      "note": "纠正一个常见误解：RL 内化的是\"决策策略\"，不是\"工具执行机制\""
+    },
+    {
+      "segmentId": "¶88",
+      "label": "c",
+      "tier": "ref",
+      "title": "脚注：读者指出的区分",
+      "quote": "RL 内化的是工具调用决策策略",
+      "note": "来自 GitHub Issue #30，专门澄清这个区分"
+    },
+    {
+      "segmentId": "¶89",
+      "label": "v",
+      "tier": "ref",
+      "title": "实验 1-3：GPT-5.6 Deep Research",
+      "quote": "GPT-5.6",
+      "note": "自由格式工具调用"
+    },
+    {
+      "segmentId": "¶90",
+      "label": "v",
+      "tier": "hard",
+      "title": "意图澄清过程",
+      "quote": "不会立即动手执行，而是首先通过一系列问题来澄清用户的真实意图",
+      "note": "不立即动手，先问几个问题澄清真实意图。值得在产品设计里借鉴"
+    },
+    {
+      "segmentId": "¶91",
+      "label": "c",
+      "tier": "ref",
+      "title": "图1-5",
+      "quote": "模型即 Agent” 架构——原生工具调用",
+      "note": "模型即 Agent 的架构图"
+    },
+    {
+      "segmentId": "¶92",
+      "label": "d",
+      "tier": "ref",
+      "title": "Harness 工程",
+      "quote": "Harness 工程",
+      "note": "本节主题：模型之外的竞争力"
+    },
+    {
+      "segmentId": "¶93",
+      "label": "t",
+      "tier": "core",
+      "title": "Demo 与产品的鸿沟",
+      "quote": "一个能跑的 Demo 和一个可靠的产品之间还有巨大的鸿沟",
+      "note": "本章的转折点。三个具体脆弱点：幻觉、选错工具、遇错无法恢复"
+    },
+    {
+      "segmentId": "¶94",
+      "label": "d",
+      "tier": "core",
+      "title": "Harness 的定义",
+      "quote": "再加上三层保障机制",
+      "note": "上下文管理 + 工具接口 + 三层保障（约束 / 验证 / 纠正）"
+    },
+    {
+      "segmentId": "¶95",
+      "label": "t",
+      "tier": "ref",
+      "title": "用方程展开",
+      "quote": "用方程展开生产形态下的完整组成",
+      "note": "从文字定义转向公式"
+    },
+    {
+      "segmentId": "¶96",
+      "label": "d",
+      "tier": "core",
+      "title": "两个方程",
+      "quote": "Harness = 上下文管理 + 工具接口 + 约束 + 验证 + 纠正",
+      "note": "本章最终形态的公式，值得抄下来"
+    },
+    {
+      "segmentId": "¶97",
+      "label": "e",
+      "tier": "hard",
+      "title": "退款 Agent 的例子",
+      "quote": "比如退款 Agent",
+      "note": "三层保障各有实例：政策进上下文、权限约束调用、数据库验证结果"
+    },
+    {
+      "segmentId": "¶98",
+      "label": "d",
+      "tier": "core",
+      "title": "Harness 的精确边界",
+      "quote": "Harness 不是模型之外的一切",
+      "note": "最容易被含糊过去的一句：Harness 不是\"模型之外的一切\"，而是\"Agent 边界内、模型之外\""
+    },
+    {
+      "segmentId": "¶99",
+      "label": "d",
+      "tier": "ref",
+      "title": "五要素对照表",
+      "quote": "Context",
+      "note": "功能 / 职责 / 例子 / 章节 四列对照"
+    },
+    {
+      "segmentId": "¶100",
+      "label": "t",
+      "tier": "ref",
+      "title": "模型控制循环的伪代码",
+      "quote": "模型控制循环的基本流程",
+      "note": "把五要素落到代码结构"
+    },
+    {
+      "segmentId": "¶101",
+      "label": "e",
+      "tier": "ref",
+      "title": "循环伪代码",
+      "quote": "while true",
+      "note": "观察、构建上下文、决策、执行、追加"
+    },
+    {
+      "segmentId": "¶102",
+      "label": "c",
+      "tier": "ref",
+      "title": "刻意不展开",
+      "quote": "这段骨架刻意不展开具体实现",
+      "note": "指明后续章节分工"
+    },
+    {
+      "segmentId": "¶103",
+      "label": "s",
+      "tier": "core",
+      "title": "五个功能构成闭环",
+      "quote": "五个功能构成一个闭环",
+      "note": "\"能做事\"靠上下文与工具，\"不做错事\"靠约束验证纠正"
+    },
+    {
+      "segmentId": "¶104",
+      "label": "s",
+      "tier": "hard",
+      "title": "重心已经转移",
+      "quote": "生产级 Agent 系统的重心已经转向约束、验证与纠正",
+      "note": "早期框架只给工具和上下文，现在重心在保障机制"
+    },
+    {
+      "segmentId": "¶105",
+      "label": "e",
+      "tier": "hard",
+      "title": "Claude Code 的证据",
+      "quote": "工具本身（文件读写、命令执行、搜索）只是一小部分",
+      "note": "一个可核对的观察：大部分代码是保障机制，不是工具本身"
+    },
+    {
+      "segmentId": "¶106",
+      "label": "e",
+      "tier": "ref",
+      "title": "保障机制清单",
+      "quote": "当错误连续发生时自动“断电”停止重试",
+      "note": "熔断器的比喻很准：错误连续发生时自动断电，像保险丝跳闸"
+    },
+    {
+      "segmentId": "¶107",
+      "label": "s",
+      "tier": "core",
+      "title": "本章的核心判断",
+      "quote": "行业正在从",
+      "note": "一句话总结整个 Harness 部分：从\"能做事\"到\"可靠地做事\""
+    },
+    {
+      "segmentId": "¶108",
+      "label": "d",
+      "tier": "ref",
+      "title": "从提示工程到 Loop 工程",
+      "quote": "从提示工程到 Loop 工程",
+      "note": "子节标题"
+    },
+    {
+      "segmentId": "¶109",
+      "label": "t",
+      "tier": "ref",
+      "title": "一条演进弧线",
+      "quote": "可以看到一条清晰的演进弧线",
+      "note": "五个阶段依次展开"
+    },
+    {
+      "segmentId": "¶110",
+      "label": "d",
+      "tier": "ref",
+      "title": "第一波：提示工程",
+      "quote": "通过优化输入给模型的自然语言指令来提升输出质量",
+      "note": "优化输入给模型的自然语言指令"
+    },
+    {
+      "segmentId": "¶111",
+      "label": "d",
+      "tier": "ref",
+      "title": "第二波：上下文工程",
+      "quote": "需要系统性地管理模型能看到的所有信息",
+      "note": "从优化提示词扩展到系统性管理所有可见信息"
+    },
+    {
+      "segmentId": "¶112",
+      "label": "d",
+      "tier": "ref",
+      "title": "第三波：Harness 工程",
+      "quote": "Harness 工程",
+      "note": "从\"模型能看到什么\"扩展到\"Agent 如何组织运行\""
+    },
+    {
+      "segmentId": "¶113",
+      "label": "d",
+      "tier": "ref",
+      "title": "第四波：Loop 工程",
+      "quote": "把视野从单次运行扩展到跨轮次的持续自主运转",
+      "note": "从单次运行扩展到跨轮次持续自主运转"
+    },
+    {
+      "segmentId": "¶114",
+      "label": "d",
+      "tier": "ref",
+      "title": "第五波：Graph 工程",
+      "quote": "Graph 工程",
+      "note": "把循环、程序、人工审批组织成显式执行图"
+    },
+    {
+      "segmentId": "¶115",
+      "label": "c",
+      "tier": "ref",
+      "title": "脚注：Graph 工程的出处",
+      "quote": "Graph Engineering",
+      "note": "2026 年 7 月的新提法，给出处便于核对"
+    },
+    {
+      "segmentId": "¶116",
+      "label": "s",
+      "tier": "core",
+      "title": "五个阶段是层层包含",
+      "quote": "这五个阶段不是替代关系，而是层层包含的",
+      "note": "不是五个并列的概念，而是五层嵌套。单个 Agent 循环只是执行图里一个节点"
+    },
+    {
+      "segmentId": "¶117",
+      "label": "v",
+      "tier": "core",
+      "title": "LangChain 的实证",
+      "quote": "得分从 52.8% 提升到 66.5%",
+      "note": "最有说服力的一组数字：改的不是模型，是 Harness，排名从 30 名外进前 5"
+    },
+    {
+      "segmentId": "¶118",
+      "label": "d",
+      "tier": "ref",
+      "title": "构建有效 Agent 的核心原则",
+      "quote": "构建有效 Agent 的核心原则",
+      "note": "子节标题"
+    },
+    {
+      "segmentId": "¶119",
+      "label": "t",
+      "tier": "ref",
+      "title": "三个核心原则",
+      "quote": "成功的 Agent 系统遵循三个核心原则",
+      "note": "来自 Anthropic 的经验总结"
+    },
+    {
+      "segmentId": "¶120",
+      "label": "d",
+      "tier": "hard",
+      "title": "原则一：保持简单",
+      "quote": "只在确实必要时才增加复杂度",
+      "note": "理由很实在：每多一层抽象都会成为调试时新的盲区"
+    },
+    {
+      "segmentId": "¶121",
+      "label": "d",
+      "tier": "hard",
+      "title": "原则二：保持透明",
+      "quote": "明确显示 Agent 的规划步骤、执行日志和决策轨迹",
+      "note": "不只是为了调试，也是用户建立信任的前提"
+    },
+    {
+      "segmentId": "¶122",
+      "label": "d",
+      "tier": "core",
+      "title": "原则三：设计好 ACI",
+      "quote": "从 Agent 视角设计接口",
+      "note": "ACI = Agent-Computer Interface。SIM 卡缺角的比喻说明\"让错误无法发生\""
+    },
+    {
+      "segmentId": "¶123",
+      "label": "c",
+      "tier": "ref",
+      "title": "脚注：Anthropic 原文",
+      "quote": "Building effective agents",
+      "note": "原则的原始出处"
+    },
+    {
+      "segmentId": "¶124",
+      "label": "t",
+      "tier": "ref",
+      "title": "接下来三节",
+      "quote": "三个独立但重要的主题",
+      "note": "模型选型、编排模式、护栏——都不属于五要素本身，但绕不开"
+    },
+    {
+      "segmentId": "¶125",
+      "label": "d",
+      "tier": "ref",
+      "title": "如何选择模型",
+      "quote": "如何选择模型",
+      "note": "子节标题"
+    },
+    {
+      "segmentId": "¶126",
+      "label": "t",
+      "tier": "ref",
+      "title": "一个实操问题",
+      "quote": "应该选什么样的模型来驱动 Agent",
+      "note": "进入选型话题"
+    },
+    {
+      "segmentId": "¶127",
+      "label": "s",
+      "tier": "ref",
+      "title": "选型比调提示词更重要",
+      "quote": "选对模型往往比优化提示词更有效",
+      "note": "所以本节给思路，不推荐具体版本（模型迭代太快）"
+    },
+    {
+      "segmentId": "¶128",
+      "label": "d",
+      "tier": "hard",
+      "title": "闭源模型",
+      "quote": "要在你自己的任务上做评估",
+      "note": "关键提醒：不要只看排行榜"
+    },
+    {
+      "segmentId": "¶129",
+      "label": "d",
+      "tier": "ref",
+      "title": "开源模型",
+      "quote": "差距在 6 个月以内",
+      "note": "成本低、可私有化、可微调；国内可选 DeepSeek、Kimi、GLM"
+    },
+    {
+      "segmentId": "¶130",
+      "label": "d",
+      "tier": "hard",
+      "title": "策略边界",
+      "quote": "并不意味着承载它的产品一定允许用户调用这种能力",
+      "note": "能力 ≠ 可用。同一任务在聊天产品、Coding Agent、API 里结果可能不同"
+    },
+    {
+      "segmentId": "¶131",
+      "label": "d",
+      "tier": "hard",
+      "title": "必须支持思考",
+      "quote": "绝大多数 Agent 需要支持思考",
+      "note": "只有单步简单任务、固定位置点击这类场景可以例外"
+    },
+    {
+      "segmentId": "¶132",
+      "label": "d",
+      "tier": "ref",
+      "title": "两个易被忽视的维度",
+      "quote": "输出 token 的速度",
+      "note": "20 轮推理每轮慢 2 秒就是多等 40 秒。另一个是多模态"
+    },
+    {
+      "segmentId": "¶133",
+      "label": "d",
+      "tier": "ref",
+      "title": "编排模式：工作流与自主",
+      "quote": "编排模式：工作流与自主",
+      "note": "子节标题"
+    },
+    {
+      "segmentId": "¶134",
+      "label": "d",
+      "tier": "ref",
+      "title": "编排模式是什么",
+      "quote": "它决定了上下文如何在 LLM 调用之间流动",
+      "note": "Harness 中\"上下文与工具\"层面的组织方式"
+    },
+    {
+      "segmentId": "¶135",
+      "label": "s",
+      "tier": "core",
+      "title": "从简单到复杂",
+      "quote": "首先考虑单个 LLM 调用",
+      "note": "判据很明确：能耗提示词解决就别上 Agent；能分解成固定子任务就用工作流；只有需要动态决策才用自主"
+    },
+    {
+      "segmentId": "¶136",
+      "label": "e",
+      "tier": "hard",
+      "title": "反面例子",
+      "quote": "一个常见的反面例子",
+      "note": "一上来就画复杂流水线：每个部件单看有道理，组合起来过度工程"
+    },
+    {
+      "segmentId": "¶137",
+      "label": "s",
+      "tier": "core",
+      "title": "Harness 不是越复杂越好",
+      "quote": "不等于 Harness 越复杂越好",
+      "note": "Manus 的 \"Less structure, more intelligence.\" 是这个取舍的凝练"
+    },
+    {
+      "segmentId": "¶138",
+      "label": "c",
+      "tier": "ref",
+      "title": "脚注：Less structure 出处",
+      "quote": "Less structure, more intelligence",
+      "note": "Manus 官网"
+    },
+    {
+      "segmentId": "¶139",
+      "label": "d",
+      "tier": "ref",
+      "title": "工作流模式",
+      "quote": "工作流模式：确定性的编排",
+      "note": "子节标题"
+    },
+    {
+      "segmentId": "¶140",
+      "label": "d",
+      "tier": "core",
+      "title": "工作流的定义",
+      "quote": "通过预定义的代码路径来编排",
+      "note": "执行路径确定，LLM 只在节点内部负责理解和生成"
+    },
+    {
+      "segmentId": "¶141",
+      "label": "e",
+      "tier": "ref",
+      "title": "订机票工作流",
+      "quote": "以一个订机票 Agent 为例",
+      "note": "四个固定节点"
+    },
+    {
+      "segmentId": "¶142",
+      "label": "e",
+      "tier": "ref",
+      "title": "四个节点",
+      "quote": "调用身份验证 API，确认用户是谁",
+      "note": "身份 → 搜索 → 付款 → 确认。顺序不可调"
+    },
+    {
+      "segmentId": "¶143",
+      "label": "e",
+      "tier": "hard",
+      "title": "顺序由代码固定",
+      "quote": "节点之间的流转顺序是代码固定的",
+      "note": "付款前不会预订、身份核实前不会搜索——不依赖 LLM 判断"
+    },
+    {
+      "segmentId": "¶144",
+      "label": "s",
+      "tier": "core",
+      "title": "工作流的两个优势",
+      "quote": "严格的流程控制",
+      "note": "严格流程控制（业务规则代码强制）+ 安全性（攻击面限制在单节点内）"
+    },
+    {
+      "segmentId": "¶145",
+      "label": "s",
+      "tier": "hard",
+      "title": "工作流的局限",
+      "quote": "工作流的主要局限是",
+      "note": "缺乏变通。遇到预设外的情况只能走异常分支或交还人类"
+    },
+    {
+      "segmentId": "¶146",
+      "label": "e",
+      "tier": "ref",
+      "title": "最简单的例子：文生图",
+      "quote": "可 Stable Diffusion 这类文生图模型只接受特定风格的提示词",
+      "note": "用户说大白话，模型只吃标签"
+    },
+    {
+      "segmentId": "¶147",
+      "label": "e",
+      "tier": "ref",
+      "title": "两个固定节点",
+      "quote": "用 LLM 把用户的自然语言需求改写成文生图模型习惯的提示词格式",
+      "note": "改写 + 生成。改写那步还需要模型认真思考场景"
+    },
+    {
+      "segmentId": "¶148",
+      "label": "d",
+      "tier": "core",
+      "title": "适配层",
+      "quote": "专门给工具（或模型）的能力短板打补丁的 Harness 代码",
+      "note": "这个词很关键：专门给工具能力短板打补丁的 Harness 代码"
+    },
+    {
+      "segmentId": "¶149",
+      "label": "s",
+      "tier": "hard",
+      "title": "适配层会消失",
+      "quote": "就不再需要提示词改写了",
+      "note": "换成原生图像生成模型，适配层就不需要了。呼应《苦涩的教训》"
+    },
+    {
+      "segmentId": "¶150",
+      "label": "v",
+      "tier": "ref",
+      "title": "实验 1-4：工作流 vs 原生的对照",
+      "quote": "文生图工作流与原生图像生成的对照",
+      "note": "同一句话走两条路线对比"
+    },
+    {
+      "segmentId": "¶151",
+      "label": "s",
+      "tier": "core",
+      "title": "适配层会被内化",
+      "quote": "会随着模型变强被模型自己内化",
+      "note": "本章已经发生了好几轮：few-shot、思维链提示、输出格式修复、JSON 容错都已被内化"
+    },
+    {
+      "segmentId": "¶152",
+      "label": "d",
+      "tier": "ref",
+      "title": "自主 Agent",
+      "quote": "自主 Agent：动态自主决策",
+      "note": "子节标题"
+    },
+    {
+      "segmentId": "¶153",
+      "label": "d",
+      "tier": "core",
+      "title": "自主 Agent 的定义",
+      "quote": "执行路径不是预先定义的",
+      "note": "与工作流的核心区别：路径由环境反馈实时决定"
+    },
+    {
+      "segmentId": "¶154",
+      "label": "e",
+      "tier": "ref",
+      "title": "自主订机票",
+      "quote": "帮我订下周三去上海的机票",
+      "note": "同一任务换成自主模式的走法：搜索→需登录→核实→回来搜→发现转机→问用户"
+    },
+    {
+      "segmentId": "¶155",
+      "label": "d",
+      "tier": "hard",
+      "title": "自主性不等于无限制",
+      "quote": "必须设计明确的",
+      "note": "停止条件必须显式设计，否则死循环或过度执行"
+    },
+    {
+      "segmentId": "¶156",
+      "label": "d",
+      "tier": "hard",
+      "title": "自主 Agent 就是 ReAct 循环",
+      "quote": "本质上就是在一个循环中使用工具的 LLM",
+      "note": "三种退出条件：调最终输出工具、无工具调用、错误或达上限"
+    },
+    {
+      "segmentId": "¶157",
+      "label": "c",
+      "tier": "ref",
+      "title": "图1-6",
+      "quote": "自主 Agent 的执行循环",
+      "note": "执行循环示意"
+    },
+    {
+      "segmentId": "¶158",
+      "label": "e",
+      "tier": "ref",
+      "title": "适用场景",
+      "quote": "自主 Agent 特别适用于开放式的问题",
+      "note": "步骤数难以预测的任务：SWE-bench、多源研究"
+    },
+    {
+      "segmentId": "¶159",
+      "label": "s",
+      "tier": "hard",
+      "title": "自主性的代价",
+      "quote": "自主性也带来了更高的成本和潜在的复合错误风险",
+      "note": "部署要求：沙盒测试、护栏监控、关键决策点加人机检查点"
+    },
+    {
+      "segmentId": "¶160",
+      "label": "d",
+      "tier": "ref",
+      "title": "两种模式的选择与混合",
+      "quote": "两种模式的选择与混合",
+      "note": "子节标题"
+    },
+    {
+      "segmentId": "¶161",
+      "label": "e",
+      "tier": "ref",
+      "title": "混合使用",
+      "quote": "很多系统会混合使用两种模式",
+      "note": "合规流程用工作流，需灵活的部分切自主。n8n 是同系统混用两种节点的例子"
+    },
+    {
+      "segmentId": "¶162",
+      "label": "c",
+      "tier": "ref",
+      "title": "图1-7 n8n 界面",
+      "quote": "n8n 工作流编辑器界面",
+      "note": "可视化拖拽构建"
+    },
+    {
+      "segmentId": "¶163",
+      "label": "d",
+      "tier": "hard",
+      "title": "先自主生成工作流，再确定性执行",
+      "quote": "先由自主 Agent 把工作流写出来，再由工作流去执行",
+      "note": "兼顾灵活与确定性，是第三种形态"
+    },
+    {
+      "segmentId": "¶164",
+      "label": "d",
+      "tier": "ref",
+      "title": "主流 Agent 框架对比",
+      "quote": "主流 Agent 框架简要对比",
+      "note": "子节标题"
+    },
+    {
+      "segmentId": "¶165",
+      "label": "t",
+      "tier": "ref",
+      "title": "选型表",
+      "quote": "帮助读者根据场景快速选型",
+      "note": "进入表格"
+    },
+    {
+      "segmentId": "¶166",
+      "label": "e",
+      "tier": "ref",
+      "title": "框架对照表",
+      "quote": "Codex 的开源 Agent 运行时",
+      "note": "核心定位 / 编排模式 / 开发方式 / 适用场景"
+    },
+    {
+      "segmentId": "¶167",
+      "label": "c",
+      "tier": "hard",
+      "title": "Codex 与 Codex Harness 的区分",
+      "quote": "Codex Harness 就是驱动这几种形态的那一层运行时",
+      "note": "产品名与运行时层分开，容易混为一谈"
+    },
+    {
+      "segmentId": "¶168",
+      "label": "c",
+      "tier": "ref",
+      "title": "脚注：Codex 出处",
+      "quote": "Codex as a platform",
+      "note": "OpenAI 2026 年 8 月"
+    },
+    {
+      "segmentId": "¶169",
+      "label": "s",
+      "tier": "hard",
+      "title": "框架会过时，判断标准不会",
+      "quote": "学会某个具体框架的用法并不重要",
+      "note": "选框架的标准：用尽可能少的抽象层让你专注业务逻辑"
+    },
+    {
+      "segmentId": "¶170",
+      "label": "t",
+      "tier": "ref",
+      "title": "从编排转向护栏",
+      "quote": "但光能做事还不够，还要确保做得对、做得安全",
+      "note": "过渡：把约束、验证、纠正落到实处"
+    },
+    {
+      "segmentId": "¶171",
+      "label": "d",
+      "tier": "ref",
+      "title": "护栏与安全性",
+      "quote": "护栏与安全性",
+      "note": "子节标题"
+    },
+    {
+      "segmentId": "¶172",
+      "label": "d",
+      "tier": "core",
+      "title": "护栏的定义与做法",
+      "quote": "构成了保障 Agent 行为安全可控的分层防线",
+      "note": "管理数据隐私与声誉风险。做法：先针对已识别风险设防，再按新漏洞逐步添加"
+    },
+    {
+      "segmentId": "¶173",
+      "label": "s",
+      "tier": "hard",
+      "title": "单个护栏不够",
+      "quote": "单个护栏不太可能提供足够的保护",
+      "note": "必须组合使用，这与三层结构是同一个道理"
+    },
+    {
+      "segmentId": "¶174",
+      "label": "q",
+      "tier": "hard",
+      "title": "误拒绝",
+      "quote": "为了降低危险请求被放行的概率，模型可能同时拒绝一部分合法但形式敏感的任务",
+      "note": "一个常被忽略的失败类型：为了拦危险请求，也拒掉了合法但形式敏感的任务。评估要双向测"
+    },
+    {
+      "segmentId": "¶175",
+      "label": "d",
+      "tier": "ref",
+      "title": "护栏类型",
+      "quote": "护栏类型",
+      "note": "子节标题"
+    },
+    {
+      "segmentId": "¶176",
+      "label": "d",
+      "tier": "core",
+      "title": "三层护栏按被绕过的难度排",
+      "quote": "越靠下的层越不依赖模型自己的判断，因此越难被一次成功的攻击穿透",
+      "note": "关键理解：不是先后顺序，是被穿透的难度。越靠下越不依赖模型判断，所以越难绕过"
+    },
+    {
+      "segmentId": "¶177",
+      "label": "d",
+      "tier": "ref",
+      "title": "上下文层护栏",
+      "quote": "在内容进入上下文之前拦截",
+      "note": "相关性分类器、安全分类器检测越狱与提示注入"
+    },
+    {
+      "segmentId": "¶178",
+      "label": "e",
+      "tier": "ref",
+      "title": "Constitutional Classifiers",
+      "quote": "Constitutional Classifiers",
+      "note": "规则驱动生成训练数据 + 上下文联合判断"
+    },
+    {
+      "segmentId": "¶179",
+      "label": "c",
+      "tier": "ref",
+      "title": "脚注：Anthropic 原文",
+      "quote": "Constitutional Classifiers",
+      "note": "2026 年，可核对"
+    },
+    {
+      "segmentId": "¶180",
+      "label": "s",
+      "tier": "core",
+      "title": "上下文层的结构性上限",
+      "quote": "很难判断自己是否已经被注入",
+      "note": "这是必须有下面两层的原因。层与层之间是\"降低概率\"与\"给出保证\"的区别"
+    },
+    {
+      "segmentId": "¶181",
+      "label": "d",
+      "tier": "core",
+      "title": "执行层护栏",
+      "quote": "在动作真正生效之前验证",
+      "note": "工具风险评级（可逆性/权限/财务影响）；复核必须由上下文之外的机制完成"
+    },
+    {
+      "segmentId": "¶182",
+      "label": "d",
+      "tier": "core",
+      "title": "数据层护栏",
+      "quote": "把“谁能对哪条数据做什么”交给一层稳定的、经过人类审查的机制强制执行",
+      "note": "价值在于不依赖上面两层是否正确。最后一道防线必须不靠模型"
+    },
+    {
+      "segmentId": "¶183",
+      "label": "d",
+      "tier": "ref",
+      "title": "人工干预",
+      "quote": "人工干预",
+      "note": "子节标题"
+    },
+    {
+      "segmentId": "¶184",
+      "label": "d",
+      "tier": "hard",
+      "title": "人工干预什么时候最必要",
+      "quote": "这在部署早期尤为重要",
+      "note": "早期能识别失败模式、发现边缘情况、建立评估周期"
+    },
+    {
+      "segmentId": "¶185",
+      "label": "d",
+      "tier": "ref",
+      "title": "平稳移交控制",
+      "quote": "平稳地移交控制权",
+      "note": "客服升级到人工，Coding Agent 交还开发者"
+    },
+    {
+      "segmentId": "¶186",
+      "label": "t",
+      "tier": "ref",
+      "title": "两种触发情况",
+      "quote": "通常有两种主要情况",
+      "note": "失败超阈值 / 高风险操作"
+    },
+    {
+      "segmentId": "¶187",
+      "label": "d",
+      "tier": "ref",
+      "title": "触发一：超过失败阈值",
+      "quote": "为 Agent 的重试次数或操作次数设置上限",
+      "note": "重试次数或操作次数超限就升级"
+    },
+    {
+      "segmentId": "¶188",
+      "label": "d",
+      "tier": "ref",
+      "title": "触发二：高风险操作",
+      "quote": "涉及敏感、不可逆或高风险的操作时",
+      "note": "大额退款、付款这类"
+    },
+    {
+      "segmentId": "¶189",
+      "label": "t",
+      "tier": "ref",
+      "title": "回到五要素主线",
+      "quote": "回到 Harness 五要素的主线",
+      "note": "过渡到结构对应关系"
+    },
+    {
+      "segmentId": "¶190",
+      "label": "d",
+      "tier": "ref",
+      "title": "五要素与「构建」部分",
+      "quote": "Harness 五要素与「构建」部分的对应",
+      "note": "子节标题"
+    },
+    {
+      "segmentId": "¶191",
+      "label": "d",
+      "tier": "core",
+      "title": "两个公式不是两套骨架",
+      "quote": "全书的结构骨架只有一个",
+      "note": "重要澄清：Agent = LLM + 上下文 + 工具 是骨架，Model + Harness 是同一骨架的换视角表达"
+    },
+    {
+      "segmentId": "¶192",
+      "label": "t",
+      "tier": "ref",
+      "title": "五要素与章节对应",
+      "quote": "Harness 五要素与第二至五章有清晰的对应",
+      "note": "进入对照表"
+    },
+    {
+      "segmentId": "¶193",
+      "label": "e",
+      "tier": "ref",
+      "title": "要素-章节对照表",
+      "quote": "Harness 要素",
+      "note": "要素 / 章节 / 核心内容 / 安全关注点"
+    },
+    {
+      "segmentId": "¶194",
+      "label": "c",
+      "tier": "hard",
+      "title": "哪些章不进五要素的格子",
+      "quote": "第六章（交互）不属于五要素中的任何一项",
+      "note": "不硬塞：交互扩展的是模态与时机，七至九章讲评估与进化"
+    },
+    {
+      "segmentId": "¶195",
+      "label": "d",
+      "tier": "hard",
+      "title": "安全是横切关注点",
+      "quote": "它是贯穿全书的横切关注点",
+      "note": "安全不按章划分，按三层护栏组织"
+    },
+    {
+      "segmentId": "¶196",
+      "label": "e",
+      "tier": "hard",
+      "title": "Anthropic 长时任务的 Harness 设计",
+      "quote": "初始化 Agent",
+      "note": "拆成初始化与执行两个 Agent，通过结构化 Harness 解决模型本身解决不了的问题"
+    },
+    {
+      "segmentId": "¶197",
+      "label": "d",
+      "tier": "ref",
+      "title": "贯穿全书的设计模式",
+      "quote": "贯穿全书的设计模式",
+      "note": "本节主题"
+    },
+    {
+      "segmentId": "¶198",
+      "label": "t",
+      "tier": "ref",
+      "title": "先一次性命名",
+      "quote": "在这里一次性命名",
+      "note": "后面章节会反复用，先给规范定义"
+    },
+    {
+      "segmentId": "¶199",
+      "label": "d",
+      "tier": "core",
+      "title": "提议者—审核者",
+      "quote": "产出与评判由两个不共享上下文的角色分别承担",
+      "note": "成立前提是\"自审不可靠\"。评判方看到的是产物而不是推理过程"
+    },
+    {
+      "segmentId": "¶200",
+      "label": "d",
+      "tier": "core",
+      "title": "渐进式披露",
+      "quote": "不把全部信息一次性放进上下文",
+      "note": "同时优化上下文预算与选择精度。Agent Skills 是最典型形态"
+    },
+    {
+      "segmentId": "¶201",
+      "label": "d",
+      "tier": "core",
+      "title": "只增不改",
+      "quote": "状态以追加的方式演进",
+      "note": "换来可缓存、可重放、可审计。KV Cache 前缀稳定性是它的性能形态"
+    },
+    {
+      "segmentId": "¶202",
+      "label": "d",
+      "tier": "core",
+      "title": "边界集 + 保留集",
+      "quote": "任何一次修改都要同时在",
+      "note": "只测前者会把过拟合当进步，只测后者会把无效修改当安全"
+    },
+    {
+      "segmentId": "¶203",
+      "label": "d",
+      "tier": "core",
+      "title": "最小 diff + 可回滚",
+      "quote": "每次修改尽量小、带来源、可单独回滚",
+      "note": "它让归因成为可能。与本章三条更新路径呼应"
+    },
+    {
+      "segmentId": "¶204",
+      "label": "d",
+      "tier": "ref",
+      "title": "本章小结",
+      "quote": "本章小结",
+      "note": "收口"
+    },
+    {
+      "segmentId": "¶205",
+      "label": "s",
+      "tier": "ref",
+      "title": "小结开篇",
+      "quote": "建立了理解和构建 AI Agent 的基础框架",
+      "note": "从实践出发"
+    },
+    {
+      "segmentId": "¶206",
+      "label": "s",
+      "tier": "core",
+      "title": "三个器官缺一不可",
+      "quote": "LLM 是大脑（决策核心），上下文是眼睛（决定它能看到什么），工具是手脚（决定它能做什么）",
+      "note": "小结第一条：LLM 是大脑、上下文是眼睛、工具是手脚"
+    },
+    {
+      "segmentId": "¶207",
+      "label": "s",
+      "tier": "core",
+      "title": "扩展眼睛和手脚是最主要的杠杆",
+      "quote": "扩展眼睛和手脚是最主要的能力杠杆",
+      "note": "通用性来自接口边界的扩大，但必须按需并配权限与验证"
+    },
+    {
+      "segmentId": "¶208",
+      "label": "s",
+      "tier": "core",
+      "title": "眼睛是决定性因素",
+      "quote": "眼睛（上下文）是决定性的因素",
+      "note": "消融实验的结论落到这里：各组件不等价"
+    },
+    {
+      "segmentId": "¶209",
+      "label": "s",
+      "tier": "core",
+      "title": "Harness 是竞争力所在",
+      "quote": "Harness 是竞争力所在",
+      "note": "模型能力商品化，差异在保障机制"
+    },
+    {
+      "segmentId": "¶210",
+      "label": "s",
+      "tier": "hard",
+      "title": "从工作流到自主的顺序",
+      "quote": "先优化提示词，再考虑工作流，最后才引入自主 Agent",
+      "note": "降低意外风险最实用的顺序，没有通用最优解"
+    },
+    {
+      "segmentId": "¶211",
+      "label": "s",
+      "tier": "ref",
+      "title": "五个设计模式",
+      "quote": "提议者—审核者",
+      "note": "一句话复述五个模式"
+    },
+    {
+      "segmentId": "¶212",
+      "label": "s",
+      "tier": "core",
+      "title": "安全是架构问题",
+      "quote": "安全问题从第一行代码就要考虑",
+      "note": "不是上线前打补丁。三层护栏后续各章都挂在这个骨架上"
+    },
+    {
+      "segmentId": "¶213",
+      "label": "t",
+      "tier": "ref",
+      "title": "下一章预告",
+      "quote": "下一章将深入探讨",
+      "note": "上下文工程；第八章展开学术渊源"
+    },
+    {
+      "segmentId": "¶214",
+      "label": "c",
+      "tier": "ref",
+      "title": "思考题说明",
+      "quote": "旨在引导读者深入思考本章的核心概念，不设标准答案",
+      "note": "作者明说思考题无标准答案"
+    },
+    {
+      "segmentId": "¶215",
+      "label": "d",
+      "tier": "ref",
+      "title": "思考题",
+      "quote": "思考题",
+      "note": "章节标题"
+    },
+    {
+      "segmentId": "¶216",
+      "label": "q",
+      "tier": "hard",
+      "title": "思考题 1-8",
+      "quote": "如果你只能给一个 Agent 系统增加一项能力",
+      "note": "第一题直接对应本章主线：模型/上下文/工具三选一，什么条件下换选择"
+    },
+    {
+      "segmentId": "¶217",
+      "label": "q",
+      "tier": "hard",
+      "title": "思考题 9-10",
+      "quote": "优雅地移交控制",
+      "note": "第 9 题问的是人工干预在用户不在线时怎么办，第 10 题问哪些工程手段会过时"
+    }
+  ]
+}

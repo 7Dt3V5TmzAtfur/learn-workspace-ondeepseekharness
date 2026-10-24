@@ -1,0 +1,136 @@
+{
+  "generatedAt": "2026-10-23T20:34:58.141Z",
+  "ok": true,
+  "cli": "C:\\Users\\x\\.dsh\\skills\\archify-2\\bin\\archify.mjs",
+  "figures": [
+    {
+      "index": 1,
+      "file": "graph-1.html",
+      "nodeCount": 18,
+      "edgeCount": 21,
+      "nodeIds": [
+        "agent-goal",
+        "aci",
+        "form-spectrum",
+        "five-types",
+        "gen-default",
+        "disclosure",
+        "perception",
+        "execution",
+        "collaboration",
+        "mcp",
+        "skill-hub",
+        "dedicated-cases",
+        "tool-explosion",
+        "smart-summary",
+        "proposer-reviewer",
+        "sidecar",
+        "side-effect-unknown",
+        "lifecycle-primitives"
+      ],
+      "ok": true,
+      "produced": true,
+      "failedStage": null,
+      "diagnostics": [],
+      "sizeBytes": 841110
+    },
+    {
+      "index": 2,
+      "file": "graph-2.html",
+      "nodeCount": 11,
+      "edgeCount": 12,
+      "nodeIds": [
+        "granularity",
+        "form-spectrum",
+        "read-document",
+        "gen-default",
+        "disclosure",
+        "dedicated-cases",
+        "tool-explosion",
+        "lazy-index",
+        "retrieval-prefilter",
+        "active-discovery",
+        "skill-as-doc"
+      ],
+      "ok": true,
+      "produced": true,
+      "failedStage": null,
+      "diagnostics": [],
+      "sizeBytes": 825219
+    },
+    {
+      "index": 3,
+      "file": "graph-3.html",
+      "nodeCount": 11,
+      "edgeCount": 13,
+      "nodeIds": [
+        "skill-4dims",
+        "four-dims",
+        "form-spectrum",
+        "dedicated-cases",
+        "gen-default",
+        "disclosure",
+        "tool-explosion",
+        "lazy-index",
+        "retrieval-prefilter",
+        "active-discovery",
+        "skill-as-doc"
+      ],
+      "ok": true,
+      "produced": true,
+      "failedStage": null,
+      "diagnostics": [],
+      "sizeBytes": 825955
+    },
+    {
+      "index": 4,
+      "file": "graph-4.html",
+      "nodeCount": 2,
+      "edgeCount": 2,
+      "nodeIds": [
+        "tool-description",
+        "silent-conversion"
+      ],
+      "ok": true,
+      "produced": true,
+      "failedStage": null,
+      "diagnostics": [],
+      "sizeBytes": 806834
+    },
+    {
+      "index": 5,
+      "file": "graph-5.html",
+      "nodeCount": 5,
+      "edgeCount": 6,
+      "nodeIds": [
+        "proxy-tool",
+        "lazy-index",
+        "active-discovery",
+        "retrieval-prefilter",
+        "skill-as-doc"
+      ],
+      "ok": true,
+      "produced": true,
+      "failedStage": null,
+      "diagnostics": [],
+      "sizeBytes": 813382
+    },
+    {
+      "index": 6,
+      "file": "graph-6.html",
+      "nodeCount": 4,
+      "edgeCount": 1,
+      "nodeIds": [
+        "trust-boundary",
+        "exec-verify-loop",
+        "hitl",
+        "hitl-timeout"
+      ],
+      "ok": true,
+      "produced": true,
+      "failedStage": null,
+      "diagnostics": [],
+      "sizeBytes": 808853
+    }
+  ]
+}

@@ -1,0 +1,600 @@
+{
+  "docId": "chapter1-940885",
+  "generatedAt": "2026-10-24T06:12:06.966Z",
+  "totalUnits": 25,
+  "totalSegments": 217,
+  "units": [
+    {
+      "id": "¶1",
+      "title": "AI Agent 入门",
+      "level": 1,
+      "kind": "md",
+      "segmentIds": [
+        "¶1",
+        "¶2",
+        "¶3",
+        "¶4",
+        "¶5"
+      ],
+      "segmentCount": 5,
+      "chars": 515,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶1",
+        "to": "¶5"
+      }
+    },
+    {
+      "id": "¶6",
+      "title": "现代 Agent = LLM + 上下文 + 工具",
+      "level": 2,
+      "kind": "md",
+      "segmentIds": [
+        "¶6",
+        "¶7",
+        "¶8",
+        "¶9",
+        "¶10",
+        "¶11",
+        "¶12",
+        "¶13",
+        "¶14",
+        "¶15"
+      ],
+      "segmentCount": 10,
+      "chars": 1732,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶6",
+        "to": "¶15"
+      }
+    },
+    {
+      "id": "¶16",
+      "title": "观察空间与动作空间：模型与世界的接口",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶16",
+        "¶17",
+        "¶18",
+        "¶19",
+        "¶20",
+        "¶21",
+        "¶22",
+        "¶23",
+        "¶24"
+      ],
+      "segmentCount": 9,
+      "chars": 2428,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶16",
+        "to": "¶24"
+      }
+    },
+    {
+      "id": "¶25",
+      "title": "工具：Agent 的手脚",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶25",
+        "¶26",
+        "¶27",
+        "¶28",
+        "¶29",
+        "¶30",
+        "¶31",
+        "¶32",
+        "¶33",
+        "¶34",
+        "¶35",
+        "¶36",
+        "¶37",
+        "¶38",
+        "¶39",
+        "¶40",
+        "¶41",
+        "¶42"
+      ],
+      "segmentCount": 18,
+      "chars": 2056,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶25",
+        "to": "¶42"
+      }
+    },
+    {
+      "id": "¶43",
+      "title": "LLM：Agent 的大脑",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶43",
+        "¶44",
+        "¶45"
+      ],
+      "segmentCount": 3,
+      "chars": 482,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶43",
+        "to": "¶45"
+      }
+    },
+    {
+      "id": "¶46",
+      "title": "模型即 Agent：当模型本身成为产品",
+      "level": 4,
+      "kind": "md",
+      "segmentIds": [
+        "¶46",
+        "¶47",
+        "¶48",
+        "¶49",
+        "¶50"
+      ],
+      "segmentCount": 5,
+      "chars": 1042,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶46",
+        "to": "¶50"
+      }
+    },
+    {
+      "id": "¶51",
+      "title": "Agent 的学习机制：从上下文适应到持久更新",
+      "level": 4,
+      "kind": "md",
+      "segmentIds": [
+        "¶51",
+        "¶52",
+        "¶53",
+        "¶54",
+        "¶55",
+        "¶56"
+      ],
+      "segmentCount": 6,
+      "chars": 648,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶51",
+        "to": "¶56"
+      }
+    },
+    {
+      "id": "¶57",
+      "title": "上下文：Agent 的眼睛",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶57",
+        "¶58",
+        "¶59",
+        "¶60",
+        "¶61",
+        "¶62",
+        "¶63",
+        "¶64"
+      ],
+      "segmentCount": 8,
+      "chars": 2232,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶57",
+        "to": "¶64"
+      }
+    },
+    {
+      "id": "¶65",
+      "title": "ReAct 循环",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶65",
+        "¶66",
+        "¶67",
+        "¶68",
+        "¶69",
+        "¶70",
+        "¶71",
+        "¶72",
+        "¶73",
+        "¶74",
+        "¶75",
+        "¶76",
+        "¶77",
+        "¶78",
+        "¶79",
+        "¶80",
+        "¶81",
+        "¶82",
+        "¶83",
+        "¶84",
+        "¶85",
+        "¶86",
+        "¶87",
+        "¶88",
+        "¶89",
+        "¶90",
+        "¶91"
+      ],
+      "segmentCount": 27,
+      "chars": 5530,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶65",
+        "to": "¶91"
+      }
+    },
+    {
+      "id": "¶92",
+      "title": "Harness 工程：模型之外的竞争力",
+      "level": 2,
+      "kind": "md",
+      "segmentIds": [
+        "¶92",
+        "¶93",
+        "¶94",
+        "¶95",
+        "¶96",
+        "¶97",
+        "¶98",
+        "¶99",
+        "¶100",
+        "¶101",
+        "¶102",
+        "¶103",
+        "¶104",
+        "¶105",
+        "¶106",
+        "¶107"
+      ],
+      "segmentCount": 16,
+      "chars": 2953,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶92",
+        "to": "¶107"
+      }
+    },
+    {
+      "id": "¶108",
+      "title": "从提示工程到 Loop 工程：工程范式的演进",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶108",
+        "¶109",
+        "¶110",
+        "¶111",
+        "¶112",
+        "¶113",
+        "¶114",
+        "¶115",
+        "¶116",
+        "¶117"
+      ],
+      "segmentCount": 10,
+      "chars": 1579,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶108",
+        "to": "¶117"
+      }
+    },
+    {
+      "id": "¶118",
+      "title": "构建有效 Agent 的核心原则",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶118",
+        "¶119",
+        "¶120",
+        "¶121",
+        "¶122",
+        "¶123",
+        "¶124"
+      ],
+      "segmentCount": 7,
+      "chars": 838,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶118",
+        "to": "¶124"
+      }
+    },
+    {
+      "id": "¶125",
+      "title": "如何选择模型",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶125",
+        "¶126",
+        "¶127",
+        "¶128",
+        "¶129",
+        "¶130",
+        "¶131",
+        "¶132"
+      ],
+      "segmentCount": 8,
+      "chars": 1108,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶125",
+        "to": "¶132"
+      }
+    },
+    {
+      "id": "¶133",
+      "title": "编排模式：工作流与自主",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶133",
+        "¶134",
+        "¶135",
+        "¶136",
+        "¶137",
+        "¶138"
+      ],
+      "segmentCount": 6,
+      "chars": 1124,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶133",
+        "to": "¶138"
+      }
+    },
+    {
+      "id": "¶139",
+      "title": "工作流模式：确定性的编排",
+      "level": 4,
+      "kind": "md",
+      "segmentIds": [
+        "¶139",
+        "¶140",
+        "¶141",
+        "¶142",
+        "¶143",
+        "¶144",
+        "¶145",
+        "¶146",
+        "¶147",
+        "¶148",
+        "¶149",
+        "¶150",
+        "¶151"
+      ],
+      "segmentCount": 13,
+      "chars": 1692,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶139",
+        "to": "¶151"
+      }
+    },
+    {
+      "id": "¶152",
+      "title": "自主 Agent：动态自主决策",
+      "level": 4,
+      "kind": "md",
+      "segmentIds": [
+        "¶152",
+        "¶153",
+        "¶154",
+        "¶155",
+        "¶156",
+        "¶157",
+        "¶158",
+        "¶159"
+      ],
+      "segmentCount": 8,
+      "chars": 856,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶152",
+        "to": "¶159"
+      }
+    },
+    {
+      "id": "¶160",
+      "title": "两种模式的选择与混合",
+      "level": 4,
+      "kind": "md",
+      "segmentIds": [
+        "¶160",
+        "¶161",
+        "¶162",
+        "¶163"
+      ],
+      "segmentCount": 4,
+      "chars": 370,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶160",
+        "to": "¶163"
+      }
+    },
+    {
+      "id": "¶164",
+      "title": "主流 Agent 框架简要对比",
+      "level": 4,
+      "kind": "md",
+      "segmentIds": [
+        "¶164",
+        "¶165",
+        "¶166",
+        "¶167",
+        "¶168",
+        "¶169",
+        "¶170"
+      ],
+      "segmentCount": 7,
+      "chars": 1555,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶164",
+        "to": "¶170"
+      }
+    },
+    {
+      "id": "¶171",
+      "title": "护栏与安全性",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶171",
+        "¶172",
+        "¶173",
+        "¶174"
+      ],
+      "segmentCount": 4,
+      "chars": 407,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶171",
+        "to": "¶174"
+      }
+    },
+    {
+      "id": "¶175",
+      "title": "护栏类型",
+      "level": 4,
+      "kind": "md",
+      "segmentIds": [
+        "¶175",
+        "¶176",
+        "¶177",
+        "¶178",
+        "¶179",
+        "¶180",
+        "¶181",
+        "¶182"
+      ],
+      "segmentCount": 8,
+      "chars": 1718,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶175",
+        "to": "¶182"
+      }
+    },
+    {
+      "id": "¶183",
+      "title": "人工干预",
+      "level": 4,
+      "kind": "md",
+      "segmentIds": [
+        "¶183",
+        "¶184",
+        "¶185",
+        "¶186",
+        "¶187",
+        "¶188",
+        "¶189"
+      ],
+      "segmentCount": 7,
+      "chars": 408,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶183",
+        "to": "¶189"
+      }
+    },
+    {
+      "id": "¶190",
+      "title": "Harness 五要素与「构建」部分的对应",
+      "level": 3,
+      "kind": "md",
+      "segmentIds": [
+        "¶190",
+        "¶191",
+        "¶192",
+        "¶193",
+        "¶194",
+        "¶195",
+        "¶196"
+      ],
+      "segmentCount": 7,
+      "chars": 1261,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶190",
+        "to": "¶196"
+      }
+    },
+    {
+      "id": "¶197",
+      "title": "贯穿全书的设计模式",
+      "level": 2,
+      "kind": "md",
+      "segmentIds": [
+        "¶197",
+        "¶198",
+        "¶199",
+        "¶200",
+        "¶201",
+        "¶202",
+        "¶203"
+      ],
+      "segmentCount": 7,
+      "chars": 981,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶197",
+        "to": "¶203"
+      }
+    },
+    {
+      "id": "¶204",
+      "title": "本章小结",
+      "level": 2,
+      "kind": "md",
+      "segmentIds": [
+        "¶204",
+        "¶205",
+        "¶206",
+        "¶207",
+        "¶208",
+        "¶209",
+        "¶210",
+        "¶211",
+        "¶212",
+        "¶213",
+        "¶214"
+      ],
+      "segmentCount": 11,
+      "chars": 901,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶204",
+        "to": "¶214"
+      }
+    },
+    {
+      "id": "¶215",
+      "title": "思考题",
+      "level": 2,
+      "kind": "md",
+      "segmentIds": [
+        "¶215",
+        "¶216",
+        "¶217"
+      ],
+      "segmentCount": 3,
+      "chars": 854,
+      "keyPoints": [],
+      "sourceRange": {
+        "from": "¶215",
+        "to": "¶217"
+      }
+    }
+  ]
+}

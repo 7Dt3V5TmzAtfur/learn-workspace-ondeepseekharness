@@ -24,6 +24,16 @@
 !.study/**/meta.json
 !.study/**/vocabulary.json
 
+# 手工写的 markdown 成果与单元骨架。
+# 之前漏了这四类：quiz.md / refs.md 是手写的（不是生成的 json），
+# units.json 是逐块核过的结构，figures.json + graph-N.html 是 archify
+# 跑完四道门才出来的图 —— 都是重做一遍成本很高的东西。
+!.study/**/quiz.md
+!.study/**/refs.md
+!.study/**/units.json
+!.study/**/figures.json
+!.study/**/graph-*.html
+
 # 测试临时产物
 **/tests/.archify-test/
 **/tests/_graph.json

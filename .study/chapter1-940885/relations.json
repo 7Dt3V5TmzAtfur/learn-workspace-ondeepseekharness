@@ -1,0 +1,641 @@
+{
+  "nodes": [
+    {
+      "id": "formula",
+      "kind": "concept",
+      "label": "Agent = LLM + 上下文 + 工具"
+    },
+    {
+      "id": "boundary",
+      "kind": "concept",
+      "label": "Agent 与 Environment 的边界"
+    },
+    {
+      "id": "model-harness",
+      "kind": "concept",
+      "label": "Model–Harness 结构"
+    },
+    {
+      "id": "obs-act",
+      "kind": "concept",
+      "label": "观察空间与动作空间"
+    },
+    {
+      "id": "rl-map",
+      "kind": "concept",
+      "label": "对应 RL 的策略/观察/接口"
+    },
+    {
+      "id": "tool",
+      "kind": "concept",
+      "label": "工具：Agent 的手脚"
+    },
+    {
+      "id": "tool-call",
+      "kind": "concept",
+      "label": "工具调用四步"
+    },
+    {
+      "id": "tool-principle",
+      "kind": "concept",
+      "label": "通用用于探索，专用用于约束"
+    },
+    {
+      "id": "llm",
+      "kind": "concept",
+      "label": "LLM：Agent 的大脑"
+    },
+    {
+      "id": "inner-think",
+      "kind": "concept",
+      "label": "内部思考"
+    },
+    {
+      "id": "model-as-agent",
+      "kind": "concept",
+      "label": "模型即 Agent"
+    },
+    {
+      "id": "learn-paths",
+      "kind": "concept",
+      "label": "能力更新的三条路径"
+    },
+    {
+      "id": "context",
+      "kind": "concept",
+      "label": "上下文：Agent 的眼睛"
+    },
+    {
+      "id": "five-parts",
+      "kind": "concept",
+      "label": "上下文的五个组成部分"
+    },
+    {
+      "id": "prefix-traj",
+      "kind": "concept",
+      "label": "静态前缀 + 轨迹"
+    },
+    {
+      "id": "ablation",
+      "kind": "concept",
+      "label": "消融实验 1-1"
+    },
+    {
+      "id": "react",
+      "kind": "concept",
+      "label": "ReAct 循环：想→做→看"
+    },
+    {
+      "id": "harness",
+      "kind": "concept",
+      "label": "Harness 工程"
+    },
+    {
+      "id": "three-guards",
+      "kind": "concept",
+      "label": "约束 / 验证 / 纠正"
+    },
+    {
+      "id": "evo-stages",
+      "kind": "concept",
+      "label": "提示→上下文→Harness→Loop→Graph"
+    },
+    {
+      "id": "principles",
+      "kind": "concept",
+      "label": "简单 / 透明 / ACI"
+    },
+    {
+      "id": "model-choice",
+      "kind": "concept",
+      "label": "模型选型"
+    },
+    {
+      "id": "workflow",
+      "kind": "concept",
+      "label": "工作流：确定性编排"
+    },
+    {
+      "id": "autonomous",
+      "kind": "concept",
+      "label": "自主 Agent：动态决策"
+    },
+    {
+      "id": "adapter",
+      "kind": "concept",
+      "label": "适配层"
+    },
+    {
+      "id": "guardrails",
+      "kind": "concept",
+      "label": "护栏三层"
+    },
+    {
+      "id": "hitl",
+      "kind": "concept",
+      "label": "人工干预"
+    },
+    {
+      "id": "design-patterns",
+      "kind": "concept",
+      "label": "五个设计模式"
+    },
+    {
+      "id": "proposer-reviewer",
+      "kind": "concept",
+      "label": "提议者—审核者"
+    },
+    {
+      "id": "progressive",
+      "kind": "concept",
+      "label": "渐进式披露"
+    },
+    {
+      "id": "append-only",
+      "kind": "concept",
+      "label": "只增不改"
+    },
+    {
+      "id": "boundary-retention",
+      "kind": "concept",
+      "label": "边界集 + 保留集"
+    },
+    {
+      "id": "min-diff",
+      "kind": "concept",
+      "label": "最小 diff + 可回滚"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "formula",
+      "relation": "cause",
+      "to": "boundary",
+      "quote": "这个公式只描述 Agent 边界之内的实现",
+      "segmentId": "¶7",
+      "evidence": "text"
+    },
+    {
+      "id": "e2",
+      "from": "formula",
+      "relation": "analogy",
+      "to": "rl-map",
+      "quote": "但不是严格的一一等同关系",
+      "segmentId": "¶14",
+      "evidence": "text"
+    },
+    {
+      "id": "e3",
+      "from": "boundary",
+      "relation": "cause",
+      "to": "model-harness",
+      "quote": "Harness 可以创建、隔离或代理一个环境",
+      "segmentId": "¶12",
+      "evidence": "text"
+    },
+    {
+      "id": "e4",
+      "from": "boundary",
+      "relation": "part-of",
+      "to": "obs-act",
+      "quote": "**观察通道与动作接口共同构成了 Agent 与外部环境之间的边界**",
+      "segmentId": "¶17",
+      "evidence": "text"
+    },
+    {
+      "id": "e5",
+      "from": "formula",
+      "relation": "part-of",
+      "to": "tool",
+      "quote": "工具是 Agent 与外部世界交互的桥梁",
+      "segmentId": "¶26",
+      "evidence": "text"
+    },
+    {
+      "id": "e6",
+      "from": "formula",
+      "relation": "part-of",
+      "to": "llm",
+      "quote": "大语言模型（Large Language Model, LLM）是 Agent 的决策核心",
+      "segmentId": "¶44",
+      "evidence": "text"
+    },
+    {
+      "id": "e7",
+      "from": "formula",
+      "relation": "part-of",
+      "to": "context",
+      "quote": "上下文是 Agent 在每个决策点能看到的全部信息",
+      "segmentId": "¶58",
+      "evidence": "text"
+    },
+    {
+      "id": "e8",
+      "from": "obs-act",
+      "relation": "cause",
+      "to": "tool",
+      "quote": "往往就是重新定义或扩展观察空间与动作空间",
+      "segmentId": "¶18",
+      "evidence": "text"
+    },
+    {
+      "id": "e9",
+      "from": "obs-act",
+      "relation": "cause",
+      "to": "context",
+      "quote": "没有通过观察通道进入上下文的信息，对模型来说就像不存在",
+      "segmentId": "¶17",
+      "evidence": "text"
+    },
+    {
+      "id": "e10",
+      "from": "tool",
+      "relation": "part-of",
+      "to": "tool-call",
+      "quote": "工具调用的流程分为四步",
+      "segmentId": "¶35",
+      "evidence": "text"
+    },
+    {
+      "id": "e11",
+      "from": "tool",
+      "relation": "cause",
+      "to": "tool-principle",
+      "quote": "通用基础能力用于组合与探索",
+      "segmentId": "¶42",
+      "evidence": "text"
+    },
+    {
+      "id": "e12",
+      "from": "tool-call",
+      "relation": "prerequisite",
+      "to": "react",
+      "quote": "这个循环就是后文要介绍的 ReAct 的基础",
+      "segmentId": "¶35",
+      "evidence": "text"
+    },
+    {
+      "id": "e13",
+      "from": "llm",
+      "relation": "part-of",
+      "to": "inner-think",
+      "quote": "LLM Agent 的一个独特能力是**内部思考**",
+      "segmentId": "¶45",
+      "evidence": "text"
+    },
+    {
+      "id": "e14",
+      "from": "llm",
+      "relation": "cause",
+      "to": "model-as-agent",
+      "quote": "将工具调用能力内化为原生能力",
+      "segmentId": "¶47",
+      "evidence": "text"
+    },
+    {
+      "id": "e15",
+      "from": "model-as-agent",
+      "relation": "contrast",
+      "to": "harness",
+      "quote": "但这并不意味着框架层变得不重要了",
+      "segmentId": "¶47",
+      "evidence": "text"
+    },
+    {
+      "id": "e16",
+      "from": "llm",
+      "relation": "prerequisite",
+      "to": "learn-paths",
+      "quote": "按照更新发生的位置和持续时间",
+      "segmentId": "¶52",
+      "evidence": "text"
+    },
+    {
+      "id": "e17",
+      "from": "context",
+      "relation": "part-of",
+      "to": "five-parts",
+      "quote": "每次调用 LLM 时的上下文由以下五个部分构成",
+      "segmentId": "¶58",
+      "evidence": "text"
+    },
+    {
+      "id": "e18",
+      "from": "five-parts",
+      "relation": "cause",
+      "to": "prefix-traj",
+      "quote": "前两项（系统提示词 + 工具定义）是静态前缀",
+      "segmentId": "¶61",
+      "evidence": "text"
+    },
+    {
+      "id": "e19",
+      "from": "prefix-traj",
+      "relation": "prerequisite",
+      "to": "react",
+      "quote": "Agent 的上下文 = 静态前缀 + 轨迹",
+      "segmentId": "¶68",
+      "evidence": "text"
+    },
+    {
+      "id": "e20",
+      "from": "five-parts",
+      "relation": "application",
+      "to": "ablation",
+      "quote": "实验 1-1 正是按这个思路",
+      "segmentId": "¶62",
+      "evidence": "text"
+    },
+    {
+      "id": "e21",
+      "from": "ablation",
+      "relation": "example-of",
+      "to": "context",
+      "quote": "上下文决定了 Agent 能看到什么",
+      "segmentId": "¶64",
+      "evidence": "text"
+    },
+    {
+      "id": "e22",
+      "from": "react",
+      "relation": "cause",
+      "to": "harness",
+      "quote": "同时也暴露了明显的脆弱点",
+      "segmentId": "¶93",
+      "evidence": "text"
+    },
+    {
+      "id": "e23",
+      "from": "harness",
+      "relation": "part-of",
+      "to": "three-guards",
+      "quote": "Harness = 上下文管理 + 工具接口 + 约束 + 验证 + 纠正",
+      "segmentId": "¶96",
+      "evidence": "text"
+    },
+    {
+      "id": "e24",
+      "from": "harness",
+      "relation": "sequence",
+      "to": "evo-stages",
+      "quote": "这五个阶段不是替代关系，而是层层包含的",
+      "segmentId": "¶116",
+      "evidence": "text"
+    },
+    {
+      "id": "e25",
+      "from": "harness",
+      "relation": "application",
+      "to": "principles",
+      "quote": "成功的 Agent 系统遵循三个核心原则",
+      "segmentId": "¶119",
+      "evidence": "text"
+    },
+    {
+      "id": "e26",
+      "from": "harness",
+      "relation": "application",
+      "to": "model-choice",
+      "quote": "以下三节展开 Harness 工程中三个独立但重要的主题",
+      "segmentId": "¶124",
+      "evidence": "text"
+    },
+    {
+      "id": "e27",
+      "from": "harness",
+      "relation": "part-of",
+      "to": "workflow",
+      "quote": "编排模式是 Harness 中“上下文与工具”层面的组织方式",
+      "segmentId": "¶134",
+      "evidence": "text"
+    },
+    {
+      "id": "e28",
+      "from": "workflow",
+      "relation": "contrast",
+      "to": "autonomous",
+      "quote": "执行路径不是预先定义的",
+      "segmentId": "¶153",
+      "evidence": "text"
+    },
+    {
+      "id": "e29",
+      "from": "workflow",
+      "relation": "cause",
+      "to": "adapter",
+      "quote": "不妨称为",
+      "segmentId": "¶148",
+      "evidence": "text"
+    },
+    {
+      "id": "e30",
+      "from": "adapter",
+      "relation": "contrast",
+      "to": "model-as-agent",
+      "quote": "就不再需要提示词改写了",
+      "segmentId": "¶149",
+      "evidence": "text"
+    },
+    {
+      "id": "e31",
+      "from": "three-guards",
+      "relation": "application",
+      "to": "guardrails",
+      "quote": "护栏按被绕过的难度分为上下文层、执行层与数据层三层",
+      "segmentId": "¶212",
+      "evidence": "text"
+    },
+    {
+      "id": "e32",
+      "from": "guardrails",
+      "relation": "part-of",
+      "to": "hitl",
+      "quote": "人工干预",
+      "segmentId": "¶183",
+      "evidence": "text"
+    },
+    {
+      "id": "e33",
+      "from": "design-patterns",
+      "relation": "part-of",
+      "to": "proposer-reviewer",
+      "quote": "产出与评判由两个不共享上下文的角色分别承担",
+      "segmentId": "¶199",
+      "evidence": "text"
+    },
+    {
+      "id": "e34",
+      "from": "design-patterns",
+      "relation": "part-of",
+      "to": "progressive",
+      "quote": "不把全部信息一次性放进上下文",
+      "segmentId": "¶200",
+      "evidence": "text"
+    },
+    {
+      "id": "e35",
+      "from": "design-patterns",
+      "relation": "part-of",
+      "to": "append-only",
+      "quote": "状态以追加的方式演进",
+      "segmentId": "¶201",
+      "evidence": "text"
+    },
+    {
+      "id": "e36",
+      "from": "design-patterns",
+      "relation": "part-of",
+      "to": "boundary-retention",
+      "quote": "任何一次修改都要同时在",
+      "segmentId": "¶202",
+      "evidence": "text"
+    },
+    {
+      "id": "e37",
+      "from": "design-patterns",
+      "relation": "part-of",
+      "to": "min-diff",
+      "quote": "每次修改尽量小、带来源、可单独回滚",
+      "segmentId": "¶203",
+      "evidence": "text"
+    },
+    {
+      "id": "e38",
+      "from": "prefix-traj",
+      "relation": "example-of",
+      "to": "append-only",
+      "quote": "改动越靠前，作废的缓存越多",
+      "segmentId": "¶201",
+      "evidence": "text"
+    },
+    {
+      "id": "e39",
+      "from": "guardrails",
+      "relation": "cause",
+      "to": "proposer-reviewer",
+      "quote": "同一个上下文中的模型难以发现自己的认知盲区",
+      "segmentId": "¶199",
+      "evidence": "text"
+    },
+    {
+      "id": "e40",
+      "from": "learn-paths",
+      "relation": "application",
+      "to": "min-diff",
+      "quote": "也正是按可",
+      "segmentId": "¶203",
+      "evidence": "text"
+    }
+  ],
+  "direction": "down",
+  "relationReview": {
+    "prerequisite": {
+      "status": "mapped",
+      "edgeIds": [
+        "e12",
+        "e16",
+        "e19"
+      ],
+      "why": "本章有一条明确的学习顺序：先懂工具调用四步，才看得懂 ReAct 循环为什么这样转；先懂五部分上下文，才理解静态前缀与轨迹为什么要分开。"
+    },
+    "part-of": {
+      "status": "mapped",
+      "edgeIds": [
+        "e4",
+        "e5",
+        "e6",
+        "e7",
+        "e10",
+        "e13",
+        "e17",
+        "e23",
+        "e27",
+        "e32",
+        "e33",
+        "e34",
+        "e35",
+        "e36",
+        "e37"
+      ],
+      "why": "全章是三层「总—分」：公式分三个组件，三个组件各自再分（工具五类、上下文五部分），Harness 分五要素。"
+    },
+    "contrast": {
+      "status": "mapped",
+      "edgeIds": [
+        "e15",
+        "e28",
+        "e30"
+      ],
+      "why": "本章的辩解都靠对照成立：工作流 vs 自主 Agent、模型即 Agent vs Harness 更重要、适配层 vs 原生能力。"
+    },
+    "cause": {
+      "status": "mapped",
+      "edgeIds": [
+        "e1",
+        "e3",
+        "e8",
+        "e9",
+        "e11",
+        "e14",
+        "e18",
+        "e22",
+        "e29",
+        "e39"
+      ],
+      "why": "主线是因果链：边界决定什么能进上下文（¶17），上下文与工具的缺口导致 Demo 与产品的鸿沟（¶93），鸿沟催生三层保障。"
+    },
+    "example-of": {
+      "status": "mapped",
+      "edgeIds": [
+        "e21",
+        "e38"
+      ],
+      "why": "Manus、OpenClaw 是观察空间扩展的实例；消融实验 1-1 是上下文关键作用的实证；只增不改在 KV Cache 上有具体形态。"
+    },
+    "application": {
+      "status": "mapped",
+      "edgeIds": [
+        "e20",
+        "e25",
+        "e26",
+        "e31",
+        "e40"
+      ],
+      "why": "每个框架性结论都落到了怎么用：Harness 三原则、模型选型、三层护栏分别对应构建、选型、安全三处的实操判断。"
+    },
+    "sequence": {
+      "status": "mapped",
+      "edgeIds": [
+        "e24"
+      ],
+      "why": "工程范式有一条严格的时间顺序：提示工程 → 上下文工程 → Harness 工程 → Loop 工程 → Graph 工程，¶116 明说后一层包含前一层。"
+    },
+    "analogy": {
+      "status": "mapped",
+      "edgeIds": [
+        "e2"
+      ],
+      "why": "文中把三个组件类比为策略、观察历史、观察/行动接口（¶14），并明确说\"不是严格的一一等同\"——是类比不是结构。"
+    }
+  },
+  "check": {
+    "ok": true,
+    "issues": [],
+    "stats": {
+      "nodes": 33,
+      "edges": 40,
+      "relationCounts": {
+        "prerequisite": 3,
+        "part-of": 15,
+        "contrast": 3,
+        "cause": 10,
+        "example-of": 2,
+        "application": 5,
+        "sequence": 1,
+        "analogy": 1
+      }
+    }
+  },
+  "savedAt": "2026-10-24T06:25:53.046Z"
+}
