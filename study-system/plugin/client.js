@@ -61,6 +61,18 @@ body[data-ds-dark-theme] .sc-root{
 .sc-head{display:flex;align-items:center;gap:var(--sc-sp-2);padding:10px var(--sc-sp-4);border-bottom:1px solid var(--dsw-alias-border-l1);flex:none}
 .sc-title{font-size:var(--sc-fs-md);font-weight:600}
 .sc-muted{color:var(--dsw-alias-label-secondary);font-size:var(--sc-fs-sm)}
+/* 读取中的等待态：只在"已选中但数据未到"时出现。
+   不加这个的话，慢一点的项目会先闪一下"请从左侧选择"，
+   用户会以为自己点错了，又去点一次。 */
+.sc-wait{flex:1;display:flex;align-items:center;justify-content:center;gap:10px;
+  color:var(--dsw-alias-label-secondary);font-size:var(--sc-fs-sm)}
+.sc-wait-dot{width:8px;height:8px;border-radius:50%;background:var(--dsw-alias-brand-primary);
+  animation:sc-wait-pulse 1.1s ease-in-out infinite}
+.sc-wait-txt{letter-spacing:.02em}
+@keyframes sc-wait-pulse{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:1;transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){
+  .sc-wait-dot{animation:none;opacity:.7}
+}
 .sc-body{display:flex;flex:1;min-height:0}
 .sc-side{width:230px;flex:none;border-right:1px solid var(--dsw-alias-border-l1);overflow:auto;padding:var(--sc-sp-2)}
 .sc-main{flex:1;min-width:0;display:flex;flex-direction:column;overflow:hidden}
@@ -1541,7 +1553,14 @@ body[data-ds-dark-theme] .sc-root{
           h(
             'div',
             { className: 'sc-harvest' },
-            harvest?.summary ?? '还没拿到东西。先读一段，标一句你觉得重要的。',
+            // 三种情况必须分清：
+            //   harvest === null → 请求还没回来/失败，不能说"你还没读"
+            //   summary 有内容   → 照实说拿到了什么
+            //   summary 为空     → 确实还没标，这时才提示先去读
+            // 原来把 null 和"空"混成一个兜底句，接口一挂就谎称用户没读。
+            harvest === null
+              ? '正在清点你已经拿到的东西…'
+              : harvest.summary || '还没拿到东西。先读一段，标一句你觉得重要的。',
           ),
           harvest?.highlights?.length
             ? h(
@@ -2095,7 +2114,17 @@ body[data-ds-dark-theme] .sc-root{
                             : h(QuizPane, { project }),
                   ),
                 )
-              : h(Empty, null, '从左侧选一份资料，或先在对话里导入一份。'),
+              : // 分清"还没选"和"选了但正在读"。
+                // 原来两种情况都显示「从左侧选一份资料」—— 用户明明已经点了，
+                // 却被要求再选一次；71KB 的项目要读一会儿，这段时间最容易让人以为点错了。
+                docId
+                ? h(
+                    'div',
+                    { className: 'sc-wait', role: 'status', 'aria-live': 'polite' },
+                    h('div', { className: 'sc-wait-dot' }),
+                    h('div', { className: 'sc-wait-txt' }, '正在读取资料…'),
+                  )
+                : h(Empty, null, '从左侧选一份资料，或先在对话里导入一份。'),
           ),
         ),
       )

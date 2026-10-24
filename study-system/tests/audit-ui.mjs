@@ -505,6 +505,50 @@ check(
   '四档若只有细微透明度差异，扫一行看不出哪部分要求更高',
 )
 
+/* ---------------------------------------------- 14. 加载态与空态要分清楚 */
+
+console.log('\n14. 「还没选」和「选了正在读」不能显示同一句话')
+
+// 之前两种情况都渲染「从左侧选一份资料」。
+// 用户明明点了，却被要求再选一次；71KB 的项目要读一会儿，
+// 这段时间最容易让人以为点错了。
+check(
+  '有独立的读取中状态',
+  /sc-wait/.test(clientSrc) && /正在读取资料/.test(clientSrc),
+  '缺加载态时，慢项目会先闪一下"请从左侧选择"',
+)
+check(
+  '读取中状态会告诉读屏软件',
+  /className: 'sc-wait'[^}]*role: 'status'/.test(clientSrc) &&
+    /'aria-live': 'polite'/.test(clientSrc),
+  '视觉上有提示，但辅助技术不知道该读到什么',
+)
+check(
+  '等待动效遵循 prefers-reduced-motion',
+  /@media \(prefers-reduced-motion:reduce\)\{\s*\n?\s*\.sc-wait-dot\{animation:none/.test(clientSrc),
+  '前庭敏感用户不该被无限脉冲打扰',
+)
+check(
+  '未选中时才提示去选资料',
+  /: h\(Empty, null, '从左侧选一份资料/.test(clientSrc),
+  '两个分支调换了，已选中时反而提示去选',
+)
+
+console.log('\n15. 「读不到」不能伪装成「你还没读」')
+
+// RecallPane 的主指标来自 /harvested。原来 harvest 为 null 时
+// 走 `harvest?.summary ?? '还没拿到东西…'`，接口一挂就谎称用户没读。
+check(
+  '请求未返回时说的是正在清点',
+  /harvest === null[\s\S]{0,80}正在清点/.test(clientSrc),
+  'null 与"空"混成一个兜底句，接口失败会变成假信息',
+)
+check(
+  '确实为空时才提示先去读',
+  /harvest\.summary \|\| '还没拿到东西/.test(clientSrc),
+  '正常空态与失败态没分开',
+)
+
 /* ---------------------------------------------- 汇总 */
 
 console.log(`\n${'─'.repeat(62)}`)
