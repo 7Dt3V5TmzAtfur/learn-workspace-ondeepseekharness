@@ -60,6 +60,30 @@ export const FRAGMENT_QUOTE_MAX_CHARS = 6
 export const SUMMARY_TARGET_CHARS = 300
 export const SUMMARY_TOLERANCE = 0.4
 
+/**
+ * 五个阶段的正式名称 —— 唯一真值。
+ *
+ * 为什么要有这张表：之前界面叫「读完自测」「费曼考核」，
+ * 服务端叫「读后自测」「读后考核」，技能文档叫「读后巩固」「读后考核」。
+ * 用户在界面看到的、Agent 在对话里说的、技能文档写的，是三套名字。
+ * 用户说"我要做费曼考核"，Agent 却在找 study-recall —— 就串线了。
+ *
+ * 以 SKILL.md 的 description 为准（那是模型实际读到的），
+ * 界面和提示语都从这里取。
+ */
+export const STAGES = Object.freeze({
+  preflight: { key: 'preflight', tab: 'plan', name: '读前建构', skill: 'study-preflight' },
+  annotate: { key: 'annotate', tab: 'read', name: '读中加工', skill: 'study-annotate' },
+  map: { key: 'map', tab: 'graph', name: '知识图谱', skill: 'study-map', full: '知识点逻辑衔接图' },
+  recall: { key: 'recall', tab: 'recall', name: '读后巩固', skill: 'study-recall' },
+  feynman: { key: 'feynman', tab: 'quiz', name: '读后考核', skill: 'study-feynman' },
+})
+
+/** 按技能名反查阶段（nextStepOf 用） */
+export function stageOfSkill(skill) {
+  return Object.values(STAGES).find((s) => s.skill === skill) ?? null
+}
+
 /** 四档掌握程度 + 各自要求的可观察动词。 */
 export const MASTERY_LEVELS = Object.freeze({
   了解: ['知道', '说出', '列举', '认出', '描述'],

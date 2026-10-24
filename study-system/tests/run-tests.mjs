@@ -1754,6 +1754,74 @@ await test('每条复述都带可改进的依据', async () => {
   )
 })
 
+section('20. 阶段只有唯一真相（stage 必须由 progress 推导）')
+
+/**
+ * 踩过：meta.json 里存着 stage:"drilled"，但 drills.jsonl 是空的。
+ * 于是列表显示"已考核"，下一句却提示"去做读后考核"。
+ * 两份数据各自为真，界面必然自相矛盾。
+ */
+const { stageFromProgress } = await import(`file://${join(LIB, 'store.js')}`)
+const { StudyStore } = await import(`file://${join(LIB, 'store.js')}`)
+const { nextStepOf } = await import(`file://${join(LIB, 'service.js')}`)
+
+await test('stageFromProgress 七个阶段都对', async () => {
+  const cases = [
+    [{ ingested: false }, 'empty'],
+    [{ ingested: true, planned: false }, 'ingested'],
+    [{ ingested: true, planned: true, annotated: false }, 'planned'],
+    [{ ingested: true, planned: true, annotated: true, mapped: false }, 'annotated'],
+    [{ ingested: true, planned: true, annotated: true, mapped: true, recalled: false }, 'mapped'],
+    [{ ingested: true, planned: true, annotated: true, mapped: true, recalled: true, drilled: false }, 'recalled'],
+    [{ ingested: true, planned: true, annotated: true, mapped: true, recalled: true, drilled: true }, 'done'],
+  ]
+  for (const [p, want] of cases) {
+    assert.equal(stageFromProgress(p), want, `${JSON.stringify(p)} 应推导为 ${want}`)
+  }
+})
+
+await test('nextStepOf 的 stage 与 stageFromProgress 完全一致', async () => {
+  // 这两处若各算一套，就会出现"列表说 A、提示说 B"
+  const combos = []
+  for (const planned of [false, true]) {
+    for (const annotated of [false, true]) {
+      for (const mapped of [false, true]) {
+        for (const recalled of [false, true]) {
+          for (const drilled of [false, true]) {
+            combos.push({ ingested: true, planned, annotated, mapped, recalled, drilled })
+          }
+        }
+      }
+    }
+  }
+  for (const p of combos) {
+    const want = stageFromProgress(p)
+    const got = nextStepOf(p).stage
+    assert.equal(got, want, `${JSON.stringify(p)}：nextStepOf 给 ${got}，推导应为 ${want}`)
+  }
+})
+
+await test('done 阶段不该再给出下一个动作', async () => {
+  const p = { ingested: true, planned: true, annotated: true, mapped: true, recalled: true, drilled: true }
+  const n = nextStepOf(p)
+  assert.equal(n.stage, 'done')
+  assert.equal(n.action, null, '流程走完了还在推动作，用户会以为没做完')
+})
+
+await test('列表的 stage 不信 meta 里的陈旧值', async () => {
+  // 造一个 meta.stage 写错、但没有任何产物的项目，看列表怎么报
+  const ws = await mkdtemp(join(tmpdir(), 'study-stage-'))
+  const store = new StudyStore(ws)
+  const docId = 'x-fake'
+  await store.saveMeta(docId, { title: 'x', stage: 'drilled' }) // 故意写"已完成"
+  const list = await store.list()
+  const row = list.find((r) => r.id === docId)
+  assert.ok(row, '应该列出这个项目')
+  assert.notEqual(row.stage, 'drilled', 'meta 说已考核，但没有任何产物，不能信')
+  assert.equal(row.stage, 'empty', `实际推导为 ${row.stage}`)
+  await rm(ws, { recursive: true, force: true })
+})
+
 console.log(`\n${'─'.repeat(52)}`)
 console.log(`通过 ${passed}　失败 ${failed}`)
 

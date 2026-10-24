@@ -132,7 +132,6 @@
 当前结果：25 块 / 182 段，中位 809 字，最大/最小 33.9 倍。
 
 ### 2.2 回指（每条知识点的来路）
-
 `preflight.json` 的每条 `knowledgePoints[]` 带：
 
 - `segmentIds` —— 原文段落号，界面渲染成「看原文 ¶N」，点了跳过去并闪一下
@@ -141,6 +140,29 @@
 **找不到就不挂**，界面显示灰色「原文位置待定位」。
 原则：挂错比不挂更糟 —— 用户点「三层防护」跳到讲 MCP 投毒的段落，
 会以为自己记错了。所以自动匹配之上还有一张人工覆盖表。
+
+### 2.3 阶段名与阶段状态：各只有一处真值
+
+**阶段名**：`rules.js` 的 `STAGES`。
+之前界面叫「读完自测 / 费曼考核」、服务端叫「读后自测 / 读后考核」、
+技能文档叫「读后巩固 / 读后考核」——三套名字。
+用户说"我要做费曼考核"，Agent 却在找 `study-recall`，就串线了。
+现在界面页签、`next.message`、`/stages` 接口都取自同一张表，
+`audit-docs.mjs` 还会校验 `SKILL.md` 的 description 以对应名字开头。
+
+**阶段状态**：`store.js` 的 `stageFromProgress(progress)`。
+
+`meta.json` 里曾经有个 `stage` 字段，没有任何代码维护它，
+只是某个历史时刻写进去的死值。实际后果：
+chapter4 的 `meta.stage` 是 `drilled`，但 `drills.jsonl` 是空的
+（从没有过真实复述记录）—— 列表显示"已考核"，
+下一句提示却让你"去做读后考核"，自相矛盾。
+
+现在 `meta.stage` 一律被忽略，`list()`、`fullProject()`、
+`nextStepOf()` 全部走 `stageFromProgress`。
+七个阶段：`empty → ingested → planned → annotated → mapped → recalled → done`。
+
+不变式（有测试守着）：**`nextStepOf(p).stage` 必须恒等于 `stageFromProgress(p)`**。
 
 **读前六段式**（对应第 1–6 项要求）
 

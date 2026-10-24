@@ -135,6 +135,23 @@ async function readJsonl(file) {
   return out
 }
 
+/**
+ * 由 progress 布尔量推导阶段名 —— 唯一真值。
+ *
+ * 不存在"记住上次写到哪"这回事：产物文件在不在、里面有没有真东西，
+ * 才是阶段。否则用户手动删了 drills.jsonl，阶段还停在"已考核"。
+ */
+export function stageFromProgress(p) {
+  if (!p) return 'empty'
+  if (!p.ingested) return 'empty'
+  if (!p.planned) return 'ingested'
+  if (!p.annotated) return 'planned'
+  if (!p.mapped) return 'annotated'
+  if (!p.recalled) return 'mapped'
+  if (!p.drilled) return 'recalled'
+  return 'done'
+}
+
 export class StudyStore {
   constructor(workspace) {
     if (!workspace) throw new Error('StudyStore 需要一个工作区路径')
@@ -166,7 +183,13 @@ export class StudyStore {
       const meta = await readJson(join(this.root, entry.name, 'meta.json'))
       if (!meta) continue
       const progress = await this.progressOf(entry.name)
-      out.push({ ...meta, progress })
+      // stage 必须由 progress 推导，不能信 meta.stage。
+      //
+      // 踩过：meta.json 里存着 stage:"drilled"，但 drills.jsonl 是空的
+      // （从没有真实复述记录），于是列表显示"已考核"、下一句却提示
+      // "去做读后考核"。两个真相来源必然打架，而 meta.stage 从来没被
+      // 任何代码维护过 —— 它只是某个历史时刻写进去的死值。
+      out.push({ ...meta, stage: stageFromProgress(progress), progress })
     }
     return out.sort((a, b) => String(b.updatedAt ?? '').localeCompare(String(a.updatedAt ?? '')))
   }
@@ -319,7 +342,8 @@ export class StudyStore {
         this.progressOf(docId),
       ])
     return {
-      meta,
+      // meta.stage 是历史遗留死值，一律用 progress 推导，别让两处打架
+      meta: { ...meta, stage: stageFromProgress(progress) },
       segments,
       source,
       preflight,

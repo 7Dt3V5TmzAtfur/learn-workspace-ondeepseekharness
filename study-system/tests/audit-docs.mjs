@@ -140,6 +140,84 @@ check(
   '文档不提这个规则，Agent 不会知道碎片会被判',
 )
 
+console.log('\n8. 阶段名的三种叫法必须统一')
+
+/**
+ * 之前界面叫「读完自测」「费曼考核」，服务端叫「读后自测」「读后考核」，
+ * 技能文档叫「读后巩固」「读后考核」——三套名字。
+ * 用户说"我要做费曼考核"，Agent 却在找 study-recall，就串线了。
+ */
+const { STAGES } = await import('../plugin/lib/rules.js')
+const service = readFileSync(join(ROOT, 'plugin/lib/service.js'), 'utf8')
+const index = readFileSync(join(ROOT, 'plugin/index.js'), 'utf8')
+
+const canonical = Object.values(STAGES).map((s) => s.name)
+check(
+  '五个阶段的正式名唯一',
+  canonical.length === 5 && new Set(canonical).size === 5,
+  `STAGES 里的名字有重复：${canonical.join(', ')}`,
+)
+
+// 界面兜底数组里的名字必须与 STAGES 完全一致
+const fallbackNames = [...client.matchAll(/label: '([^']+)', stage:/g)].map((m) => m[1])
+check(
+  '界面的兜底页签与 STAGES 同名同序',
+  fallbackNames.join('|') === canonical.join('|'),
+  `界面兜底是 [${fallbackNames.join(', ')}]，STAGES 是 [${canonical.join(', ')}]`,
+)
+
+// 服务端的提示语不能自己写死旧名字
+const deadNames = ['读后自测', '费曼考核']
+for (const dead of deadNames) {
+  check(
+    `服务端提示语不再出现旧名「${dead}」`,
+    !service.includes(dead),
+    `service.js 里还有「${dead}」，与界面和技能文档不一致`,
+  )
+}
+
+// 注释里可以提旧名（那是解释为什么改名），代码里的文案不行
+const clientCodeOnly = client
+  .split('\n')
+  .filter((l) => !/^\s*(\*|\/\/|\/\*)/.test(l))
+  .join('\n')
+check(
+  '界面文案里不再出现旧名「读完自测」',
+  !clientCodeOnly.includes('读完自测'),
+  'client.js 的界面文案还有「读完自测」，与 STAGES 的「读后巩固」不一致',
+)
+
+check(
+  '有 /stages 接口供界面取真值',
+  /route === '\/stages'/.test(index),
+  '界面写死名字，改一处要改三处，迟早再次漂移',
+)
+
+check(
+  '文档写明阶段状态也只有一个真值',
+  /stageFromProgress/.test(doc),
+  'meta.stage 与 progress 打架过一次，文档要留下这条教训',
+)
+
+check(
+  '文档写明 nextStepOf 与 stageFromProgress 必须恒等',
+  /恒等于|恒等/.test(doc),
+  '两处各算一套就会"列表说 A、提示说 B"',
+)
+
+console.log('\n9. 技能文档的正式名与 STAGES 一致')
+
+for (const s of Object.values(STAGES)) {
+  const md = readFileSync(join('D:/learn/.dsh/skills', s.skill, 'SKILL.md'), 'utf8')
+  const first = (md.match(/^description:\s*(.+)$/m) ?? [])[1] ?? ''
+  // description 前半句就是阶段正式名
+  check(
+    `${s.skill} 的 description 以「${s.name}」开头`,
+    first.startsWith(s.name),
+    `实际是「${first.slice(0, 24)}…」，用户和模型看到的叫法对不上`,
+  )
+}
+
 console.log('\n' + '─'.repeat(60))
 console.log(`通过 ${pass}　失败 ${fails.length}`)
 if (fails.length) {

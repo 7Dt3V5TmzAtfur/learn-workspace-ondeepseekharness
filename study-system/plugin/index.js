@@ -11,6 +11,7 @@ import { readFile } from 'node:fs/promises'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { StudyService, nextStepOf } from './lib/service.js'
+import { STAGES } from './lib/rules.js'
 import { StudyStore, findWorkspaceRoot, findWorkspaceRoots } from './lib/store.js'
 
 export const name = 'study-copilot'
@@ -596,6 +597,11 @@ export function apply(ctx, config = {}) {
           }
           if (req.method === 'GET' && route === '/vocabulary') {
             return send(res, 200, svcOf(url).vocabulary())
+          }
+          // 阶段名唯一真值（rules.js STAGES），界面页签也用它，
+          // 免得界面说「费曼考核」、服务端说「读后考核」、技能说「读后巩固」
+          if (req.method === 'GET' && route === '/stages') {
+            return send(res, 200, { stages: Object.values(STAGES) })
           }
           if (req.method === 'POST' && route === '/ingest') {
             const body = await readBody(req)

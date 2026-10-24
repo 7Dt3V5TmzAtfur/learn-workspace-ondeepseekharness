@@ -6,7 +6,7 @@ import { basename, extname, resolve, isAbsolute } from 'node:path'
 import { readFile, stat } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { extractDocument, segmentText } from './extract.js'
-import { StudyStore, slugify, STUDY_DIR_NAME } from './store.js'
+import { StudyStore, slugify, STUDY_DIR_NAME, stageFromProgress } from './store.js'
 import { buildArchifyFigures } from './archify-figures.js'
 import { renderMarkdown, layoutGraph, escapeHtml as escHtml } from './markdown.js'
 
@@ -20,6 +20,7 @@ import {
   ATTENTION_TIERS,
   ROLE_LABELS,
   RELATION_TYPES,
+  STAGES,
 } from './rules.js'
 
 const STAGE_ORDER = ['ingested', 'planned', 'annotated', 'mapped', 'recalled', 'drilled']
@@ -31,25 +32,36 @@ const STAGE_ORDER = ['ingested', 'planned', 'annotated', 'mapped', 'recalled', '
 const REVIEW_INTERVALS = [1, 3, 7]
 
 function nextStepOf(progress) {
-  if (!progress.ingested) return { stage: 'empty', action: 'study_ingest', message: '先导入一份资料' }
-  if (!progress.planned) {
-    return { stage: 'ingested', action: 'study-preflight', message: '读前建构：生成六段式学习全景（摘要/帮助与目标/重难点/考核/思考题/参考资料）' }
-  }
-  if (!progress.annotated) {
-    return { stage: 'planned', action: 'study-annotate', message: '读中加工：逐段打渐构标签 + 三色注意力' }
-  }
-  if (!progress.mapped) {
-    return { stage: 'annotated', action: 'study-map', message: '梳理知识点逻辑关系，生成衔接图' }
-  }
-  if (!progress.recalled) {
+  // stage 与 message 必须成对，所以统一由 stageFromProgress 算一次，
+  // 避免"列表说已考核、提示语让你去做考核"这种自相矛盾。
+  const stage = stageFromProgress(progress)
+  if (stage === 'empty') return { stage, action: 'study_ingest', message: '先导入一份资料' }
+  if (stage === 'ingested') {
     return {
-      stage: 'mapped',
-      action: 'study-recall',
-      message: '读后自测：生成 6-12 条问答（每条 ≤100 字），再定一个明天能做完的最小行动',
+      stage,
+      action: 'study-preflight',
+      message: `${STAGES.preflight.name}：生成六段式学习全景（摘要/帮助与目标/重难点/考核/思考题/参考资料）`,
     }
   }
-  if (!progress.drilled) {
-    return { stage: 'recalled', action: 'study-feynman', message: '读后考核：合上讲义做费曼复述与练习' }
+  if (stage === 'planned') {
+    return { stage, action: 'study-annotate', message: `${STAGES.annotate.name}：逐段打渐构标签 + 三色注意力` }
+  }
+  if (stage === 'annotated') {
+    return { stage, action: 'study-map', message: `梳理${STAGES.map.full}，生成衔接图` }
+  }
+  if (stage === 'mapped') {
+    return {
+      stage,
+      action: 'study-recall',
+      message: `${STAGES.recall.name}：生成 6-12 条问答（每条 ≤100 字），再定一个明天能做完的最小行动`,
+    }
+  }
+  if (stage === 'recalled') {
+    return {
+      stage,
+      action: 'study-feynman',
+      message: `${STAGES.feynman.name}：合上讲义做费曼复述与练习`,
+    }
   }
   return { stage: 'done', action: null, message: '全流程完成：可以做迁移应用或教给别人' }
 }

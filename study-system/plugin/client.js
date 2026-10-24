@@ -1450,14 +1450,14 @@ body[data-ds-dark-theme] .sc-root{
         return h(
           'div',
           { className: 'sc-card' },
-          h('h4', null, '读完自测（QA）'),
+          h('h4', null, '读后巩固（QA）'),
           h('div', { className: 'sc-muted' }, '还没有 QA。读完全文后让 Agent 生成一份速查问答，每条不超过 100 字。'),
         )
       }
       return h(
         'div',
         { className: 'sc-card' },
-        h('h4', null, `读完自测（QA，${pairs.length} 条）`),
+        h('h4', null, `读后巩固（QA，${pairs.length} 条）`),
         h('div', { className: 'sc-muted', style: { marginBottom: 8 } }, '先在心里答一遍，再点开核对答案。'),
         pairs.map((p, i) =>
           h(
@@ -1494,7 +1494,7 @@ body[data-ds-dark-theme] .sc-root{
     }
 
     /**
-     * 读完自测面板。
+     * 读后巩固面板。
      *
      * 为什么要单独一个页签：QA 原来是塞在"费曼考核"页底部的，
      * 而它其实是考核**之前**的那一步（先能回忆细节，再能完整复述）。
@@ -1864,13 +1864,50 @@ body[data-ds-dark-theme] .sc-root{
       /* Tab 顺序 = 学习流程顺序。
        * 原来第一个 Tab 是"精读加工"、默认也停在它，而学习第一步是读前建构，
        * 用户一进来看到的是一堆正文，却看不到"我要学什么、怎么考"。 */
-      const tabs = [
-        { key: 'plan', label: '读前建构', stage: 'planned' },
-        { key: 'read', label: '读中加工', stage: 'annotated' },
-        { key: 'graph', label: '知识图谱', stage: 'mapped' },
-        { key: 'recall', label: '读完自测', stage: 'recalled' },
-        { key: 'quiz', label: '费曼考核', stage: 'drilled' },
-      ]
+      /**
+       * 页签：名字与顺序都从宿主 /stages 取（rules.js STAGES 是唯一真值）。
+       *
+       * 之前这里写死「读完自测」「费曼考核」，而服务端提示语说「读后自测」
+       * 「读后考核」、技能文档说「读后巩固」「读后考核」—— 三套名字。
+       * 用户说"我要做费曼考核"，Agent 却在找 study-recall，就串线了。
+       *
+       * 拿不到就退回本地默认值，不让界面因为一个接口失败而空掉。
+       */
+      const [stageList, setStageList] = useState(null)
+      useEffect(() => {
+        let alive = true
+        api('/stages')
+          .then((d) => alive && Array.isArray(d?.stages) && setStageList(d.stages))
+          .catch(() => {})
+        return () => {
+          alive = false
+        }
+      }, [])
+
+      const tabs = useMemo(() => {
+        const STAGE_TO_STAGE_KEY = {
+          preflight: 'planned',
+          annotate: 'annotated',
+          map: 'mapped',
+          recall: 'recalled',
+          feynman: 'drilled',
+        }
+        if (stageList?.length) {
+          return stageList.map((s) => ({
+            key: s.tab,
+            label: s.name,
+            stage: STAGE_TO_STAGE_KEY[s.key],
+          }))
+        }
+        // 兜底：与 STAGES 保持同样的名字与顺序
+        return [
+          { key: 'plan', label: '读前建构', stage: 'planned' },
+          { key: 'read', label: '读中加工', stage: 'annotated' },
+          { key: 'graph', label: '知识图谱', stage: 'mapped' },
+          { key: 'recall', label: '读后巩固', stage: 'recalled' },
+          { key: 'quiz', label: '读后考核', stage: 'drilled' },
+        ]
+      }, [stageList])
 
       // 默认落在"下一步该做的那一步"上，用户打开就知道从哪开始
       const nextTabKey = useMemo(() => {

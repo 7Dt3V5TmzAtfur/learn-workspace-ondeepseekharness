@@ -301,7 +301,7 @@ check(
 )
 check(
   'QA 带条数显示',
-  /读完自测（QA，\$\{pairs\.length\} 条）/.test(clientSrc),
+  /读后巩固（QA，\$\{pairs\.length\} 条）/.test(clientSrc),
   '不显示条数用户不知道漏没漏',
 )
 
