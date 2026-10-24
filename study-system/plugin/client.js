@@ -509,6 +509,93 @@ body[data-ds-dark-theme] .sc-root{
 
     const q = (ws) => (ws ? `?ws=${encodeURIComponent(ws)}` : '')
 
+    /**
+     * 面板崩了要留下现场，而不是一片空白。
+     *
+     * 用户看到的只有"什么也不显示"，既没有堆栈也没有现场。
+     * 这里把渲染异常与未捕获错误回传宿主，落到
+     * <DSH_HOME>/study-copilot-client-errors.log。只发错误信息，不发学习数据。
+     */
+    const reportError = (payload) => {
+      try {
+        fetch(`${API}/client-errors`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify(payload),
+        })
+      } catch {
+        /* 上报失败就失败，不能反过来影响界面 */
+      }
+    }
+
+    let mountReported = false
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('error', (e) => {
+        reportError({
+          kind: 'error',
+          message: String(e.message ?? ''),
+          stack: e.error?.stack ?? null,
+          src: e.filename ?? null,
+          line: e.lineno ?? null,
+        })
+      })
+      window.addEventListener('unhandledrejection', (e) => {
+        const reason = e.reason
+        reportError({
+          kind: 'rejection',
+          message: String(reason?.message ?? reason ?? ''),
+          stack: reason?.stack ?? null,
+        })
+      })
+    }
+
+    /**
+     * 渲染错误边界。
+     * 没有它，一个组件抛错整块面板就消失，用户得不到任何可操作信息。
+     */
+    class PanelBoundary extends React.Component {
+      constructor(props) {
+        super(props)
+        this.state = { error: null }
+      }
+
+      static getDerivedStateFromError(error) {
+        return { error }
+      }
+
+      componentDidCatch(error, info) {
+        reportError({
+          kind: 'render',
+          message: String(error?.message ?? error),
+          stack: error?.stack ?? null,
+          componentStack: info?.componentStack ?? null,
+        })
+      }
+
+      render() {
+        const error = this.state.error
+        if (!error) return this.props.children
+        return h(
+          'div',
+          { className: 'sc-shell', style: { padding: 16 } },
+          h('h4', null, '工作台渲染出错'),
+          h(
+            'div',
+            { className: 'sc-issue', 'data-level': 'error', style: { marginTop: 8 } },
+            String(error?.message ?? error),
+          ),
+          h(
+            'div',
+            { className: 'sc-muted', style: { marginTop: 8, lineHeight: 1.8 } },
+            '错误已记录到 ~/.dsh/study-copilot-client-errors.log。',
+            h('br'),
+            '刷新面板可重试；连续失败请重启应用，并把这条日志发给我。',
+          ),
+        )
+      }
+    }
+
     const STAGES = [
       { key: 'ingested', label: '导入' },
       { key: 'planned', label: '读前' },
@@ -881,27 +968,14 @@ body[data-ds-dark-theme] .sc-root{
       return out
     }
 
-    function PreflightPane({ project, onJump, onGotoSegment }) {
+    function PreflightPane({ project, onJump }) {
       const plan = project.preflight
       const [cur, setCur] = useState('①')
 
       const blocks = useMemo(() => splitPreflight(project.preflightHtml), [project.preflightHtml])
 
-      /**
-       * 知识点右侧的「看原文 ¶N」是宿主渲染的 <a data-seg>，
-       * 用事件委托接住 —— 这样不用为每个知识点单独写 React 组件，
-       * 也让宿主那份 HTML 保持纯静态。
-       */
-      const onBodyClick = useCallback(
-        (e) => {
-          const a = e.target?.closest?.('a.sc-kp-jump')
-          if (!a) return
-          e.preventDefault()
-          const seg = a.getAttribute('data-seg')
-          if (seg && onGotoSegment) onGotoSegment(seg)
-        },
-        [onGotoSegment],
-      )
+      // 知识点右侧的「看原文 ¶N」跳转由外层的 sc-pane 事件委托统一接管
+      // （见 Workbench 的 onBodyClick），这里不再单独处理。
 
       if (!plan) {
         return h(
@@ -2402,6 +2476,24 @@ body[data-ds-dark-theme] .sc-root{
         setJumpTo(segId)
         setTab('read')
       }, [])
+
+      /**
+       * 知识点右侧的「看原文 ¶N」是宿主渲染的 <a class="sc-kp-jump" data-seg>。
+       * 用事件委托挂在整个内容区上，不必为每个知识点写一个 React 组件。
+       *
+       * 注意：这个处理必须定义在 Workbench 里 —— sc-pane 的 onClick 在这一层，
+       * 定义在子组件 PreflightPane 里够不着（曾经因此让面板整块空白）。
+       */
+      const onBodyClick = useCallback(
+        (e) => {
+          const a = e.target?.closest?.('a.sc-kp-jump')
+          if (!a) return
+          e.preventDefault()
+          const seg = a.getAttribute('data-seg')
+          if (seg) gotoSegment(seg)
+        },
+        [gotoSegment],
+      )
       const [error, setError] = useState(null)
       const [busy, setBusy] = useState(false)
       // 30 秒预览：导入完成后先给这个，而不是直接把人扔进读前建构。
@@ -2411,6 +2503,14 @@ body[data-ds-dark-theme] .sc-root{
       const [showDiag, setShowDiag] = useState(false)
       const [diag, setDiag] = useState(null)
       const [candidates, setCandidates] = useState([])
+
+      // 诊断：先分辨"面板没挂起来"和"挂起来后渲染崩了"——两者都是一片空白，
+      // 但一个要查 slots 注册，一个要查组件。只报一次，不刷日志。
+      useEffect(() => {
+        if (mountReported) return
+        mountReported = true
+        reportError({ kind: 'mount', message: 'Workbench mounted' })
+      }, [])
 
       // 第一次列目录时自动选中第一份，省得用户面对空白。
       // 但"刚导入了一份"这种情况不能这么办：refresh 时 docId 还是 null，
@@ -2749,7 +2849,7 @@ body[data-ds-dark-theme] .sc-root{
                     tab === 'read'
                       ? h(ReadingPane, { project, onAsk: ask, workspace: wsPath, jumpTo, onJumped: () => setJumpTo(null) })
                       : tab === 'plan'
-                        ? h(PreflightPane, { project, onJump: setTab, onGotoSegment: gotoSegment })
+                        ? h(PreflightPane, { project, onJump: setTab })
                         : tab === 'graph'
                           ? h(GraphPane, { project, onGoto: gotoSegment })
                           : tab === 'recall'
@@ -2900,7 +3000,10 @@ body[data-ds-dark-theme] .sc-root{
         )
 
         ctx.slots.inject('main', () =>
-          ctx.slots.register({ name: 'main', key: PANEL_ID }, Workbench),
+          // 包一层错误边界：组件抛错时给出原因，而不是让整块面板消失
+          ctx.slots.register({ name: 'main', key: PANEL_ID }, (props) =>
+            h(PanelBoundary, null, h(Workbench, props)),
+          ),
         )
 
         ctx.slots.inject('conversation.composer.dock', () =>

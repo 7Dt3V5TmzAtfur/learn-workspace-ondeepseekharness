@@ -7,7 +7,7 @@
  * 3. 系统提示段落：告诉模型这套流程怎么用
  */
 import { resolve, dirname, extname, sep, join } from 'node:path'
-import { readFile } from 'node:fs/promises'
+import { readFile, writeFile } from 'node:fs/promises'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { StudyService, nextStepOf } from './lib/service.js'
@@ -617,6 +617,28 @@ export function apply(ctx, config = {}) {
             // 免得界面说「费曼考核」、服务端说「读后考核」、技能说「读后巩固」
             if (req.method === 'GET' && route === '/stages') {
               return send(res, 200, { stages: Object.values(STAGES) })
+            }
+            /**
+             * 界面报错回传。
+             *
+             * 为什么需要：面板一崩就是一片空白，用户只能说"什么也不显示"，
+             * 既没有堆栈也没有现场，只能靠猜。这里把渲染异常落到
+             * <DSH_HOME>/study-copilot-client-errors.log，一行一条 JSON。
+             * 只收错误信息与堆栈，不碰学习数据。
+             */
+            if (req.method === 'POST' && route === '/client-errors') {
+              const body = await readBody(req)
+              const line = `${JSON.stringify({ at: new Date().toISOString(), ...body })}\n`
+              const logPath = join(DSH_HOME, 'study-copilot-client-errors.log')
+              try {
+                const prev = existsSync(logPath) ? await readFile(logPath, 'utf8') : ''
+                // 留最近 200 行，避免无限增长
+                const kept = prev.split('\n').filter(Boolean).slice(-199).join('\n')
+                await writeFile(logPath, `${kept}${kept ? '\n' : ''}${line}`)
+              } catch {
+                /* 写日志失败不能反过来弄崩接口 */
+              }
+              return send(res, 200, { ok: true })
             }
             if (req.method === 'POST' && route === '/ingest') {
               const body = await readBody(req)
