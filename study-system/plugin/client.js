@@ -163,26 +163,22 @@ body[data-ds-dark-theme] .sc-root{
 .sc-hl-hard{background:var(--sc-hard-bg);box-shadow:inset 0 -2px 0 var(--sc-hard-line);color:var(--sc-hard-fg)}
 .sc-hl-ref{background:var(--sc-ref-bg);box-shadow:inset 0 -2px 0 var(--sc-ref-line);color:var(--sc-ref-fg)}
 
-/* 渐构标签徽标：#d 定义|Definition */
-.sc-tag{display:inline-flex;align-items:baseline;gap:5px;font-size:var(--sc-fs-xs);line-height:1.6;padding:1px 7px;border-radius:var(--sc-r-sm);margin-bottom:5px;background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary);font-weight:500}
-/* 英文副标签：原来是硬挤在中文后面的。
- * 现在单独一档 9.5px、半透明、有分隔点，读起来是「五类工具的审视特征 · Definition」 */
-.sc-tag-en{font-size:9.5px;letter-spacing:.03em;text-transform:none;opacity:.5;font-weight:400}
-.sc-tag-d{background:rgba(245,158,11,.18)}
-.sc-tag-e{background:rgba(20,184,166,.18)}
-.sc-tag-q{background:rgba(192,38,211,.16)}
-.sc-tag-s{background:rgba(37,99,235,.16)}
-.sc-tag-t{background:rgba(249,115,22,.18)}
-.sc-tag-c{background:rgba(100,116,139,.20)}
-.sc-tag-v{background:rgba(13,148,136,.18)}
+/* 渐构角色标记：只显示 #d，放在左侧留白里。
+ * 它曾经是段落首行里的胶囊，再后来是一整行旁注——两种都在打断正文。
+ * 现在正文完全不包含它，位置、颜色、显隐都由版面决定。 */
 /* 正文容器：宿主把每段渲染成 inline 文本 + <br>，没有 <p>，
  * 所以首行缩进必须落在这个容器上，而不是 p 上。 */
 .sc-seg > div{text-indent:2em}
 .sc-seg > div > .sc-seg-note,.sc-seg-note,.sc-pause{text-indent:0}
 /* 角色徽标独占一行，但压到最轻：它是旁注，不是正文。
  * 之前是带底色的胶囊挤在首行里，读起来像"段落编号后面的所属文字"。 */
-.sc-seg > .sc-tag{display:block;width:max-content;max-width:100%;margin:0 0 3px;padding:0;background:transparent;color:var(--dsw-alias-label-secondary);font-weight:400;opacity:.62;font-size:calc(11px * var(--sc-scale))}
-.sc-seg:hover > .sc-tag{opacity:.9}
+.sc-seg-role{position:absolute;left:2px;top:30px;width:36px;text-align:right;font-size:calc(10px * var(--sc-scale));font-weight:600;letter-spacing:.02em;opacity:.5;transition:opacity .15s;pointer-events:none;user-select:none}
+.sc-seg[data-tier=core] .sc-seg-role{color:var(--sc-core-fg)}
+.sc-seg[data-tier=hard] .sc-seg-role{color:var(--sc-hard-fg)}
+.sc-seg[data-tier=ref] .sc-seg-role{color:var(--sc-ref-fg)}
+.sc-seg:hover .sc-seg-role{opacity:.95}
+/* 窄屏没有余量放留白标记：直接收起，正文优先 */
+@media (max-width:760px){.sc-seg{padding-left:12px}.sc-seg-mark,.sc-seg-role{display:none}}
 /* 段落备注：原来是裸文本，和正文同色分不清。
  * 现在左侧竖线 + 斜体 + 小一号，明确是批注不是原文。 */
 .sc-seg-note{margin-top:6px;padding:5px var(--sc-sp-2);border-left:2px solid var(--dsw-alias-border-l2);font-size:var(--sc-fs-sm);line-height:1.7;color:var(--dsw-alias-label-secondary);font-style:italic}
@@ -1837,8 +1833,18 @@ body[data-ds-dark-theme] .sc-root{
                   setAnswer(null)
                 },
               },
-              // 段号退到左侧留白里，只在悬停时显形：定位要用，但不是正文
+              // 段号与角色都退到左侧留白：定位与分类要用，但不是正文
               h('span', { className: 'sc-seg-mark', 'aria-hidden': 'true' }, seg.id),
+              a
+                ? h(
+                    'span',
+                    {
+                      className: 'sc-seg-role',
+                      title: [`#${a.label}`, a.keyword, a.title].filter(Boolean).join(' · '),
+                    },
+                    `#${a.label}`,
+                  )
+                : null,
               // 有宿主渲染的高亮版就用它；否则退回纯文本 Markdown
               //
               // 暂停回顾：核心/攻坚档的段落在"看过的第一眼"之后会被盖上，

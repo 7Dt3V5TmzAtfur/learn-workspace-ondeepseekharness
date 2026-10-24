@@ -846,19 +846,6 @@ export function renderAnnotatedHtml(segments, annotation) {
       const tier = a ? tierOfLabel(a.label) ?? a.tier : null
       const tierClass = a ? TIER_CLASS[tier] ?? TIER_CLASS.core : ''
 
-      // 段落角色徽标：#d 定义|Definition 形式（渐构要求的输出格式）
-      let tag = ''
-      if (a) {
-        const role = ROLE_LABELS[String(a.label).replace(/^#/, '').toLowerCase()]
-        const en = role?.en ?? ''
-        const zh = role?.zh ?? ''
-        const kw = a.keyword ? `${escHtml(a.keyword)} ` : ''
-        tag =
-          `<span class="sc-tag sc-tag-${escHtml(a.label)}" title="${escHtml(zh)}｜${escHtml(en)}">` +
-          `#${escHtml(a.label)} ${kw}${escHtml(a.title ?? '')}` +
-          `<span class="sc-tag-en">${escHtml(en)}</span></span>`
-      }
-
       // 正文：整段过一次 Markdown，高亮用占位符法落位
       const quote = a?.quote ? String(a.quote).trim() : ''
       const body = markQuote(String(seg.text), quote, a ? tierClass : '')
@@ -866,7 +853,7 @@ export function renderAnnotatedHtml(segments, annotation) {
       // 备注单独一行，不参与高亮
       const note = a?.note ? `<div class="sc-seg-note">${escHtml(a.note)}</div>` : ''
       const tierAttr = a ? ` data-tier="${escHtml(tier ?? '')}"` : ''
-      return `<section class="sc-seg" data-id="${escHtml(seg.id)}"${tierAttr}>${tag}${body}${note}</section>`
+      return `<section class="sc-seg" data-id="${escHtml(seg.id)}"${tierAttr}>${body}${note}</section>`
     })
     .join('\n')
 }
