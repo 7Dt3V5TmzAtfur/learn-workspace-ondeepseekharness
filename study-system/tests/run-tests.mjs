@@ -1651,6 +1651,109 @@ await test('单元清单不重不漏', async () => {
   assert.equal(flat.length, unitsFixture.totalSegments, '有段不属于任何单元')
 })
 
+section('19. 费曼三门闸的判定（真实调用 recordDrill）')
+
+/**
+ * 这块测的是"闸门开得对不对"，不是"能不能存进去"。
+ *
+ * 背景：真实项目里 drills.jsonl 一直是 0 条 —— 这条路径从没被走过。
+ * 三道闸（必须闭卷 / 至少 60 秒 / 不许抄）很容易把所有用户都挡在外面，
+ * 挡多了功能就等于不存在。所以四种典型行为都要有明确结论。
+ */
+const ORIGINAL_TEXT =
+  '执行工具的安全不应依赖单一机制，而应构建多层防护体系。第一层是输入验证——在执行任何操作之前，检查所有参数的合法性：文件路径是否存在路径遍历攻击。在此之上是权限控制。'
+
+/**
+ * 用真实 workspace 让抄录检测能读到真实原文，只把写入与进度换成假的。
+ *
+ * 如果连 artifact 也 mock 掉，抄原文的检测就永远不会触发 ——
+ * 那这条测试等于在测一个空实现，永远绿。
+ */
+const REAL_WS = 'D:/learn'
+const FIXTURE_DOC = 'chapter4-d6eaed'
+
+function drillSvc() {
+  const svc = new StudyService(REAL_WS)
+  const real = svc.store
+  svc.store = Object.create(real)
+  svc.store.appendJsonl = async () => {}
+  svc.store.saveMeta = async () => {}
+  svc.store.progressOf = async () => ({ stage: 'annotated' })
+  svc.store.meta = async () => ({ stage: 'annotated' })
+  return svc
+}
+
+await test('认真闭卷复述 → 计入', async () => {
+  const r = await drillSvc().recordDrill(FIXTURE_DOC, {
+    prompt: '讲清执行工具的三层防护',
+    answer:
+      '执行工具能改外部世界，所以安全不能只有一道关。先验参数把路径穿越挡掉，再限权限只能碰指定目录，最后对不可逆操作加独立审查，一个模型提议另一个批准。三层叠起来，单点失效不会直接造成事故。',
+    closedBook: true,
+    durationSec: 180,
+    rubricHit: ['参数验证', '权限控制', '独立审查'],
+    verdict: '达标',
+  })
+  assert.equal(r.record.valid, true, '认真复述应计入')
+})
+
+await test('开卷 → 记录但不计入，并说明原因', async () => {
+  const r = await drillSvc().recordDrill(FIXTURE_DOC, {
+    answer: '执行工具要安全，要验证参数、控制权限、加独立审查。',
+    closedBook: false,
+    durationSec: 200,
+    verdict: '部分达标',
+  })
+  assert.equal(r.record.valid, false, '开卷不该计入')
+  assert.ok(
+    r.record.warnings.some((w) => w.code === 'drill-open-book'),
+    '要明说是因为开卷，否则用户不知道下次怎么改',
+  )
+})
+
+await test('十秒随手打两行 → 记录但不计入', async () => {
+  const r = await drillSvc().recordDrill(FIXTURE_DOC, {
+    answer: '就讲了执行工具要安全。',
+    closedBook: true,
+    durationSec: 10,
+    verdict: '未达标',
+  })
+  assert.equal(r.record.valid, false, '太快不该计入')
+  assert.ok(
+    r.record.warnings.some((w) => w.code === 'drill-too-fast'),
+    '要明说是因为太快',
+  )
+})
+
+await test('闭卷但真的抄原文 → 判为抄', async () => {
+  const r = await drillSvc().recordDrill(FIXTURE_DOC, {
+    answer: ORIGINAL_TEXT,
+    closedBook: true,
+    durationSec: 150,
+    verdict: '达标',
+  })
+  assert.equal(r.record.valid, false, '抄原文不该计入')
+  assert.ok(
+    r.record.warnings.some((w) => w.code === 'drill-copied') || r.record.copiedRatio > 0,
+    `抄原文应被识别，实际 copiedRatio=${r.record.copiedRatio}`,
+  )
+})
+
+await test('每条复述都带可改进的依据', async () => {
+  // 界面要把"为什么没计入"显示出来；记录里没有 warnings 就显示不出来
+  const r = await drillSvc().recordDrill(FIXTURE_DOC, {
+    answer: '太短',
+    closedBook: false,
+    durationSec: 5,
+    verdict: '未达标',
+  })
+  assert.ok(Array.isArray(r.record.warnings), 'warnings 应是数组')
+  assert.ok(r.record.warnings.length > 0, '被拦下时必须给原因')
+  assert.ok(
+    r.record.warnings.every((w) => w.message && w.message.length > 8),
+    '原因要是一句人话，不能只有错误码',
+  )
+})
+
 console.log(`\n${'─'.repeat(52)}`)
 console.log(`通过 ${passed}　失败 ${failed}`)
 

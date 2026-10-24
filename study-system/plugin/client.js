@@ -320,6 +320,25 @@ body[data-ds-dark-theme] .sc-root{
   color:var(--dsw-alias-label-secondary);line-height:1.6}
 .sc-harvest-where{flex:none;font-variant-numeric:tabular-nums;font-size:var(--sc-fs-xs);
   color:var(--dsw-alias-label-secondary);opacity:.75;min-width:38px}
+/* 复述记录：每次讲完要能看出"这次算不算数、为什么不算"。
+   三道闸门（闭卷/够时间/没抄）如果只拦不解释，用户只会觉得被刁难。 */
+.sc-drill{padding:var(--sc-sp-2) 0;border-bottom:1px solid var(--dsw-alias-border-l1)}
+.sc-drill:last-child{border-bottom:none}
+.sc-drill-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.sc-drill-badge{flex:none;font-size:var(--sc-fs-xs);padding:1px 7px;border-radius:999px;
+  font-weight:600;white-space:nowrap}
+.sc-drill-badge[data-valid=true]{color:var(--dsw-alias-state-success-primary);
+  background:color-mix(in oklab, var(--dsw-alias-state-success-primary) 12%, transparent)}
+.sc-drill-badge[data-valid=false]{color:var(--dsw-alias-state-warn-primary);
+  background:color-mix(in oklab, var(--dsw-alias-state-warn-primary) 14%, transparent)}
+.sc-drill-prompt{flex:1;min-width:0;font-size:var(--sc-fs-sm);color:var(--dsw-alias-label-primary)}
+.sc-drill-meta{flex:none;font-size:var(--sc-fs-xs);color:var(--dsw-alias-label-secondary);
+  font-variant-numeric:tabular-nums}
+.sc-drill-answer{margin-top:var(--sc-sp-1);line-height:1.75;font-size:var(--sc-fs-sm)}
+.sc-drill-row{margin-top:var(--sc-sp-1);font-size:var(--sc-fs-sm);line-height:1.7}
+.sc-drill-warn{margin:var(--sc-sp-1) 0 0;padding-left:18px;font-size:var(--sc-fs-xs);
+  color:var(--dsw-alias-state-warn-primary);line-height:1.7}
+.sc-drill.is-invalid{opacity:.92}
 /* 单元目录：这份资料分几块。
    默认收起，因为"想直接读"的人不该被目录挡路；
    展开后一行一块，带段数与要点数，点一下定位到那块。 */
@@ -1629,14 +1648,36 @@ body[data-ds-dark-theme] .sc-root{
             : project.drills.map((d, i) =>
                 h(
                   'div',
-                  { key: i, style: { marginBottom: 10, paddingBottom: 10, borderBottom: '1px solid var(--dsw-alias-border-l1)' } },
-                  h('div', { className: 'sc-muted' }, d.prompt ? `题：${d.prompt}` : '（自由复述）'),
-                  h('div', { style: { marginTop: 4, lineHeight: 1.7 } }, d.answer),
-                  d.verdict ? h('div', { style: { marginTop: 4 } }, h('b', null, '判卷：'), d.verdict) : null,
+                  { key: i, className: 'sc-drill' + (d.valid ? '' : ' is-invalid') },
+                  // 计入与否必须明说。之前只看得到"判卷：…"，
+                  // 用户不知道这次算不算数，闸门就成了黑箱。
+                  h(
+                    'div',
+                    { className: 'sc-drill-head' },
+                    h(
+                      'span',
+                      { className: 'sc-drill-badge', 'data-valid': String(Boolean(d.valid)) },
+                      d.valid ? '已计入' : '未计入',
+                    ),
+                    d.prompt ? h('span', { className: 'sc-drill-prompt' }, `题：${d.prompt}`) : h('span', { className: 'sc-drill-prompt' }, '（自由复述）'),
+                    d.durationSec != null
+                      ? h('span', { className: 'sc-drill-meta' }, d.minutes ? `${d.minutes} 分钟` : `${d.durationSec} 秒`)
+                      : null,
+                  ),
+                  h('div', { className: 'sc-drill-answer' }, d.answer),
+                  d.verdict ? h('div', { className: 'sc-drill-row' }, h('b', null, '判卷：'), d.verdict) : null,
                   (d.rubricHit ?? []).length
                     ? h('div', { className: 'sc-muted' }, `达标要点：${d.rubricHit.join('、')}`)
                     : null,
                   d.minimalAction ? h('div', { className: 'sc-muted' }, `下一步最小行动：${d.minimalAction}`) : null,
+                  // 为什么没计入 —— 这句话是用户唯一能改进的依据
+                  (d.warnings ?? []).length
+                    ? h(
+                        'ul',
+                        { className: 'sc-drill-warn' },
+                        d.warnings.map((w, j) => h('li', { key: j }, w.message)),
+                      )
+                    : null,
                 ),
               ),
         ),

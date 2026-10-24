@@ -446,6 +446,31 @@ check(
   '前庭敏感用户会不适',
 )
 
+/* ---------------------------------------------- 12. 复述记录要说清算不算数 */
+
+console.log('\n12. 复述记录：这次算不算数、为什么不算')
+
+check(
+  '每条记录带「已计入 / 未计入」标记',
+  /sc-drill-badge/.test(clientSrc) && /'已计入'/.test(clientSrc),
+  '只显示"判卷：…"，用户不知道这次到底算不算数',
+)
+check(
+  '未计入时把原因列出来',
+  /sc-drill-warn/.test(clientSrc) && /w\.message/.test(clientSrc),
+  '只说没计入不说为什么，用户下次还会犯同样的错',
+)
+check(
+  '显示这次花了多久',
+  /sc-drill-meta/.test(clientSrc) && /d\.minutes/.test(clientSrc),
+  '不显示时长，用户不知道"太快"这条闸门是怎么卡的',
+)
+check(
+  '计入与否靠 valid 字段而不是自己猜',
+  /d\.valid \?/.test(clientSrc),
+  '界面自己推断是否计入，和服务端判定会打架',
+)
+
 /* ---------------------------------------------- 汇总 */
 
 console.log(`\n${'─'.repeat(62)}`)
