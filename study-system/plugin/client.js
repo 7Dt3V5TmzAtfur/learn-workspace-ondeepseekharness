@@ -52,6 +52,11 @@ window.__ModuleLoader__.load({
   --sc-ref-fg:#0f766e;  --sc-ref-bg:#f0fdfa;  --sc-ref-line:#14b8a6;
   --sc-hl-pad:0 2px;
   --sc-lv-color:var(--dsw-alias-label-secondary);
+  /* 弹层：阅读区自己的明暗两套配色。
+   * 之前直接用 DSH 的通用令牌，深色主题下与阅读区不统一，用户看到"颜色不对"。 */
+  --sc-pop-bg:#ffffff;
+  --sc-pop-fg:#20242d;
+  --sc-pop-border:#d8dee8;
 }
 /* 深色必须单独给值。原来全部靠 rgba(x,.10) 叠在深色底上，
  * 实测深底 #2c2c2e 上 10% 蓝 ≈ #313a4a，几乎看不见。 */
@@ -59,6 +64,9 @@ body[data-ds-dark-theme] .sc-root{
   --sc-core-fg:#fdba74; --sc-core-bg:#3a2617; --sc-core-line:#f59e0b;
   --sc-hard-fg:#f0abfc; --sc-hard-bg:#3b1d3f; --sc-hard-line:#c026d3;
   --sc-ref-fg:#5eead4;  --sc-ref-bg:#12332f;  --sc-ref-line:#14b8a6;
+  --sc-pop-bg:#23262e;
+  --sc-pop-fg:#e6eaf2;
+  --sc-pop-border:#3a4252;
 }
 .sc-root{display:flex;flex-direction:column;height:100%;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font-size:var(--sc-fs-base)}
 .sc-head{display:flex;align-items:center;gap:var(--sc-sp-2);padding:10px var(--sc-sp-4);border-bottom:1px solid var(--dsw-alias-border-l1);flex:none}
@@ -175,7 +183,7 @@ body[data-ds-dark-theme] .sc-root{
 .sc-seg-role{position:absolute;left:2px;top:30px;width:36px;text-align:right;font-size:calc(10px * var(--sc-scale));font-weight:600;letter-spacing:.02em;opacity:.5;transition:opacity .15s;cursor:help;user-select:none}
 /* 悬停整段就显示角色全称：只挂在小标记上时，鼠标几乎不可能正好停在 36px 里。
  * 面板向上落在这段的上留白中，不遮挡正文。 */
-.sc-seg-role-full{display:none;position:absolute;left:44px;bottom:calc(100% + 4px);width:max-content;max-width:320px;padding:3px 8px;border:1px solid var(--dsw-alias-border-l1);border-radius:var(--sc-r-sm);background:var(--dsw-alias-bg-layer-2);color:var(--dsw-alias-label-primary);font-size:var(--sc-fs-xs);font-weight:400;line-height:1.6;white-space:normal;box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:6;pointer-events:none}
+.sc-seg-role-full{display:none;position:absolute;left:44px;bottom:calc(100% + 4px);width:max-content;max-width:320px;padding:3px 8px;border:1px solid var(--sc-pop-border);border-radius:var(--sc-r-sm);background:var(--sc-pop-bg);color:var(--sc-pop-fg);font-size:var(--sc-fs-xs);font-weight:400;line-height:1.6;white-space:normal;box-shadow:0 2px 8px rgba(0,0,0,.12);z-index:6;pointer-events:none}
 .sc-seg:hover .sc-seg-role-full,.sc-seg:focus-within .sc-seg-role-full{display:block}
 .sc-seg[data-tier=core] .sc-seg-role{color:var(--sc-core-fg)}
 .sc-seg[data-tier=hard] .sc-seg-role{color:var(--sc-hard-fg)}
