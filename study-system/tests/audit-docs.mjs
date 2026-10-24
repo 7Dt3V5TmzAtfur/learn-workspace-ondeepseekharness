@@ -158,14 +158,7 @@ check(
   `STAGES 里的名字有重复：${canonical.join(', ')}`,
 )
 
-// 界面不再自带阶段表：名字、顺序、判据、按钮文案全部来自宿主 /stages。
-// （曾经这里比对的是"界面兜底数组 vs STAGES"，但兜底数组本身就是第二份真相，
-//  它已经导致过漏掉 recalled、annotations 判据失效的问题。）
-check(
-  '客户端不自带阶段表（只读宿主 /stages）',
-  !/const STAGES = \[/.test(client) && /progressKey/.test(client),
-  'client.js 里又出现了本地 STAGES 数组，或没有使用宿主给的 progressKey',
-)
+// 阶段表相关的不变量搬到 audit-architecture.mjs（跨半身的结构约束）
 
 // 服务端的提示语不能自己写死旧名字
 const deadNames = ['读后自测', '费曼考核']

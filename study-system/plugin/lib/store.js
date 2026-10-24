@@ -213,6 +213,19 @@ export class StudyStore {
     return (await readJson(join(this.dir(docId), 'segments.json'), { items: [] })).items ?? []
   }
 
+  /**
+   * 段落正文（id → text），缺失文件时返回空 Map。
+   *
+   * 这是读正文的唯一入口。原来九处各自读 segment-texts.json、各自决定
+   * "缺正文时退到什么"，三种兜底同时存在：退到 60 字 lead、退到空串、原样返回。
+   * 改存储形态或补兜底要动九处，漏一处不会报错，只会静默改变行为。
+   */
+  async segmentTexts(docId) {
+    const doc = await this.artifact(docId, 'segment-texts.json').catch(() => null)
+    const items = Array.isArray(doc?.items) ? doc.items : []
+    return new Map(items.map((t) => [t.id, String(t.text ?? '')]))
+  }
+
   async sourceText(docId) {
     try {
       return await readFile(join(this.dir(docId), 'source.md'), 'utf8')

@@ -241,9 +241,7 @@ export class StudyService {
    */
   async project(docId, options = {}) {
     const project = await this.store.fullProject(docId)
-    const texts = new Map(
-      ((await this.store.artifact(docId, 'segment-texts.json'))?.items ?? []).map((t) => [t.id, t.text]),
-    )
+    const texts = await this.store.segmentTexts(docId)
     const imageBase = `/study-copilot/api/asset/${encodeURIComponent(docId)}/`
 
     const segments = project.segments.map((s) => {
@@ -470,9 +468,7 @@ export class StudyService {
    */
   async read(docId, options = {}) {
     const segments = await this.store.segments(docId)
-    const texts = new Map(
-      ((await this.store.artifact(docId, 'segment-texts.json'))?.items ?? []).map((t) => [t.id, t.text]),
-    )
+    const texts = await this.store.segmentTexts(docId)
     const offset = Math.max(0, Number(options.offset ?? 0))
     const limit = Math.min(Number(options.limit ?? 20), 100)
     const slice = segments.slice(offset, offset + limit)
@@ -502,9 +498,7 @@ export class StudyService {
     const segments = await this.store.segments(docId)
     // quote 校验需要段落正文，而 segments.json 只存了字数摘要，
     // 正文在 segment-texts.json 里，这里合并进来。
-    const texts = new Map(
-      ((await this.store.artifact(docId, 'segment-texts.json'))?.items ?? []).map((t) => [t.id, t.text]),
-    )
+    const texts = await this.store.segmentTexts(docId)
     const withText = segments.map((s) => ({ ...s, text: texts.get(s.id) ?? '' }))
     const totalChars = segments.reduce((a, s) => a + s.chars, 0)
     const check = validateAnnotation(items, { segments: withText, totalChars })
@@ -670,8 +664,8 @@ export class StudyService {
     let copiedRatio = 0
     let longestRun = 0
     try {
-      const texts = (await this.store.artifact(docId, 'segment-texts.json').catch(() => null))?.items ?? []
-      const source = texts.map((t) => String(t.text ?? '')).join('\n').replace(/[\s*`#>|]/g, '')
+      const texts = await this.store.segmentTexts(docId)
+      const source = [...texts.values()].join('\n').replace(/[\s*`#>|]/g, '')
       const mine = text.replace(/[\s*`#>|]/g, '')
       if (source.length >= 8 && mine.length >= 8) {
         const N = 8
@@ -892,12 +886,7 @@ export class StudyService {
    */
   async coverage(docId) {
     const segs = await this.store.segments(docId)
-    const texts = new Map(
-      ((await this.store.artifact(docId, 'segment-texts.json').catch(() => null))?.items ?? []).map((t) => [
-        t.id,
-        String(t.text ?? ''),
-      ]),
-    )
+    const texts = await this.store.segmentTexts(docId)
     const annotations = (await this.store.artifact(docId, 'annotations.json').catch(() => null))?.items ?? []
     const done = new Set(annotations.map((a) => a.segmentId))
 
@@ -1032,8 +1021,8 @@ export class StudyService {
     const meta = await this.store.meta(docId).catch(() => null)
     if (!meta) return null
     const units = await this.store.artifact(docId, 'units.json').catch(() => null)
-    const texts = (await this.store.artifact(docId, 'segment-texts.json').catch(() => null))?.items ?? []
-    const textOf = new Map(texts.map((t) => [t.id, String(t.text ?? '')]))
+    const textOf = await this.store.segmentTexts(docId)
+    const ids = [...textOf.keys()]
 
     const list = units?.units ?? []
     // 没有单元的小资料（短文章、笔记）：把整篇当成一块，
@@ -1041,7 +1030,7 @@ export class StudyService {
     const pseudo =
       list.length > 0
         ? null
-        : [{ id: texts[0]?.id ?? '¶1', title: meta.title ?? docId, level: 1, segmentIds: texts.map((t) => t.id), chars: meta.chars ?? 0 }]
+        : [{ id: ids[0] ?? '¶1', title: meta.title ?? docId, level: 1, segmentIds: ids, chars: meta.chars ?? 0 }]
     const blocks = list.length > 0 ? list : pseudo ?? []
     // 只取前两层标题当目录：再细分就不是"预览"了
     const outline =
@@ -1053,10 +1042,10 @@ export class StudyService {
         : // 没跑过切块的小资料，直接从段落里认标题。
           // 不认的话 8 段带三个小标题的文章会显示"1 块、目录为空"，
           // 等于没回答"这是什么形状"——而那正是预览的主要用途。
-          texts
-            .map((t) => {
-              const m = /^(#{1,3})\s+(.+)$/.exec(String(t.text ?? '').trim())
-              return m ? { title: m[2].trim(), level: m[1].length, segId: t.id } : null
+          ids
+            .map((id) => {
+              const m = /^(#{1,3})\s+(.+)$/.exec(String(textOf.get(id) ?? '').trim())
+              return m ? { title: m[2].trim(), level: m[1].length, segId: id } : null
             })
             .filter(Boolean)
             .slice(0, 8)
@@ -1109,8 +1098,8 @@ export class StudyService {
     // 没有单元的小资料只有一个 pseudo block，从"最后一块"往前找会立刻撞到开头那段，
     // 于是结尾抓手和开头一模一样。这里按真实段落顺序扫，才找得到真正的收尾。
     const lastSentence = () => {
-      for (let i = texts.length - 1; i >= 0; i -= 1) {
-        const got = sentenceIn(texts[i].id)
+      for (let i = ids.length - 1; i >= 0; i -= 1) {
+        const got = sentenceIn(ids[i])
         if (got) return got
       }
       return null
@@ -1311,9 +1300,8 @@ export class StudyService {
     if (!clean) throw new Error('缺少要追问的词')
     let context = ''
     if (segmentId) {
-      const texts = (await this.store.artifact(docId, 'segment-texts.json').catch(() => null))?.items ?? []
-      const hit = texts.find((t) => t.id === segmentId)
-      context = hit?.text ?? ''
+      const texts = await this.store.segmentTexts(docId)
+      context = texts.get(segmentId) ?? ''
     }
     const record = {
       id: `t-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
@@ -1378,9 +1366,7 @@ export class StudyService {
 
   async render(docId) {
     const segments = await this.store.segments(docId)
-    const texts = new Map(
-      ((await this.store.artifact(docId, 'segment-texts.json'))?.items ?? []).map((t) => [t.id, t.text]),
-    )
+    const texts = await this.store.segmentTexts(docId)
     const withText = segments.map((s) => ({ ...s, text: texts.get(s.id) ?? s.lead ?? '' }))
     const annotations = await this.store.artifact(docId, 'annotations.json')
     return renderAnnotatedHtml(withText, annotations)
@@ -1437,9 +1423,7 @@ export class StudyService {
 
   async renderAnnotatedMarkdown(docId, segments, items) {
     const byId = new Map(items.map((it) => [it.segmentId, it]))
-    const texts = new Map(
-      ((await this.store.artifact(docId, 'segment-texts.json'))?.items ?? []).map((t) => [t.id, t.text]),
-    )
+    const texts = await this.store.segmentTexts(docId)
     const out = []
     for (const seg of segments) {
       const a = byId.get(seg.id)

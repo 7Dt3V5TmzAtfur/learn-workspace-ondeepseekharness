@@ -20,6 +20,7 @@ const SUITES = [
   ['audit-skills.mjs', '技能文档约束'],
   ['audit-requirements.mjs', '用户需求逐条'],
   ['audit-docs.mjs', '文档与代码一致'],
+  ['audit-architecture.mjs', '架构不变量'],
   ['audit-styles.mjs', '样式与变量'],
   ['check-render.mjs', 'Markdown 渲染'],
 ]
