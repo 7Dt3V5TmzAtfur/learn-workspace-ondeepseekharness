@@ -3,7 +3,11 @@
  * 运行：node tests/audit-ui.mjs [docId]
  */
 import { readFileSync, existsSync } from 'node:fs'
-import { join } from 'node:path'
+import { join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+// 仓库根从文件位置推，不写死盘符：换台机器/换目录不该整套测试连不上
+const ROOT = dirname(dirname(fileURLToPath(import.meta.url)))
 
 const WS = 'D:\\learn'
 // 端口每次启动可能不同，别写死（写死过一次，整套测试因为连不上而全红）
@@ -183,15 +187,11 @@ for (const f of figures) {
   check('没有节点被画进多张图', dup.length === 0, `重复：${dup.map(([id]) => id).slice(0, 5).join(', ')}`)
 }
 
-// 界面必须用 iframe 嵌 archify 的 HTML，不能自己画
-const uiSrc = readFileSync(join('D:', 'learn', 'study-system', 'plugin', 'client.js'), 'utf8')
-const gpStart = uiSrc.indexOf('function GraphPane')
-const gpEnd = uiSrc.indexOf('function QuizPane')
-if (gpStart >= 0 && gpEnd > gpStart) {
-  const graphPaneCode = uiSrc.slice(gpStart, gpEnd)
-  check('图谱页用 iframe 嵌入 archify HTML', /iframe/.test(graphPaneCode), '必须嵌 archify 生成的页面')
-  check('图谱页不再自己画 SVG', !/createElementNS/.test(graphPaneCode), '手搓 SVG 的方案已被用户否决')
-}
+// 界面必须用 iframe 嵌 archify 的 HTML，不能自己画。
+// 不按函数名切片：切片依赖文件内的函数顺序，挪一个函数就整段失效（而且不报错）。
+const uiSrc = readFileSync(join(ROOT, 'plugin', 'client.js'), 'utf8')
+check('图谱页用 iframe 嵌入 archify HTML', /h\('iframe'/.test(uiSrc), '必须嵌 archify 生成的页面')
+check('界面不再手搓 SVG', !/createElementNS/.test(uiSrc), '手搓 SVG 的方案已被用户否决')
 
 /* ---------------------------------------------- 4. 资源可达性 */
 
@@ -243,7 +243,7 @@ check('资源路由挡住路径穿越', leaked === 0, `${leaked} 个穿越请求
 
 console.log('\n5. 交互实现：客户端代码是否真的做对了')
 
-const clientSrc = readFileSync(join('D:', 'learn', 'study-system', 'plugin', 'client.js'), 'utf8')
+const clientSrc = readFileSync(join(ROOT, 'plugin', 'client.js'), 'utf8')
 
 check(
   '选区取值用 toString()（不是 String(selection)）',
@@ -357,7 +357,7 @@ console.log('\n9. 第一性原理：反完成主义（原则/反完成主义阅�
 
 // 这一节防的是"看起来完工、实际没用"：
 // 覆盖率 100% 但全是碎片，界面很满但一个点都没记住。
-const serviceSrc = readFileSync(join('D:', 'learn', 'study-system', 'plugin', 'lib', 'service.js'), 'utf8')
+const serviceSrc = readFileSync(join(ROOT, 'plugin', 'lib', 'service.js'), 'utf8')
 
 check(
   '主指标是"拿到了什么"而不是"完成了多少"',
@@ -506,9 +506,9 @@ check(
   '各部分若与主段同级，就分不出从属关系',
 )
 check(
-  '降级渲染的兜底也用同一个层级',
-  /h\('h2', \{ className: 'sc-pf-h' \}/.test(clientSrc),
-  '主路径用 h2、兜底用 h3，两种情况下结构不一致',
+  '六段式只有一份渲染实现',
+  !/function FallbackPreflight/.test(clientSrc),
+  '第二套渲染器会与宿主那份漂移；降级只摊原始数据，不再复刻六段',
 )
 check(
   '档位与标题之间有足够间距',

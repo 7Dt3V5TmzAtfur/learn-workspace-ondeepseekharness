@@ -516,8 +516,42 @@ body[data-ds-dark-theme] .sc-root{
 
     /* ------------------------------------------------------------ 数据 */
 
+    /**
+     * 当前资料库（工作区）。
+     *
+     * 只有一个来源：Workbench 解析出的 wsPath（含手动指定）。DockBar、RecallPane
+     * 这些拿不到 wsPath 的组件以前干脆不传，读的是"默认工作区"——用户切过目录后，
+     * 它们在另一处取数。现在由这一层记住，调用点不必各自拼 ws。
+     */
+    let currentWorkspace = null
+    const workspaceListeners = new Set()
+
+    function setCurrentWorkspace(ws) {
+      const next = ws || null
+      if (next === currentWorkspace) return
+      currentWorkspace = next
+      workspaceListeners.forEach((fn) => fn(next))
+    }
+
+    function useCurrentWorkspace() {
+      const [ws, setWs] = useState(currentWorkspace)
+      useEffect(() => {
+        const listener = (v) => setWs(v)
+        workspaceListeners.add(listener)
+        setWs(currentWorkspace)
+        return () => workspaceListeners.delete(listener)
+      }, [])
+      return ws
+    }
+
+    function apiUrl(path) {
+      const needWs = currentWorkspace && !/[?&]ws=/.test(path)
+      const glue = path.includes('?') ? '&' : '?'
+      return `${API}${path}${needWs ? `${glue}ws=${encodeURIComponent(currentWorkspace)}` : ''}`
+    }
+
     async function api(path, init) {
-      const res = await fetch(`${API}${path}`, {
+      const res = await fetch(apiUrl(path), {
         headers: { 'content-type': 'application/json' },
         ...init,
       })
@@ -526,7 +560,28 @@ body[data-ds-dark-theme] .sc-root{
       return body
     }
 
-    const q = (ws) => (ws ? `?ws=${encodeURIComponent(ws)}` : '')
+    /** 上传一份资料：URL 与错误文案只在这里出现一次。 */
+    async function apiUpload(file) {
+      const res = await fetch(apiUrl(`/ingest-upload?name=${encodeURIComponent(file.name)}`), {
+        method: 'POST',
+        body: file,
+      })
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.error ?? `导入失败（${res.status}）`)
+      return body
+    }
+
+    /** 让宿主发起一个阶段：错误语义与 URL 也只在这里出现一次。 */
+    async function apiRunStage(docId, stageKey) {
+      const res = await fetch(apiUrl('/run-stage'), {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ docId, stage: stageKey }),
+      })
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.error ?? `没能发起（${res.status}）`)
+      return body
+    }
 
     /**
      * 面板崩了要留下现场，而不是一片空白。
@@ -679,7 +734,7 @@ body[data-ds-dark-theme] .sc-root{
      * 只该看到那个框。
      */
     function Entry(props) {
-      const { onImported, onAsk, busyHint, workspace } = props
+      const { onImported, onAsk, busyHint } = props
       const [dragOver, setDragOver] = useState(false)
       const [pathInput, setPathInput] = useState('')
       // 只有一个布尔量。原来还多一个 stage='done'，但它从来没被读过 ——
@@ -696,14 +751,8 @@ body[data-ds-dark-theme] .sc-root{
           setErr(null)
           setBusy(true)
           try {
-            const res = await fetch(
-              `${API}/ingest-upload?name=${encodeURIComponent(file.name)}${workspace ? `&ws=${encodeURIComponent(workspace)}` : ''}`,
-              { method: 'POST', body: file },
-            )
-            const body = await res.json().catch(() => ({}))
-            if (!res.ok) throw new Error(body.error ?? `导入失败（${res.status}）`)
-            // 交给上层去显示预览；这里不自己切状态
-            onImported?.(body)
+            // URL、工作区、错误文案都在 apiUpload 里，这里只关心结果
+            onImported?.(await apiUpload(file))
           } catch (e) {
             setErr(e.message)
           } finally {
@@ -719,7 +768,7 @@ body[data-ds-dark-theme] .sc-root{
         setErr(null)
         setBusy(true)
         try {
-          const body = await api(`/ingest${q(workspace)}`, { method: 'POST', body: JSON.stringify({ path: p }) })
+          const body = await api('/ingest', { method: 'POST', body: JSON.stringify({ path: p }) })
           setPathInput('')
           onImported?.(body)
         } catch (e) {
@@ -1003,13 +1052,20 @@ body[data-ds-dark-theme] .sc-root{
         )
       }
 
-      // 宿主没给 HTML 时的降级：仍要六段齐全，缺哪段就明说缺
+      /**
+       * 宿主没给 HTML 时的降级。
+       *
+       * 这里曾经有第二套六段渲染器，靠 audit-ui 比对两边标题层级来防漂移——
+       * 两份实现守一个契约，改一边就不同步。现在只把原始数据摊开：
+       * 丑，但不会说谎，也不会长成第二个真值。
+       */
       if (!project.preflightHtml) {
         return h(
           'div',
           null,
           h(IssueList, { issues: plan.check?.issues }),
-          h(FallbackPreflight, { plan }),
+          h('div', { className: 'sc-muted', style: { marginTop: 8 } }, '宿主没有返回渲染结果，下面是原始数据：'),
+          h('pre', { className: 'sc-pre' }, JSON.stringify(plan, null, 2)),
         )
       }
 
@@ -1084,131 +1140,6 @@ body[data-ds-dark-theme] .sc-root{
     }
 
     /** 降级渲染：宿主没给 preflightHtml 时用的兜底，六段都要有。 */
-    function FallbackPreflight({ plan }) {
-      const md = (t) => h('div', { style: { whiteSpace: 'pre-wrap', lineHeight: 1.8 } }, String(t ?? '—'))
-      const sec = (num, title, body) =>
-        h(
-          'section',
-          { className: 'sc-pf-sec' },
-          h('h2', { className: 'sc-pf-h' }, `${num}　${title}`),
-          h('div', { className: 'sc-pf-body' }, body),
-        )
-      const parts = plan.parts ?? []
-      return h(
-        'div',
-        { className: 'sc-pf' },
-        sec('①', '资料摘要', md(plan.summary)),
-        sec(
-          '②',
-          '对我的帮助与目标',
-          h(
-            'div',
-            { className: 'sc-kv' },
-            h('span', null, '对我的帮助'), md(plan.goals?.help),
-            h('span', null, '总目标'), md(plan.goals?.main),
-            h('span', null, '子目标'), md((plan.goals?.subgoals ?? []).map((s) => (typeof s === 'string' ? s : s.text)).join('\n')),
-          ),
-        ),
-        sec(
-          '③',
-          '每一部分的目标、要求、重点、难点',
-          parts.length
-            ? h(
-                'div',
-                null,
-                parts.map((p, i) =>
-                  h(
-                    'div',
-                    { className: 'sc-part', key: i },
-                    h('h3', null, p.title ?? `第 ${i + 1} 部分`),
-                    h('div', { className: 'sc-kv2' }, h('span', { className: 'sc-kv2-k' }, '重点'), h('div', { className: 'sc-kv2-v' }, md((p.keyPoints ?? []).join('\n')))),
-                    h('div', { className: 'sc-kv2' }, h('span', { className: 'sc-kv2-k' }, '难点'), h('div', { className: 'sc-kv2-v' }, md((p.difficulties ?? []).join('\n')))),
-                  ),
-                ),
-              )
-            : h('div', { className: 'sc-muted' }, '（还没有分部分内容）'),
-        ),
-        sec(
-          '④',
-          '每一部分的考核方式与知识点',
-          parts.length
-            ? h(
-                'div',
-                null,
-                parts.map((p, i) =>
-                  h(
-                    'div',
-                    { className: 'sc-part', key: i },
-                    h('h3', null, p.title ?? `第 ${i + 1} 部分`, h('span', { className: 'sc-lv', 'data-lv': p.assessment?.level ?? '' }, p.assessment?.level ?? '—')),
-                    p.assessment?.requirement ? h('div', { className: 'sc-req' }, p.assessment.requirement) : null,
-                    (p.knowledgePoints ?? []).map((kp, j) =>
-                      h(
-                        'div',
-                        { className: 'sc-kp', key: j },
-                        h('div', { className: 'sc-kp-h' }, `知识点 ${j + 1}　${kp.name ?? ''}`),
-                        h('div', { className: 'sc-kp-b' }, md(kp.content)),
-                        kp.note ? h('div', { className: 'sc-kp-note' }, `备注：${kp.note}`) : null,
-                      ),
-                    ),
-                  ),
-                ),
-              )
-            : h('div', { className: 'sc-muted' }, '（还没有考核要求）'),
-        ),
-        sec(
-          '⑤',
-          '思考题与作业',
-          (plan.exercises ?? []).length
-            ? h(
-                'div',
-                null,
-                h(
-                  'div',
-                  { className: 'sc-muted', style: { marginBottom: 8, lineHeight: 1.7 } },
-                  '题目只有这一份。读完来这里挑一道，合上书讲一遍——「读后考核」负责判卷，不另存题库。',
-                ),
-                h(
-                  'ol',
-                  { className: 'sc-ex-list' },
-                  plan.exercises.map((ex, i) =>
-                    h(
-                      'li',
-                      { className: 'sc-ex', key: i },
-                      h('div', { className: 'sc-ex-q' }, ex.question ?? ''),
-                      // 达标要点与最小行动本来只落在 quiz.md 里，界面上看不到，
-                      // 于是考核页又去渲染了一遍 quiz.md —— 重复就从这里开始。
-                      // 现在它们跟着题目走，考核页只负责判卷。
-                      ex.kind ? h('div', { className: 'sc-muted', style: { marginTop: 4 } }, `类型：${ex.kind}`) : null,
-                      (ex.rubric ?? []).length
-                        ? h('div', { className: 'sc-muted' }, `达标要点：${ex.rubric.join('；')}`)
-                        : null,
-                      ex.minimalAction ? h('div', { className: 'sc-muted' }, `最小行动：${ex.minimalAction}`) : null,
-                    ),
-                  ),
-                ),
-              )
-            : h('div', { className: 'sc-muted' }, '（还没有思考题）'),
-        ),
-        sec(
-          '⑥',
-          '参考资料',
-          (plan.references ?? []).length
-            ? h(
-                'ol',
-                { className: 'sc-ref-list' },
-                plan.references.map((r, i) =>
-                  h(
-                    'li',
-                    { className: 'sc-ref', key: i },
-                    h('span', { className: 'sc-ref-kind', 'data-kind': r.kind ?? '我的知识' }, r.kind ?? '我的知识'),
-                    h('div', { className: 'sc-ref-body' }, r.title ?? r.name ?? '', r.note ? h('div', { className: 'sc-ref-note' }, r.note) : null),
-                  ),
-                ),
-              )
-            : h('div', { className: 'sc-muted' }, '（还没有参考资料）'),
-        ),
-      )
-    }
 
     /* -------------------------------------------------------- 精读面板 */
 
@@ -1222,7 +1153,7 @@ body[data-ds-dark-theme] .sc-root{
      * 早期版本按段落套 class 整段变色，导致"每段都是一块颜色"、
      * 注意力机制完全失效；现在高亮是短语级的。
      */
-    function ReadingPane({ project, onAsk, onLocate, workspace, jumpTo, onJumped }) {
+    function ReadingPane({ project, onAsk, onLocate, jumpTo, onJumped }) {
       const [sel, setSel] = useState(null)
       const [selText, setSelText] = useState('')
       const [onlyAnnotated, setOnlyAnnotated] = useState(false)
@@ -1443,7 +1374,6 @@ body[data-ds-dark-theme] .sc-root{
           const r = await api('/term', {
             method: 'POST',
             body: JSON.stringify({
-              workspace,
               docId: project.id,
               term: word,
               segmentId,
@@ -1467,12 +1397,12 @@ body[data-ds-dark-theme] .sc-root{
         let alive = true
         const tick = async () => {
           try {
-            const r = await api(`/terms-pending/${encodeURIComponent(project.id)}${q(workspace)}`)
+            const r = await api(`/terms-pending/${encodeURIComponent(project.id)}`)
             const items = r?.items ?? []
             if (!alive) return
             // 这条已经不在待答列表里了 → 说明被答过，去拿全量找到它
             if (!items.some((it) => it.term === answer.word)) {
-              const p = await api(`/project/${encodeURIComponent(project.id)}${q(workspace)}`)
+              const p = await api(`/project/${encodeURIComponent(project.id)}`)
               if (!alive) return
               const hit = [...(p.terms ?? [])]
                 .reverse()
@@ -1491,7 +1421,7 @@ body[data-ds-dark-theme] .sc-root{
           alive = false
           window.clearInterval(timer)
         }
-      }, [answer?.pending, answer?.word, project.id, workspace])
+      }, [answer?.pending, answer?.word, project.id])
 
       // 语音识别的实例要留住，否则"聆听中"无法停止，用户只能等它自己超时
       const recRef = useRef(null)
@@ -2500,15 +2430,24 @@ body[data-ds-dark-theme] .sc-root{
      * 客户端取 remote.session 需要注入嵌套服务，实测取不到；
      * 宿主侧 agent.followup() 才是给插件用的正规入口。
      */
-    async function requestStage(docId, stageKey) {
-      const res = await fetch(`${API}/run-stage`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ docId, stage: stageKey }),
-      })
-      const body = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(body.error ?? `没能发起（${res.status}）`)
-      return body
+    /**
+     * 等某个阶段的产物出现。返回最新的 project，等不到返回 null。
+     *
+     * 这段循环原来内联在点击回调里：超时、间隔、判据、异常处理全挤在按钮后面，
+     * 想改"等多久"得先读完整段 UI 代码。抽出来之后，按钮只管文案与状态。
+     */
+    async function waitForStage(docId, stage, { timeoutMs = 240000, intervalMs = 2000 } = {}) {
+      const startedAt = Date.now()
+      while (Date.now() - startedAt < timeoutMs) {
+        await new Promise((r) => setTimeout(r, intervalMs))
+        try {
+          const next = await api(`/project/${encodeURIComponent(docId)}`)
+          if (next?.progress?.[stage.progressKey]) return next
+        } catch {
+          /* 单次查询失败不该终止等待 */
+        }
+      }
+      return null
     }
 
     /** 阶段操作条：五个页签同一位置。重做用就地二次确认，不弹窗。 */
@@ -2734,6 +2673,10 @@ body[data-ds-dark-theme] .sc-root{
         reportError({ kind: 'mount', message: 'Workbench mounted' })
       }, [])
 
+      // 先把这个工作区告诉 api 层：后面的请求（含 DockBar / ReadingPane）都读它。
+      // 放在 refresh 之前，保证首次拉列表时已经生效。
+      useEffect(() => setCurrentWorkspace(wsPath), [wsPath])
+
       // 第一次列目录时自动选中第一份，省得用户面对空白。
       // 但"刚导入了一份"这种情况不能这么办：refresh 时 docId 还是 null，
       // 自动选中会挑到列表第一项（很可能是另一份旧资料），
@@ -2742,7 +2685,7 @@ body[data-ds-dark-theme] .sc-root{
       const refresh = useCallback(
         async (preferId) => {
           try {
-            const data = await api(`/projects${q(wsPath)}`)
+            const data = await api('/projects')
             // 后端在发现“别的目录里有项目”时会给出 suggested，直接采用并记住
             if (!manualWs && data.suggested && data.suggested !== wsPath) {
               setManualWs(data.suggested)
@@ -2778,7 +2721,7 @@ body[data-ds-dark-theme] .sc-root{
           if (!out?.docId) return refresh()
           refresh(out.docId)
           try {
-            const p = await api(`/peek/${encodeURIComponent(out.docId)}${q(wsPath)}`)
+            const p = await api(`/peek/${encodeURIComponent(out.docId)}`)
             setPreview({ docId: out.docId, peek: p.peek })
           } catch {
             // 预览拿不到不该拦住用户：正文已经能看了
@@ -2806,13 +2749,7 @@ body[data-ds-dark-theme] .sc-root{
           setBusy(true)
           setError(null)
           try {
-            const res = await fetch(
-              `${API}/ingest-upload?name=${encodeURIComponent(file.name)}${wsPath ? `&ws=${encodeURIComponent(wsPath)}` : ''}`,
-              { method: 'POST', body: file },
-            )
-            const body = await res.json().catch(() => ({}))
-            if (!res.ok) throw new Error(body.error ?? `导入失败（${res.status}）`)
-            await handleImported(body)
+            await handleImported(await apiUpload(file))
           } catch (e) {
             setError(e.message)
           } finally {
@@ -2837,7 +2774,7 @@ body[data-ds-dark-theme] .sc-root{
         setError(null)
         setPathError(null)
         try {
-          const out = await api(`/ingest${q(wsPath)}`, {
+          const out = await api('/ingest', {
             method: 'POST',
             body: JSON.stringify({ path: p }),
           })
@@ -2864,25 +2801,12 @@ body[data-ds-dark-theme] .sc-root{
           setStageBusy(stage.key)
           setError(null)
           try {
-            await requestStage(docId, stage.key)
-            const startedAt = Date.now()
-            let finished = false
-            while (Date.now() - startedAt < 240000) {
-              await new Promise((r) => setTimeout(r, 2000))
-              let next = null
-              try {
-                next = await api(`/project/${encodeURIComponent(docId)}${q(wsPath)}`)
-              } catch {
-                continue
-              }
-              if (next?.progress?.[stage.progressKey]) {
-                setProject(next)
-                setReloadTick((n) => n + 1)
-                finished = true
-                break
-              }
-            }
-            if (!finished) {
+            await apiRunStage(docId, stage.key)
+            const next = await waitForStage(docId, stage)
+            if (next) {
+              setProject(next)
+              setReloadTick((n) => n + 1)
+            } else {
               setError(`已把「${stage.name}」发给 Agent，但 4 分钟内没等到产物。它可能还在跑，去对话里看一眼。`)
             }
           } catch (e) {
@@ -2906,7 +2830,7 @@ body[data-ds-dark-theme] .sc-root{
           return
         }
         let alive = true
-        api(`/project/${encodeURIComponent(docId)}${q(wsPath)}`)
+        api(`/project/${encodeURIComponent(docId)}`)
           .then((data) => alive && setProject(data))
           .catch((e) => alive && setError(e.message))
         return () => {
@@ -2924,7 +2848,7 @@ body[data-ds-dark-theme] .sc-root{
               method: 'POST',
               body: JSON.stringify({ docId, term, segmentId, source: 'ui' }),
             })
-            const data = await api(`/project/${encodeURIComponent(docId)}${q(wsPath)}`)
+            const data = await api(`/project/${encodeURIComponent(docId)}`)
             setProject(data)
             // 注意：这里不再 setTab('quiz')。用户正在读，追问后应该留在原地，
             // 答案由 ReadingPane 就地显示；跳到别的页签会打断阅读。
@@ -3295,7 +3219,6 @@ body[data-ds-dark-theme] .sc-root{
                             key: 'read',
                             project,
                             onAsk: ask,
-                            workspace: wsPath,
                             jumpTo,
                             onJumped: () => setJumpTo(null),
                           }),
@@ -3323,7 +3246,6 @@ body[data-ds-dark-theme] .sc-root{
                   )
                 : h(Entry, {
                     busyHint: '正在读这份资料…',
-                    workspace: wsPath,
                     // 与资料库菜单共用同一段收尾：刷新 → 选中新项目 → 30 秒预览
                     onImported: handleImported,
                     onAsk: () => {
@@ -3361,10 +3283,10 @@ body[data-ds-dark-theme] .sc-root{
 
     /* ------------------------------------------------------ 输入框停靠条 */
 
-    function DockBar(props) {
-      const { useWorkspaces } = props
-      const snapshot = useWorkspaces ? useWorkspaces((s) => s) : null
-      const wsPath = snapshot?.workspaces?.[0]?.path ?? null
+    function DockBar() {
+      // 工作区只有一个来源（Workbench 解析出的那个），这里只订阅变化。
+      // 以前自己取 workspaces[0]，手动指定过目录后，停靠条和面板会指向两处。
+      const wsPath = useCurrentWorkspace()
       const [current, setCurrent] = useState(null)
       const [stages, setStages] = useState(null)
 
@@ -3380,7 +3302,7 @@ body[data-ds-dark-theme] .sc-root{
 
       useEffect(() => {
         let alive = true
-        api(`/projects${q(wsPath)}`)
+        api('/projects')
           .then((d) => alive && setCurrent(d.items?.[0] ?? null))
           .catch(() => {})
         return () => {
