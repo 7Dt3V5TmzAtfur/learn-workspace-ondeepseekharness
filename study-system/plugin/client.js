@@ -47,18 +47,18 @@ window.__ModuleLoader__.load({
   /* 圆角 */
   --sc-r-sm:4px; --sc-r-md:8px; --sc-r-lg:12px;
   /* 三色注意力（浅色主题） */
-  --sc-core-fg:#b45309; --sc-core-bg:#fff7ed; --sc-core-line:#f59e0b; --sc-core-row:rgba(245,158,11,.09);
-  --sc-hard-fg:#a21caf; --sc-hard-bg:#fdf4ff; --sc-hard-line:#c026d3; --sc-hard-row:rgba(192,38,211,.08);
-  --sc-ref-fg:#0f766e;  --sc-ref-bg:#f0fdfa;  --sc-ref-line:#14b8a6; --sc-ref-row:rgba(20,184,166,.07);
+  --sc-core-fg:#b45309; --sc-core-bg:#fff7ed; --sc-core-line:#f59e0b;
+  --sc-hard-fg:#a21caf; --sc-hard-bg:#fdf4ff; --sc-hard-line:#c026d3;
+  --sc-ref-fg:#0f766e;  --sc-ref-bg:#f0fdfa;  --sc-ref-line:#14b8a6;
   --sc-hl-pad:0 2px;
   --sc-lv-color:var(--dsw-alias-label-secondary);
 }
 /* 深色必须单独给值。原来全部靠 rgba(x,.10) 叠在深色底上，
  * 实测深底 #2c2c2e 上 10% 蓝 ≈ #313a4a，几乎看不见。 */
 body[data-ds-dark-theme] .sc-root{
-  --sc-core-fg:#fdba74; --sc-core-bg:#3a2617; --sc-core-line:#f59e0b; --sc-core-row:rgba(245,158,11,.14);
-  --sc-hard-fg:#f0abfc; --sc-hard-bg:#3b1d3f; --sc-hard-line:#c026d3; --sc-hard-row:rgba(192,38,211,.14);
-  --sc-ref-fg:#5eead4;  --sc-ref-bg:#12332f;  --sc-ref-line:#14b8a6; --sc-ref-row:rgba(20,184,166,.12);
+  --sc-core-fg:#fdba74; --sc-core-bg:#3a2617; --sc-core-line:#f59e0b;
+  --sc-hard-fg:#f0abfc; --sc-hard-bg:#3b1d3f; --sc-hard-line:#c026d3;
+  --sc-ref-fg:#5eead4;  --sc-ref-bg:#12332f;  --sc-ref-line:#14b8a6;
 }
 .sc-root{display:flex;flex-direction:column;height:100%;background:var(--dsw-alias-bg-base);color:var(--dsw-alias-label-primary);font-size:var(--sc-fs-base)}
 .sc-head{display:flex;align-items:center;gap:var(--sc-sp-2);padding:10px var(--sc-sp-4);border-bottom:1px solid var(--dsw-alias-border-l1);flex:none}
@@ -607,6 +607,60 @@ body[data-ds-dark-theme] .sc-root{
         scaleListeners.add(listener)
         setValue(currentScale)
         return () => scaleListeners.delete(listener)
+      }, [])
+      return value
+    }
+
+    /**
+     * 项目列表版本号。Workbench 刷新列表后通知 DockBar 重取，
+     * 否则导入新资料后停靠条仍显示旧的第一项。
+     */
+    const projectsListeners = new Set()
+
+    function bumpProjects() {
+      projectsListeners.forEach((fn) => fn())
+    }
+
+    function useProjectsTick() {
+      const [tick, setTick] = useState(0)
+      useEffect(() => {
+        const listener = () => setTick((n) => n + 1)
+        projectsListeners.add(listener)
+        return () => projectsListeners.delete(listener)
+      }, [])
+      return tick
+    }
+
+    /**
+     * 阶段表：/stages 只取一次，Workbench 与 DockBar 共用。
+     * 以前两处各取一次，断网时还会各自失败一次。
+     */
+    let stagesCache = null
+    const stageListeners = new Set()
+
+    function ensureStages() {
+      if (stagesCache) return Promise.resolve(stagesCache)
+      return api('/stages')
+        .then((d) => {
+          stagesCache = Array.isArray(d?.stages) ? d.stages : []
+          stageListeners.forEach((fn) => fn(stagesCache))
+          return stagesCache
+        })
+        .catch(() => {
+          stagesCache = []
+          stageListeners.forEach((fn) => fn(stagesCache))
+          return stagesCache
+        })
+    }
+
+    function useStages() {
+      const [value, setValue] = useState(stagesCache)
+      useEffect(() => {
+        const listener = (v) => setValue(v)
+        stageListeners.add(listener)
+        if (!stagesCache) ensureStages()
+        else setValue(stagesCache)
+        return () => stageListeners.delete(listener)
       }, [])
       return value
     }
@@ -1452,7 +1506,8 @@ body[data-ds-dark-theme] .sc-root{
           })
           const prompt = `在《${project.title ?? project.id}》${segmentId ?? ''} 这段里，「${word}」是什么意思？请结合上下文解释，不要只给字典释义。`
           setAnswer({ word, segmentId, prompt, pending: true, context: r?.context ?? '' })
-          if (onAsk) onAsk(word, segmentId)
+          // 只通知父级同步列表；写入已经在上面完成，父级不再重复 POST
+          onAsk?.()
         } catch (e) {
           setAnswer({ word, text: `追问失败：${e.message}`, error: true })
         } finally {
@@ -2779,6 +2834,7 @@ body[data-ds-dark-theme] .sc-root{
               return
             }
             setProjects(data.items ?? [])
+            bumpProjects()
             setDiag({
               workspace: data.workspace,
               requested: data.requested,
@@ -2789,12 +2845,13 @@ body[data-ds-dark-theme] .sc-root{
             if (data.candidates) setCandidates(data.candidates.filter((c) => c.count > 0))
             setError(null)
             if (preferId) setDocId(preferId)
-            else if (!docId && data.items?.length) setDocId(data.items[0].id)
+            else if (!docIdRef.current && data.items?.length) setDocId(data.items[0].id)
           } catch (e) {
             setError(e.message)
           }
         },
-        [wsPath, docId, manualWs, setManualWs],
+        // 不依赖 docId：否则每选一份资料都会把整个列表再拉一遍
+        [wsPath, manualWs, setManualWs],
       )
 
       /**
@@ -2826,7 +2883,11 @@ body[data-ds-dark-theme] .sc-root{
       const menuFileRef = useRef(null)
       const [stageBusy, setStageBusy] = useState(null)
       // 阶段跑完后要把详情重新拉一次；docId 没变，靠这个记号触发 effect
-      const [reloadTick, setReloadTick] = useState(0)
+      // refresh 需要读最新的 docId，但不该把它写进依赖（写进去就会每选一份资料重拉全表）
+      const docIdRef = useRef(null)
+      useEffect(() => {
+        docIdRef.current = docId
+      }, [docId])
 
       const closeMenu = useCallback(() => setMenu(null), [])
 
@@ -2891,8 +2952,8 @@ body[data-ds-dark-theme] .sc-root{
             await apiRunStage(docId, stage.key)
             const next = await waitForStage(docId, stage)
             if (next) {
+              // waitForStage 返回的就是最新 /project，无需再触发一次拉取
               setProject(next)
-              setReloadTick((n) => n + 1)
             } else {
               setError(`已把「${stage.name}」发给 Agent，但 4 分钟内没等到产物。它可能还在跑，去对话里看一眼。`)
             }
@@ -2923,18 +2984,18 @@ body[data-ds-dark-theme] .sc-root{
         return () => {
           alive = false
         }
-        // reloadTick：阶段刚跑完时 docId 没变，靠它把详情重新拉一次
-      }, [docId, wsPath, reloadTick])
+      }, [docId, wsPath])
 
+      /**
+       * 追问的写入由 ReadingPane 完成（它要用返回的 context），这里只把最新的 terms 拉回来。
+       * 以前两处各 POST 一次：同一次点击产生两条待答记录，而"不在待答列表里才算答完"
+       * 的判据因为第二条一直挂着，答案永远不会显示。
+       */
       const ask = useCallback(
-        async (term, segmentId) => {
-          if (!term || !docId) return
+        async () => {
+          if (!docId) return
           setBusy(true)
           try {
-            await api('/term', {
-              method: 'POST',
-              body: JSON.stringify({ docId, term, segmentId, source: 'ui' }),
-            })
             const data = await api(`/project/${encodeURIComponent(docId)}`)
             setProject(data)
             // 注意：这里不再 setTab('quiz')。用户正在读，追问后应该留在原地，
@@ -2945,7 +3006,7 @@ body[data-ds-dark-theme] .sc-root{
             setBusy(false)
           }
         },
-        [docId, wsPath],
+        [docId],
       )
 
       /* Tab 顺序 = 学习流程顺序。
@@ -2960,16 +3021,8 @@ body[data-ds-dark-theme] .sc-root{
        *
        * 拿不到就退回本地默认值，不让界面因为一个接口失败而空掉。
        */
-      const [stageList, setStageList] = useState(null)
-      useEffect(() => {
-        let alive = true
-        api('/stages')
-          .then((d) => alive && Array.isArray(d?.stages) && setStageList(d.stages))
-          .catch(() => {})
-        return () => {
-          alive = false
-        }
-      }, [])
+      // 阶段表全应用只取一次，DockBar 读的是同一份缓存
+      const stageList = useStages()
 
       // 页签的名字、顺序、tab 键全部来自宿主 /stages。
       // 曾经在这里存过一份兜底数组，结果它成了第二份阶段表。
@@ -3331,7 +3384,9 @@ body[data-ds-dark-theme] .sc-root{
                     tab === 'read'
                       ? [
                           h(ReadingPane, {
-                            key: 'read',
+                            // 按资料 id 挂载：paused/recalls/answer 都以 ¶N 为键，
+                            // 换一份资料若段数相同，旧状态会原样串到新资料上
+                            key: project.id,
                             project,
                             onAsk: ask,
                             jumpTo,
@@ -3404,17 +3459,8 @@ body[data-ds-dark-theme] .sc-root{
       const wsPath = useCurrentWorkspace()
       const scale = useScale()
       const [current, setCurrent] = useState(null)
-      const [stages, setStages] = useState(null)
-
-      useEffect(() => {
-        let alive = true
-        api('/stages')
-          .then((d) => alive && setStages(Array.isArray(d?.stages) ? d.stages : []))
-          .catch(() => {})
-        return () => {
-          alive = false
-        }
-      }, [])
+      const stages = useStages()
+      const projectsTick = useProjectsTick()
 
       useEffect(() => {
         let alive = true
@@ -3424,7 +3470,8 @@ body[data-ds-dark-theme] .sc-root{
         return () => {
           alive = false
         }
-      }, [wsPath])
+        // projectsTick：列表变了（导入/刷新）就重取，否则停靠条会停在旧项目上
+      }, [wsPath, projectsTick])
 
       if (!current) return null
       const idx = stageIndexOf(current.progress, stages)

@@ -96,7 +96,8 @@
 | 文件 | 内容 | 写入者 |
 |---|---|---|
 | `meta.json` | 标题、源文件、格式、字数、阶段、时间 | 插件 |
-| `source.md` | 归一化后的正文（段落带 `¶N` 锚点） | 插件 |
+| `source.md` | 归一化后的正文（裸文本，不含段落锚点） | 插件 |
+| `segment-texts.json` | 段落正文（`id → text`），读取只经 `store.segmentTexts()` | 插件 |
 | `segments.json` | 段落索引：id/章节/字数/首句 | 插件 |
 | `units.json` | 单元骨架：资料分几块，每块的段范围与要点 | 脚本生成 + 自校验 |
 | `preflight.md` | 读前六段式（人读） | 技能+工具 |
@@ -267,8 +268,8 @@ chapter4 的 `meta.stage` 是 `drilled`，但 `drills.jsonl` 是空的
 | 2 攻坚 | 品红 `--sc-hard-line` `#c026d3` | `#q` 疑问难点 / `#v` 验证 | 必须停下来想的地方 | ≤ 全文 8% |
 | 3 参考 | 青 `--sc-ref-line` `#14b8a6` | `#e` 例子 / `#t` 迁移 / `#c` 备注 | 需要时回查 | 不限，但不参与精读 |
 
-深浅两套主题各有一组 token（浅色深字 `--sc-*-fg` 配浅底 `--sc-*-bg`，深色反过来），
-行底色是 `--sc-*-row`。
+深浅两套主题各有一组 token（浅色深字 `--sc-*-fg` 配浅底 `--sc-*-bg`，深色反过来）。
+底色只用于**短语**（`--sc-*-bg`）；段落本身不染色，只用 2px 左边线 `--sc-*-line` 表示档位。
 
 **来源说明（必须诚实）**：
 
@@ -284,17 +285,17 @@ chapter4 的 `meta.stage` 是 `drilled`，但 `drills.jsonl` 是空的
 `#c` 标签必须带两字关键词，且 quote 不能是 ≤6 字的碎片
 （`FRAGMENT_QUOTE_MAX_CHARS`，纯标题段豁免）。
 
-## 4. 六个阶段（状态机）
+## 4. 进度状态（五个阶段，七个状态）
+
+五个**学习阶段**是动作：`preflight → annotate → map → recall → feynman`。
+项目的**状态**由产物推导（`stageFromProgress`），共七个值，没有 `drilled`：
 
 ```
-ingested ──preflight──▶ planned ──annotate──▶ annotated ──map──▶ mapped
-   导入        读前建构         读中标注            知识图谱
-                                      │
-                                      ├──qa──▶ recalled ──drill──▶ drilled ──▶ done
-                                      │        读后自测              费曼考核
-                                      └─（terms 随时记录，不占阶段）
+empty ──ingest──▶ ingested ──preflight──▶ planned ──annotate──▶ annotated
+   ──map──▶ mapped ──qa──▶ recalled ──有效复述──▶ done
 ```
 
+`done` 表示考核通过（`drills.jsonl` 里存在 `valid` 记录）。
 图谱与自测都只依赖 `annotated`，可以任选顺序；`quiz.md` 在读前就生成，
 所以"考核"阶段只由 `drills.jsonl` 的真实记录点亮。
 
@@ -332,7 +333,8 @@ ingested ──preflight──▶ planned ──annotate──▶ annotated ─�
 **预览**：导入后先给 30 秒预览（`GET /peek/:docId`），回答"要不要读"而不是"怎么读"：
 分几块、多少字、约多分钟、开头/结尾/最长一块各一句原话。
 点「开始读」直接看正文；「先看学习计划」才是次要出口——读前建构是承诺，不是门槛。
-**主面板**：五个 Tab —— 精读加工 / 读前建构 / 知识图谱 / 读完自测 / 费曼考核。
+**主面板**：五个 Tab，名字与顺序全部取自 `GET /stages`（即 `rules.js` 的 `STAGES`）：
+读前建构 / 读中加工 / 知识图谱 / 读后巩固 / 读后考核，默认停在「下一步该做的那一步」。
 **输入框停靠条**：显示当前文档 + 阶段 + 主推荐，右侧可带一个「也可以」的轻推荐。
 
 **精读页（Tab 1）的层次**，从上到下正好是用户心里的三个问题：

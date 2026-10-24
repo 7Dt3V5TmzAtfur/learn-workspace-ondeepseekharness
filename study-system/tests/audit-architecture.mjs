@@ -90,6 +90,24 @@ check(
 )
 
 console.log('\n' + '─'.repeat(62))
+console.log('\n5. 写入口与取数不重复')
+
+check(
+  '追问只有一个写入点',
+  (client.match(/api\('\/term'/g) ?? []).length === 1,
+  '两处各 POST 一次会生成两条待答记录，答案判据永远为假',
+)
+check(
+  '阶段表只请求一次',
+  (client.match(/api\('\/stages'\)/g) ?? []).length === 1,
+  'Workbench 与 DockBar 各取一次，白白多一个请求且失败面翻倍',
+)
+check(
+  '精读页按资料 id 挂载',
+  /key: project\.id/.test(client),
+  '按固定 key 挂载会把上一份资料的 paused/recalls 串到新资料上',
+)
+
 if (fail > 0) {
   console.log('\n架构不变量被破坏：\n')
   problems.forEach((p, i) => console.log(`${i + 1}. ${p}`))

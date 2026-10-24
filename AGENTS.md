@@ -1,8 +1,9 @@
 # AGENTS.md
 
 个人的学习工作区，同时是一个跑在 DSH 里的学习系统 **study-copilot** 的源码仓库。
-把任意格式资料导入成学习项目，走完六个阶段：
-`ingested → planned（读前建构）→ annotated（三色标注）→ mapped（知识图谱）→ recalled（读后自测）→ drilled（费曼考核）`。
+把任意格式资料导入成学习项目，依次走五个阶段：
+`preflight（读前建构）→ annotate（读中加工·三色标注）→ map（知识图谱）→ recall（读后巩固）→ feynman（读后考核）`。
+进度状态另有一套值：`empty → ingested → planned → annotated → mapped → recalled → done`（由产物推导，不写死）。
 
 ## 目录速览
 
@@ -42,10 +43,11 @@
 ## 验证
 
 ```bash
-node study-system/tests/all.mjs
+# 端口每次启动会变：先看当前实例，再传给测试
+DSH_WEB_HOST=http://127.0.0.1:<当前端口> node study-system/tests/all.mjs
 ```
 
-一次跑 8 套件（单测 / 真实 HTTP / 界面渲染 / 技能文档 / 需求逐条 / 文档一致性 / 样式 / Markdown 渲染），任一红即整体失败。
+一次跑 11 套件（单测 / 挂载时序 / 真实 HTTP / 界面内容 / 技能文档 / 需求逐条 / 文档一致 / 架构不变量 / 组件渲染冒烟 / 样式 / Markdown 渲染），任一红即整体失败。不带 `DSH_WEB_HOST` 时三个 HTTP 套件会连默认端口而崩，不是代码坏了。
 改完插件必须重载 bundle（先 `enabled=false` 再 `enabled=true`），否则接口跑旧代码。
 
 ## Agent skills
@@ -60,4 +62,4 @@ node study-system/tests/all.mjs
 
 ### Domain docs
 
-没有 `GLOSSARY.md` 与 `docs/adr/`：词汇以 `DESIGN.md` 为准，决策沉在 ticket 的 `## Resolution`。见 `docs/agents/domain.md`。
+词汇以 `GLOSSARY.md` 为准（领域词 + `_Avoid_` 禁词），架构与取舍以 `DESIGN.md` 为准；`docs/adr/` 尚不存在，决策沉在 ticket 的 `## Resolution`。见 `docs/agents/domain.md`。
