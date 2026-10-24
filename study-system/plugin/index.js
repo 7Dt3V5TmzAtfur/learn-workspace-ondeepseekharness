@@ -8,6 +8,7 @@
  */
 import { resolve, dirname, extname, sep, join } from 'node:path'
 import { readFile, writeFile } from 'node:fs/promises'
+import { randomUUID } from 'node:crypto'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { StudyService, nextStepOf } from './lib/service.js'
@@ -35,6 +36,11 @@ function serviceFor(workspace) {
  * 所以界面拿不到路径时，用这个值兜底——它来自真正执行过 study_* 的那个会话目录。
  */
 let lastAgentWorkspace = null
+/**
+ * 最近一次 study_* 工具调用所在的会话。
+ * 阶段按钮要靠它把消息投回用户正在用的那个会话，而不是随便挑一个。
+ */
+let lastAgentSessionId = null
 export function rememberWorkspace(path) {
   if (path) lastAgentWorkspace = resolve(path)
 }
@@ -262,6 +268,11 @@ export function apply(ctx, config = {}) {
       async execute(args) {
         const workspace = await workspaceOf()
         rememberWorkspace(workspace)
+        try {
+          lastAgentSessionId = ctx.get('agents')?.currentInitiator?.()?.id ?? lastAgentSessionId
+        } catch {
+          /* 不在 initiator 边界内就算了，不影响工具本身 */
+        }
         const svc = serviceFor(workspace)
         switch (def.name) {
           case 'study_ingest':
@@ -507,6 +518,25 @@ export function apply(ctx, config = {}) {
       return serviceFor(ws)
     }
 
+    /**
+     * 在本工作区里挑一个会话：最近创建的那个。
+     * 只在没有 lastAgentSessionId 时兜底——例如用户刚导入、还没让 Agent 干过活。
+     * 从不跨工作区投递：宁可报错让用户先开一次对话。
+     */
+    const pickSession = (workspace) => {
+      const store = ctx.get('sessions')
+      const all = typeof store?.list === 'function' ? store.list() : []
+      if (!all.length) return null
+      const norm = (p) => String(p ?? '').replace(/\//g, '\\').replace(/\\+$/, '').toLowerCase()
+      const mine = all.filter((s) => {
+        const cwd = s?.header?.cwd
+        return !cwd || norm(cwd) === norm(workspace)
+      })
+      const pool = mine.length ? mine : all
+      pool.sort((a, b) => (b?.header?.createdAt ?? 0) - (a?.header?.createdAt ?? 0))
+      return pool[0]?.id ?? null
+    }
+
     /** 列出各候选工作区下已有的学习项目，帮界面在拿不到路径时自我修复。 */
     const discoverWorkspaces = async () => {
       const candidates = []
@@ -565,24 +595,6 @@ export function apply(ctx, config = {}) {
             if (req.method === 'GET' && route === '/workspaces') {
               return send(res, 200, { items: await discoverWorkspaces() })
             }
-            // 图片等静态资源：/asset/<docId>/<相对路径>
-            if (req.method === 'GET' && route.startsWith('/asset/')) {
-              const rest = route.slice('/asset/'.length)
-              const slash = rest.indexOf('/')
-              if (slash < 0) return send(res, 400, { error: '缺少资源路径' })
-              const safeDecode = (v) => {
-                try {
-                  return decodeURIComponent(v)
-                } catch {
-                  return v
-                }
-              }
-              const docId = safeDecode(rest.slice(0, slash))
-              // route 来自 url.pathname，本身仍是百分号编码的，这里只需解码一次
-              const relPath = safeDecode(rest.slice(slash + 1))
-              await serveAsset(res, svcOf(url), docId, relPath)
-              return
-            }
             if (req.method === 'GET' && route === '/projects') {
               const raw = url.searchParams.get('ws')
               const svc = svcOf(url)
@@ -639,6 +651,76 @@ export function apply(ctx, config = {}) {
                 /* 写日志失败不能反过来弄崩接口 */
               }
               return send(res, 200, { ok: true })
+            }
+            /**
+             * 界面上的阶段按钮：替用户把"继续某阶段"这句话投进会话，并立刻起一轮 turn。
+             *
+             * 为什么是宿主做而不是界面直接发：客户端要拿 `remote.session` 得注入
+             * 嵌套服务，实际取不到；宿主这边 `agent.followup()` 是给插件用的正规入口
+             * （内置定时提醒同款），且界面只需打一个自己的 HTTP 接口。
+             */
+            if (req.method === 'POST' && route === '/run-stage') {
+              const body = await readBody(req)
+              const stage = STAGES[body.stage]
+              if (!stage) return send(res, 400, { error: `未知阶段 ${body.stage}` })
+              if (!body.docId) return send(res, 400, { error: '缺少 docId' })
+
+              const workspace = svcOf(url).ws
+              // 找到该把消息投给谁：优先最近一次 Agent 工具调用所在的会话，
+              // 退化到"本工作区最近创建的会话"。永不跨工作区乱投。
+              const sessionId = lastAgentSessionId ?? pickSession(workspace)
+              if (!sessionId) {
+                return send(res, 409, { error: '找不到可用的会话：先在这个工作区里发起一次对话，再点按钮。' })
+              }
+
+              const agents = ctx.get('agents')
+              let target = agents?.get?.(sessionId)
+              if (!target) {
+                const controller = ctx.get('sessionController')
+                if (controller?.resolveAgent) {
+                  const resolved = await controller.resolveAgent(sessionId)
+                  if (resolved && 'agent' in resolved) target = resolved.agent
+                }
+              }
+              if (!target?.followup) {
+                return send(res, 409, { error: `会话 ${sessionId} 当前不可写（可能已归档或已被其他窗口占用）。` })
+              }
+
+              const verb = stage.key === 'feynman' ? '开始' : '继续'
+              const phaseBefore = target.phase?.kind ?? null
+              const eventsBefore = typeof target.session?.snapshotEvents === 'function' ? target.session.snapshotEvents().length : null
+              let sendError = null
+              try {
+                target.followup({
+                  id: randomUUID(),
+                  role: 'user',
+                  content: [{ type: 'text', text: `${verb} docId=${body.docId} 的「${stage.name}」，加载 ${stage.skill} 技能。` }],
+                  // 来源必须写 plugin：写成 user 等于伪造"人类亲手输入"的授权
+                  // v4 会话格式要求"生产者自有"的 kind，{kind:'plugin'} 会被拒；
+                  // 等价于内置 producerKind(): `plugin:<包名>`
+                  source: { kind: 'plugin:@local/dsh-study-copilot' },
+                })
+              } catch (e) {
+                sendError = String(e?.message ?? e)
+              }
+              // 立即落盘一次，否则会话日志要等 turn 结束才看得见
+              let flushResult = null
+              try {
+                flushResult = await ctx.get('sessions')?.flush?.(target.session)
+              } catch (e) {
+                flushResult = 'error: ' + String(e?.message ?? e)
+              }
+              return send(res, sendError ? 500 : 200, {
+                ok: !sendError,
+                sessionId,
+                agentFound: Boolean(target),
+                phaseBefore,
+                phaseAfter: target.phase?.kind ?? null,
+                eventsBefore,
+                eventsAfter: typeof target.session?.snapshotEvents === 'function' ? target.session.snapshotEvents().length : null,
+                flushResult,
+                error: sendError,
+              })
             }
             if (req.method === 'POST' && route === '/ingest') {
               const body = await readBody(req)

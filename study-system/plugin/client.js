@@ -17,12 +17,6 @@ window.__ModuleLoader__.load({
 
     const API = '/study-copilot/api'
     const PANEL_ID = 'study-copilot'
-    /**
-     * apply() 收到的 ctx 存一份给组件用。
-     * 组件定义在工厂里、拿不到 apply 的参数，而「一键让 Agent 跑某个阶段」需要
-     * ctx.get('remote') 才能把消息投进当前会话。
-     */
-    let pluginCtx = null
 
     /* ------------------------------------------------------------ 样式 */
 
@@ -2481,50 +2475,20 @@ body[data-ds-dark-theme] .sc-root{
     }
 
     /**
-     * 当前会话 id。
-     * 面板是挂在 main slot 上的自定义视图，不一定是 session-scoped，
-     * 所以按"props → URL"的顺序找；都没有就返回 null，由调用方明说，
-     * 不猜、更不挑一个会话替用户发。
+     * 让宿主替我们发起一个阶段：把「继续/开始 某阶段」投进用户正在用的会话，
+     * 并立刻起一轮 turn。用宿主自己的接口而不是客户端 RPC ——
+     * 客户端取 remote.session 需要注入嵌套服务，实测取不到；
+     * 宿主侧 agent.followup() 才是给插件用的正规入口。
      */
-    function currentSessionId(props) {
-      const fromProps = props?.sessionId ?? props?.session?.id ?? props?.session?.sessionId
-      if (typeof fromProps === 'string' && fromProps) return fromProps
-      try {
-        const url = new URL(window.location.href)
-        const fromQuery = url.searchParams.get('session') ?? url.searchParams.get('sessionId')
-        if (fromQuery) return fromQuery
-        const fromHash = (url.hash || '').match(/session[/=]([A-Za-z0-9_-]+)/)
-        if (fromHash) return fromHash[1]
-      } catch {
-        /* URL 解析失败就当没有 */
-      }
-      return null
-    }
-
-    /**
-     * 把一句话投进当前会话，等价于用户在输入框里回车。
-     * 走的是 composer 同一条 RPC（mode=queue：排在当前 turn 之后，不打断）。
-     */
-    async function promptAgent(text, sessionId) {
-      if (!sessionId) {
-        throw new Error('定位不到当前会话，没法替你发送。可以先把这句发到对话里：' + text)
-      }
-      const remote = pluginCtx?.get?.('remote')
-      if (!remote?.session?.prompt) {
-        throw new Error('当前客户端没有可用的 remote 接口，请在对话里发送：' + text)
-      }
-      const result = await remote.session.prompt({
-        requestId: crypto.randomUUID(),
-        sessionId,
-        mode: 'queue',
-        content: [{ type: 'text', text }],
-        clientTimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    async function requestStage(docId, stageKey) {
+      const res = await fetch(`${API}/run-stage`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ docId, stage: stageKey }),
       })
-      if (!result?.ok) {
-        const code = result?.error?.code ?? 'unknown'
-        const message = result?.error?.message ?? ''
-        throw new Error(`没能发出去（${code}）${message ? '：' + message : ''}`)
-      }
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body.error ?? `没能发起（${res.status}）`)
+      return body
     }
 
     /** 阶段操作条：五个页签同一位置。重做用就地二次确认，不弹窗。 */
@@ -2746,8 +2710,6 @@ body[data-ds-dark-theme] .sc-root{
         reportError({
           kind: 'props',
           keys: Object.keys(props ?? {}).join(','),
-          sessionLike: Object.keys(props ?? {}).filter((k) => /session/i.test(k)).join(','),
-          hasSessionId: Boolean(currentSessionId(props)),
         })
         reportError({ kind: 'mount', message: 'Workbench mounted' })
       }, [])
@@ -2879,15 +2841,13 @@ body[data-ds-dark-theme] .sc-root{
       const runStage = useCallback(
         async (stage) => {
           if (!docId || !stage) return
-          const verb = stage.key === 'feynman' ? '开始' : '继续'
-          const text = `${verb} docId=${docId} 的「${stage.name}」，加载 ${stage.skill} 技能。`
           setStageBusy(stage.key)
           setError(null)
           try {
-            await promptAgent(text, currentSessionId(props))
+            await requestStage(docId, stage.key)
             const startedAt = Date.now()
             let finished = false
-            while (Date.now() - startedAt < 180000) {
+            while (Date.now() - startedAt < 240000) {
               await new Promise((r) => setTimeout(r, 2000))
               let next = null
               try {
@@ -2903,7 +2863,7 @@ body[data-ds-dark-theme] .sc-root{
               }
             }
             if (!finished) {
-              setError(`已把「${stage.name}」发给 Agent，但 3 分钟内没等到产物。它可能还在跑，去对话里看一眼。`)
+              setError(`已把「${stage.name}」发给 Agent，但 4 分钟内没等到产物。它可能还在跑，去对话里看一眼。`)
             }
           } catch (e) {
             setError(e.message)
@@ -2911,7 +2871,7 @@ body[data-ds-dark-theme] .sc-root{
             setStageBusy(null)
           }
         },
-        [docId, wsPath, props],
+        [docId, wsPath],
       )
 
       useEffect(() => {
@@ -3466,8 +3426,7 @@ body[data-ds-dark-theme] .sc-root{
     return {
       inject: ['slots'],
       apply(ctx) {
-        // 组件里要发消息给 Agent，需要 remote；工厂里拿不到 apply 的参数，存一份
-        pluginCtx = ctx
+        // 阶段按钮走宿主接口 /run-stage，不在客户端直接碰 remote
         ctx.slots.inject('sidebar.panellist', () =>
           ctx.slots.register({ name: 'sidebar.panellist', id: PANEL_ID, order: 20, label: () => '学习工作台' }, BookIcon),
         )
