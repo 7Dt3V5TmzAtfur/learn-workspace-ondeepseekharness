@@ -1159,9 +1159,36 @@ body[data-ds-dark-theme] .sc-root{
         ),
         sec(
           '⑤',
-          '思考题与作业（费曼）',
+          '思考题与作业',
           (plan.exercises ?? []).length
-            ? h('ol', { className: 'sc-ex-list' }, plan.exercises.map((ex, i) => h('li', { className: 'sc-ex', key: i }, h('div', { className: 'sc-ex-q' }, ex.question ?? '') )))
+            ? h(
+                'div',
+                null,
+                h(
+                  'div',
+                  { className: 'sc-muted', style: { marginBottom: 8, lineHeight: 1.7 } },
+                  '题目只有这一份。读完来这里挑一道，合上书讲一遍——「读后考核」负责判卷，不另存题库。',
+                ),
+                h(
+                  'ol',
+                  { className: 'sc-ex-list' },
+                  plan.exercises.map((ex, i) =>
+                    h(
+                      'li',
+                      { className: 'sc-ex', key: i },
+                      h('div', { className: 'sc-ex-q' }, ex.question ?? ''),
+                      // 达标要点与最小行动本来只落在 quiz.md 里，界面上看不到，
+                      // 于是考核页又去渲染了一遍 quiz.md —— 重复就从这里开始。
+                      // 现在它们跟着题目走，考核页只负责判卷。
+                      ex.kind ? h('div', { className: 'sc-muted', style: { marginTop: 4 } }, `类型：${ex.kind}`) : null,
+                      (ex.rubric ?? []).length
+                        ? h('div', { className: 'sc-muted' }, `达标要点：${ex.rubric.join('；')}`)
+                        : null,
+                      ex.minimalAction ? h('div', { className: 'sc-muted' }, `最小行动：${ex.minimalAction}`) : null,
+                    ),
+                  ),
+                ),
+              )
             : h('div', { className: 'sc-muted' }, '（还没有思考题）'),
         ),
         sec(
