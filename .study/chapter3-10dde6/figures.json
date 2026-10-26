@@ -1,0 +1,79 @@
+{
+  "generatedAt": "2026-10-24T10:10:00.228Z",
+  "ok": true,
+  "cli": "C:\\Users\\x\\.dsh\\skills\\archify-2\\bin\\archify.mjs",
+  "figures": [
+    {
+      "index": 1,
+      "file": "graph-1.html",
+      "nodeCount": 21,
+      "edgeCount": 29,
+      "nodeIds": [
+        "memory-hierarchy",
+        "three-axes",
+        "cognitive-types",
+        "storage-4formats",
+        "adv-json-cards",
+        "double-layer-mem",
+        "proactive",
+        "agentic-rag",
+        "contextual-retrieval",
+        "raw-needs-structure",
+        "structured-index",
+        "when-structured",
+        "hybrid-retrieval",
+        "rrf",
+        "retrieval-metrics",
+        "bi-vs-cross",
+        "sparse-bm25",
+        "chunking",
+        "dense-embedding",
+        "context-loss",
+        "eval-3layer"
+      ],
+      "ok": true,
+      "produced": true,
+      "failedStage": null,
+      "diagnostics": [],
+      "sizeBytes": 850651
+    },
+    {
+      "index": 2,
+      "file": "graph-2.html",
+      "nodeCount": 5,
+      "edgeCount": 6,
+      "nodeIds": [
+        "compression-leak",
+        "incremental-pr",
+        "periodic-review",
+        "evidence-layer",
+        "updates-both"
+      ],
+      "ok": true,
+      "produced": true,
+      "failedStage": null,
+      "diagnostics": [],
+      "sizeBytes": 814018
+    },
+    {
+      "index": 3,
+      "file": "graph-3.html",
+      "nodeCount": 7,
+      "edgeCount": 2,
+      "nodeIds": [
+        "user-as-code",
+        "mem0",
+        "raptor",
+        "graphrag",
+        "filesystem-l012",
+        "contextual-compress",
+        "write-time-vs-query-time"
+      ],
+      "ok": true,
+      "produced": true,
+      "failedStage": null,
+      "diagnostics": [],
+      "sizeBytes": 813505
+    }
+  ]
+}

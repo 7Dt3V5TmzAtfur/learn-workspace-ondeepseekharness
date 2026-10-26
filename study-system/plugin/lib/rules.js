@@ -186,7 +186,13 @@ export function tierOfLabel(label) {
 export function summarizeAnnotations(items, totalChars) {
   const byTier = { core: 0, hard: 0, ref: 0 }
   const tierChars = { core: 0, hard: 0, ref: 0 }
+  // 两个口径，各回答一个问题：
+  //   highlightedChars / ratio     核心+攻坚 —— 注意力预算（≤10% + ≤8%）
+  //   colorChars / colorRatio      三档合计 —— 读者眼里"有多少字带颜色"（≤20%）
+  // 早期只算了前者，于是"总高亮不超过 20%"这条只约束了两档，
+  // 参考档可以无限标却不占名额 —— 而需求里写的 10%-20% 讲的正是读者看到的比例。
   let highlightedChars = 0
+  let colorChars = 0
   for (const it of items ?? []) {
     const tier = tierOfLabel(it?.label) ?? it?.tier
     // 注意：用 in 判断，不能写 !byTier[tier] —— 计数从 0 开始，0 是假值，
@@ -195,6 +201,7 @@ export function summarizeAnnotations(items, totalChars) {
     const chars = [...String(it?.quote ?? '')].length
     byTier[tier] += 1
     tierChars[tier] += chars
+    colorChars += chars
     if (tier !== 'ref') highlightedChars += chars
   }
   const total = totalChars || 1
@@ -204,6 +211,8 @@ export function summarizeAnnotations(items, totalChars) {
     highlightedChars,
     totalChars,
     ratio: Number((highlightedChars / total).toFixed(4)),
+    colorChars,
+    colorRatio: Number((colorChars / total).toFixed(4)),
     tierRatio: Object.fromEntries(Object.keys(byTier).map((k) => [k, Number((tierChars[k] / total).toFixed(4))])),
     tierChars,
   }
@@ -233,6 +242,7 @@ export function validateAnnotation(items, context) {
   const seen = new Map()
   const byTier = { core: 0, hard: 0, ref: 0 }
   let highlightedChars = 0
+  let colorChars = 0
   const tierCharsMap = { core: 0, hard: 0, ref: 0 }
   const quoteRanges = new Map() // segmentId -> [[start,end], ...] 用于检测片段重叠
 
@@ -345,20 +355,24 @@ export function validateAnnotation(items, context) {
     }
     byTier[tier] += 1
     tierCharsMap[tier] += quoteChars
-    // 参考档是"需要时回查"，不算注意力高亮，不进预算
+    colorChars += quoteChars
+    // 参考档是"需要时回查"，不算注意力高亮，不进分档预算
     if (tier !== 'ref') highlightedChars += quoteChars
   }
 
   const totalChars = context.totalChars || context.segments.reduce((a, s) => a + s.chars, 0) || 1
   const ratio = highlightedChars / totalChars
+  const colorRatio = colorChars / totalChars
 
-  if (ratio > TOTAL_HIGHLIGHT_BUDGET) {
+  // 总预算按三档合计判：参考档不分档封顶，但一样会把页面染满。
+  // 只约束核心/攻坚的话，把 40% 的正文都标成例子也能过关 —— 读者看到的还是一页颜色。
+  if (colorRatio > TOTAL_HIGHLIGHT_BUDGET) {
     issues.push(
       issue(
         'error',
         'budget-total',
-        `高亮覆盖 ${(ratio * 100).toFixed(1)}%，超过二八法则上限 ${TOTAL_HIGHLIGHT_BUDGET * 100}%。` +
-          '请缩短 quote，或减少核心/攻坚档的条数。',
+        `高亮覆盖 ${(colorRatio * 100).toFixed(1)}%（三档合计，其中核心+攻坚 ${(ratio * 100).toFixed(1)}%），` +
+          `超过二八法则上限 ${TOTAL_HIGHLIGHT_BUDGET * 100}%。请缩短 quote，或减少参考档的条数。`,
       ),
     )
   }
@@ -456,6 +470,8 @@ export function validateAnnotation(items, context) {
       highlightedChars,
       totalChars,
       ratio: Number(ratio.toFixed(4)),
+      colorChars,
+      colorRatio: Number(colorRatio.toFixed(4)),
       // 分档占比：让模型和界面都能看出"是不是某一档用超了"，
       // 只有总 ratio 的话，超预算时不知道是哪一档的问题。
       tierRatio: Object.fromEntries(
@@ -622,6 +638,22 @@ export function validateRelations(graph) {
           'edge-no-evidence',
           `关系 ${edge?.from} → ${edge?.to}（${edge?.relation}）缺原文出处：` +
             '请给出说明这条关系的那句原文；如果原文并没有明说、是你自己推出来的，请标 evidence:"inference" 并写 why',
+        ),
+      )
+    }
+    /* 省略号 = 拼出来的引用。
+     * 实测 chapter3 的 41 条边里有 8 条写成「¶215「前半句…后半句」」——
+     * 这种 quote 无法与原文字符串比对，也就等于无法核对。
+     * 规则要求 quote 是"说明这条关系的那句原文"，一句就够；
+     * 用省略号压缩等于把"无法验证"伪装成"有出处"。
+     * 允许的例外只有一种：标了 evidence:'inference' 自己承认是推断。 */
+    if (hasQuote && !isInference && /…|\.\.\./.test(hasQuote)) {
+      issues.push(
+        issue(
+          'error',
+          'edge-quote-ellipsis',
+          `关系 ${edge?.from} → ${edge?.to} 的原文出处里有省略号：请给出一句逐字原文（只给最关键的那一句），` +
+            '不要用 … 把两处拼起来；如果是你自己推出来的，改标 evidence:"inference" 并写 why',
         ),
       )
     }

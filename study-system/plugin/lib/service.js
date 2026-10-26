@@ -5,6 +5,7 @@
 import { basename, extname, resolve, isAbsolute } from 'node:path'
 import { readFile, stat, mkdir, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { extractDocument, segmentText } from './extract.js'
 import { StudyStore, slugify, STUDY_DIR_NAME, stageFromProgress } from './store.js'
 import { buildArchifyFigures } from './archify-figures.js'
@@ -19,6 +20,7 @@ import {
   renderAnnotatedHtml,
   ATTENTION_TIERS,
   summarizeAnnotations,
+  tierOfLabel,
   ROLE_LABELS,
   RELATION_TYPES,
   STAGES,
@@ -152,6 +154,13 @@ export class StudyService {
     const ext = extname(safeName)
     if (!ext) throw new Error(`认不出文件类型：${safeName}。文件名需要带后缀，例如 .pdf / .md`)
 
+    // 同一份内容已经在库里：一个字节都不用落盘，直接把那个项目还回去。
+    // 放在写 _inbox 之前，否则每次重复上传都会在 _inbox 留一份孤儿副本。
+    if (!options.docId) {
+      const reuse = await this.reuseOf(buffer, options)
+      if (reuse) return reuse
+    }
+
     // 放进工作区的 _inbox：用户能自己找到，也不会和已有资料混在一起
     const inbox = resolve(this.workspace, '_inbox')
     await mkdir(inbox, { recursive: true })
@@ -161,6 +170,37 @@ export class StudyService {
     // 落盘名带时间戳是为了同名文件不互相覆盖，但标题必须保持干净 ——
     // 否则列表里会显示「20261024T063647-上传测试」，用户认不出这是自己的文件。
     return this.ingest(saved, { ...options, title: options.title ?? basename(safeName, ext) })
+  }
+
+  /**
+   * 同一份正文已经导入过时，返回既有项目的摘要；否则 null。
+   *
+   * 判等只看正文内容（sha1），不看文件名 —— 用户常把同一份资料改个名再导一次。
+   * 内容变了就绝不复用：段号会整体位移，旧标注会挂到别的段落上，
+   * 那比多出一个项目危险得多。
+   */
+  async reuseOf(buffer, options = {}) {
+    if (!Buffer.isBuffer(buffer) || !buffer.length) return null
+    const hash = createHash('sha1').update(buffer).digest('hex')
+    const docId = await this.store.findByContentHash(hash)
+    if (!docId) return null
+    const meta = await this.store.meta(docId).catch(() => null)
+    if (!meta) return null
+    // 不复用路径上改标题：导入是"把资料放进来"，不是"改已有项目的名字"。
+    // 悄悄改名会让用户以为新建了一份，实际动的是旧项目（测试里就撞到过：
+    // 同一份夹具换个标题再导，把另一个用例的项目改成了自己的名字）。
+    // 想改名是另一个明确动作，不该由一次导入顺手完成。
+    return {
+      docId,
+      title: meta.title ?? docId,
+      format: meta.format ?? null,
+      chars: meta.chars ?? 0,
+      segmentCount: meta.segmentCount ?? 0,
+      warning: meta.warning ?? null,
+      // 让调用方（界面/模型）能说清"这份资料已经在库里了"，而不是以为刚导入成功
+      reused: true,
+      next: nextStepOf(await this.store.progressOf(docId)),
+    }
   }
 
   /**
@@ -175,6 +215,13 @@ export class StudyService {
     if (info.size === 0) throw new Error(`文件为空：${abs}`)
 
     const buf = await readFile(abs)
+    // 同一份正文导入第二次，返回已有项目而不是再造一个。
+    // 曾经 chapter1 在库里出现两次（正文哈希完全相同，其中一份一条标注都没有），
+    // 用户面对两个同名条目，根本分不清哪个是自己在读的。
+    if (!options.docId) {
+      const reuse = await this.reuseOf(buf, options)
+      if (reuse) return reuse
+    }
     const { text, format, warning } = await extractDocument(abs, buf)
     if (!text || text.length < 10) {
       throw new Error(`提取不到正文内容（${format}）。若为扫描件请先 OCR。`)
@@ -194,6 +241,8 @@ export class StudyService {
       chars: totalChars,
       segmentCount: segments.length,
       warning: warning ?? null,
+      // 内容指纹：下次同一份文件再进来时据此认出它，而不是又建一个项目
+      contentHash: createHash('sha1').update(buf).digest('hex'),
       createdAt: (await this.store.meta(docId).catch(() => null))?.createdAt ?? new Date().toISOString(),
     })
     await this.store.writeArtifact(docId, 'source.md', text)
@@ -290,17 +339,13 @@ export class StudyService {
 
     // 分档占比按标签现算：老项目保存时还没有 tierRatio，
     // 而且标签归位后旧的 byTier 也不可信。图例与颜色必须同源。
-    const annotationStats = project.annotations
-      ? summarizeAnnotations(
-          project.annotations.items,
-          project.segments.reduce((a, s) => a + (s.chars || 0), 0),
-        )
-      : null
+    const totalChars = project.segments.reduce((a, s) => a + (s.chars || 0), 0)
+    const annotationsView = project.annotations ? this.annotationView(project.annotations, totalChars) : null
 
     return {
       ...project,
-      // stats 覆盖为现算值；其余（items/issues）保持原样
-      annotations: project.annotations ? { ...project.annotations, stats: annotationStats } : project.annotations,
+      // stats 与每条的 tier 都现算；其余（items 内容/issues）保持原样
+      annotations: annotationsView,
       // fullProject 把文件信息放在 meta 键下，不摊平。
       // 不展开的话 stage 根本不在返回值里（前端读出来是 undefined），
       // 而 /projects 列表里却有 —— 同一份数据两个接口两个样子。
@@ -493,17 +538,50 @@ export class StudyService {
     }
   }
 
+  /**
+   * 保存读前六段式。
+   *
+   * 校验不通过时**只留草稿**，不写 preflight.json —— 与标注、图谱同一套语义。
+   * 踩过：只写了①摘要、②③④⑤⑥全缺的计划也被当成正式产物落盘，
+   * 于是 progressOf 认定 planned，界面显示"读前建构完成"，下一步直接推人去标注；
+   * 而用户打开读前页只看到一个孤零零的摘要，另外五段全是「还没有内容」。
+   * 派生的 refs.md / quiz.md 同样不写：残缺题库比没有题库更容易让人以为做完了。
+   */
   async savePreflight(docId, plan) {
     const segments = await this.store.segments(docId)
     const check = validatePreflight(plan)
-    await this.store.writeArtifact(docId, 'preflight.json', { ...plan, validatedAt: new Date().toISOString(), check })
-    if (plan?.references?.length) {
+    const name = check.ok ? 'preflight.json' : 'preflight.rejected.json'
+    await this.store.writeArtifact(docId, name, { ...plan, validatedAt: new Date().toISOString(), check })
+    if (check.ok && plan?.references?.length) {
       await this.store.writeArtifact(docId, 'refs.md', this.renderRefs(plan.references))
     }
-    if (plan?.exercises?.length) {
+    if (check.ok && plan?.exercises?.length) {
       await this.store.writeArtifact(docId, 'quiz.md', this.renderExercises(plan.exercises, plan.summary))
     }
-    return { docId, check, next: nextStepOf(await this.store.progressOf(docId)), segmentCount: segments.length }
+    return {
+      docId,
+      check,
+      accepted: check.ok,
+      next: nextStepOf(await this.store.progressOf(docId)),
+      segmentCount: segments.length,
+    }
+  }
+
+  /**
+   * 标注的唯一读取口径：档位由标签推、统计按 quote 现算。
+   *
+   * 磁盘上的 `tier` 字段可能是历史版本写错的（chapter1 有 73 条 #d 存成 ref），
+   * 而 `stats` 可能是更早的格式（同一份 chapter1 的 stats 里连 tierRatio 都没有）。
+   * 写入口已经改成按标签归位了，读出口必须同样处理，否则会出现
+   * "图例说核心 123 处、收获说拿到 50 处"这种两个真相。
+   *
+   * @param {{items?:Array,stats?:object}} annotations 磁盘上的标注
+   * @param {number} totalChars 全文总字数（占比的分母）
+   */
+  annotationView(annotations, totalChars) {
+    if (!annotations?.items?.length) return annotations ?? null
+    const items = annotations.items.map((it) => ({ ...it, tier: tierOfLabel(it?.label) ?? it?.tier }))
+    return { ...annotations, items, stats: summarizeAnnotations(items, totalChars) }
   }
 
   async saveAnnotation(docId, items) {
@@ -975,8 +1053,10 @@ export class StudyService {
     const terms = await this.store.jsonl(docId, 'terms.jsonl').catch(() => [])
     const drills = await this.store.jsonl(docId, 'drills.jsonl').catch(() => [])
 
-    // 只要"能复述"的核心档，参考档和攻坚档不算"拿到的点"
-    const core = ann.filter((a) => a.tier === 'core')
+    // 只要"能复述"的核心档，参考档和攻坚档不算"拿到的点"。
+    // 档位按标签推，不信磁盘上的 tier：chapter1 有 73 条 #d 存成了 ref，
+    // 信 tier 会把 123 处数成 50 处 —— 这正是"拿到的东西"被少报的来源。
+    const core = ann.filter((a) => (tierOfLabel(a?.label) ?? a?.tier) === 'core')
     // 有效考核：合书、够时长、没抄原文
     const validDrills = drills.filter((d) => d.valid !== false)
     const actions = validDrills.map((d) => String(d.minimalAction ?? '').trim()).filter(Boolean)
@@ -1228,7 +1308,13 @@ export class StudyService {
     const meta = await this.store.meta(docId)
     const progress = await this.store.progressOf(docId)
     const preflight = await this.store.artifact(docId, 'preflight.json').catch(() => null)
-    const annotations = await this.store.artifact(docId, 'annotations.json').catch(() => null)
+    const annotationsRaw = await this.store.artifact(docId, 'annotations.json').catch(() => null)
+    // 预算占比必须现算：chapter1 的 stats 是旧格式（没有 tierRatio），
+    // 直接读 stats 会让模型看到 coreRatio:null，等于失去了判断依据。
+    const totalChars =
+      annotationsRaw?.stats?.totalChars ||
+      (await this.store.segments(docId)).reduce((a, s) => a + (s.chars || 0), 0)
+    const annotations = this.annotationView(annotationsRaw, totalChars)
     const relations = await this.store.artifact(docId, 'relations.json').catch(() => null)
     const qa = await this.store.artifact(docId, 'qa.json').catch(() => null)
     const terms = await this.store.jsonl(docId, 'terms.jsonl').catch(() => [])
@@ -1283,7 +1369,10 @@ export class StudyService {
       // 高亮预算实测值：模型应该据此判断要不要缩短 quote
       highlight: annotations?.stats
         ? {
+            // ratio：核心+攻坚，对注意力预算（≤10% + ≤8%）
             ratio: annotations.stats.ratio,
+            // colorRatio：三档合计，对"总高亮 ≤20%"与读者实际看到的比例
+            colorRatio: annotations.stats.colorRatio ?? null,
             coreRatio: annotations.stats.tierRatio?.core ?? null,
             hardRatio: annotations.stats.tierRatio?.hard ?? null,
             refRatio: annotations.stats.tierRatio?.ref ?? null,
@@ -1445,9 +1534,11 @@ export class StudyService {
         out.push(`#${a.label} ${kw}${a.title ?? ''}|${ROLE_LABELS[a.label]?.en ?? a.label}`)
       }
       let body = texts.get(seg.id) ?? seg.lead ?? ''
-      // 导出 Markdown 时用加粗表达三色高亮，保证纯文本也能看出档位
+      // 导出 Markdown 时用加粗表达三色高亮，保证纯文本也能看出档位。
+      // 档位仍按标签推：磁盘上的 tier 可能是历史错误值。
       if (a?.quote) {
-        const mark = a.tier === 'ref' ? '*' : '**'
+        const tier = tierOfLabel(a.label) ?? a.tier
+        const mark = tier === 'ref' ? '*' : '**'
         body = body.replace(String(a.quote), `${mark}${a.quote}${mark}`)
       }
       out.push(body)

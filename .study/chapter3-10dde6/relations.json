@@ -1,0 +1,561 @@
+{
+  "nodes": [
+    {
+      "id": "memory-hierarchy",
+      "kind": "taxonomy",
+      "label": "记忆层次：轨迹与长期记忆"
+    },
+    {
+      "id": "eval-3layer",
+      "kind": "taxonomy",
+      "label": "三层次评估框架"
+    },
+    {
+      "id": "proactive",
+      "kind": "problem",
+      "label": "主动服务层：最难的一层"
+    },
+    {
+      "id": "storage-4formats",
+      "kind": "taxonomy",
+      "label": "四种存储格式"
+    },
+    {
+      "id": "adv-json-cards",
+      "kind": "method",
+      "label": "Advanced JSON Cards"
+    },
+    {
+      "id": "user-as-code",
+      "kind": "example",
+      "label": "User as Code 可执行记忆"
+    },
+    {
+      "id": "mem0",
+      "kind": "example",
+      "label": "Mem0 读取时消歧"
+    },
+    {
+      "id": "cognitive-types",
+      "kind": "taxonomy",
+      "label": "情景/语义/程序记忆"
+    },
+    {
+      "id": "three-axes",
+      "kind": "principle",
+      "label": "三套体系正交可组合"
+    },
+    {
+      "id": "compression-leak",
+      "kind": "method",
+      "label": "记忆压缩与日志脱敏"
+    },
+    {
+      "id": "chunking",
+      "kind": "method",
+      "label": "文档分块与块大小权衡"
+    },
+    {
+      "id": "context-loss",
+      "kind": "problem",
+      "label": "分块切断上下文"
+    },
+    {
+      "id": "dense-embedding",
+      "kind": "method",
+      "label": "稠密嵌入与余弦相似度"
+    },
+    {
+      "id": "sparse-bm25",
+      "kind": "method",
+      "label": "BM25 稀疏检索"
+    },
+    {
+      "id": "hybrid-retrieval",
+      "kind": "protocol",
+      "label": "混合检索三阶段"
+    },
+    {
+      "id": "rrf",
+      "kind": "method",
+      "label": "RRF 倒数排名融合"
+    },
+    {
+      "id": "bi-vs-cross",
+      "kind": "concept",
+      "label": "双编码器与跨编码器"
+    },
+    {
+      "id": "retrieval-metrics",
+      "kind": "method",
+      "label": "recall@k / MRR / nDCG"
+    },
+    {
+      "id": "raw-needs-structure",
+      "kind": "principle",
+      "label": "未经提炼的原始知识不可用"
+    },
+    {
+      "id": "structured-index",
+      "kind": "tool-type",
+      "label": "结构化索引"
+    },
+    {
+      "id": "raptor",
+      "kind": "method",
+      "label": "RAPTOR 树状层次索引"
+    },
+    {
+      "id": "graphrag",
+      "kind": "method",
+      "label": "GraphRAG 实体关系图"
+    },
+    {
+      "id": "filesystem-l012",
+      "kind": "method",
+      "label": "文件系统范式与 L0/L1/L2"
+    },
+    {
+      "id": "when-structured",
+      "kind": "principle",
+      "label": "什么时候需要结构化索引"
+    },
+    {
+      "id": "contextual-retrieval",
+      "kind": "method",
+      "label": "上下文感知检索"
+    },
+    {
+      "id": "contextual-compress",
+      "kind": "anti-pattern",
+      "label": "上下文感知压缩（易混）"
+    },
+    {
+      "id": "updates-both",
+      "kind": "principle",
+      "label": "增量更新 + 全量整理"
+    },
+    {
+      "id": "incremental-pr",
+      "kind": "protocol",
+      "label": "PR 式提议者—审核者"
+    },
+    {
+      "id": "periodic-review",
+      "kind": "method",
+      "label": "定期整理三项工作"
+    },
+    {
+      "id": "evidence-layer",
+      "kind": "protocol",
+      "label": "原始证据/知识/服务三层"
+    },
+    {
+      "id": "write-time-vs-query-time",
+      "kind": "concept",
+      "label": "写入时消歧 vs 读取时推理"
+    },
+    {
+      "id": "agentic-rag",
+      "kind": "method",
+      "label": "智能体化 RAG"
+    },
+    {
+      "id": "double-layer-mem",
+      "kind": "principle",
+      "label": "双层记忆架构"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "from": "memory-hierarchy",
+      "to": "eval-3layer",
+      "relation": "prerequisite",
+      "quote": "¶8「要让 Agent 跨会话提供个性化服务，需要一层持久的用户记忆」，而¶15「在动手设计记忆系统之前，先要回答一个问题：什么样的记忆系统算“好”」"
+    },
+    {
+      "id": "e2",
+      "from": "eval-3layer",
+      "to": "storage-4formats",
+      "relation": "prerequisite",
+      "quote": "¶24「有了评估标准，就可以进入具体设计。记忆系统的设计可以拆成三个独立的维度——放哪里、怎么存、存什么」"
+    },
+    {
+      "id": "e3",
+      "from": "storage-4formats",
+      "to": "adv-json-cards",
+      "relation": "prerequisite",
+      "quote": "¶32「下面四种渐进式的存储格式，代表了记忆粒度和结构复杂度的递进」"
+    },
+    {
+      "id": "e4",
+      "from": "memory-hierarchy",
+      "to": "three-axes",
+      "relation": "prerequisite",
+      "quote": "¶59「回顾本节之前的内容，我们实际上引入了三套分类体系。为了避免混淆，表3-1 将它们的关系一次性厘清」"
+    },
+    {
+      "id": "e5",
+      "from": "storage-4formats",
+      "to": "three-axes",
+      "relation": "prerequisite",
+      "quote": "¶61 表3-1 把「存储格式」与「记忆层次」「认知类型」并列为三套体系"
+    },
+    {
+      "id": "e6",
+      "from": "cognitive-types",
+      "to": "three-axes",
+      "relation": "prerequisite",
+      "quote": "¶59「我们实际上引入了三套分类体系」，第三套即本节刚讲完的认知类型"
+    },
+    {
+      "id": "e7",
+      "from": "eval-3layer",
+      "to": "double-layer-mem",
+      "relation": "prerequisite",
+      "quote": "¶218「回看实验 3-1 确立的三层标尺——基础回忆靠可靠的存取即可满足，多会话检索靠检索技术补齐」"
+    },
+    {
+      "id": "e8",
+      "from": "adv-json-cards",
+      "to": "double-layer-mem",
+      "relation": "prerequisite",
+      "quote": "¶215「需将前面介绍的 Advanced JSON Cards（结构化核心事实，常驻 Agent 上下文…）与本章的上下文感知检索…结合成双层记忆结构」"
+    },
+    {
+      "id": "e9",
+      "from": "chunking",
+      "to": "dense-embedding",
+      "relation": "prerequisite",
+      "quote": "¶96「下面先看文档进入知识库的第一道工序——文档分块，再重点看检索器的两大技术路线：稠密嵌入和稀疏嵌入」"
+    },
+    {
+      "id": "e10",
+      "from": "chunking",
+      "to": "sparse-bm25",
+      "relation": "prerequisite",
+      "quote": "¶96「再重点看检索器的两大技术路线：稠密嵌入和稀疏嵌入」"
+    },
+    {
+      "id": "e11",
+      "from": "contextual-retrieval",
+      "to": "double-layer-mem",
+      "relation": "prerequisite",
+      "quote": "¶215「将上下文感知检索应用于用户记忆的构建，是解决传统对话历史分块痛点的关键」"
+    },
+    {
+      "id": "e12",
+      "from": "dense-embedding",
+      "to": "hybrid-retrieval",
+      "relation": "prerequisite",
+      "quote": "¶133「混合检索的思路很简单——两个引擎都跑，结果合并」"
+    },
+    {
+      "id": "e13",
+      "from": "sparse-bm25",
+      "to": "hybrid-retrieval",
+      "relation": "prerequisite",
+      "quote": "¶133「混合检索的思路很简单——两个引擎都跑，结果合并」"
+    },
+    {
+      "id": "e14",
+      "from": "bi-vs-cross",
+      "to": "hybrid-retrieval",
+      "relation": "prerequisite",
+      "quote": "¶138「融合负责从两路结果中产生统一的候选池，重排序负责在这个候选池上精排」"
+    },
+    {
+      "id": "e15",
+      "from": "hybrid-retrieval",
+      "to": "retrieval-metrics",
+      "relation": "prerequisite",
+      "quote": "¶140「调优这样一条多阶段流水线，需要客观的度量指标，最核心的有三个」"
+    },
+    {
+      "id": "e16",
+      "from": "hybrid-retrieval",
+      "to": "when-structured",
+      "relation": "prerequisite",
+      "quote": "¶167「前面介绍的混合检索（稠密 + 稀疏 + 重排序）已经能覆盖大多数需求。一个简单的判断标准」"
+    },
+    {
+      "id": "e17",
+      "from": "raw-needs-structure",
+      "to": "structured-index",
+      "relation": "prerequisite",
+      "quote": "¶154「必须在索引阶段投入计算资源，对原始知识主动提炼、抽象和结构化」"
+    },
+    {
+      "id": "e18",
+      "from": "structured-index",
+      "to": "when-structured",
+      "relation": "prerequisite",
+      "quote": "¶167「如果查询经常需要跨文档综合…结构化索引才值得投入」"
+    },
+    {
+      "id": "e19",
+      "from": "updates-both",
+      "to": "incremental-pr",
+      "relation": "prerequisite",
+      "quote": "¶177「完整的更新机制必须同时包含两条路径：事件触发的增量更新，以及周期触发的全量整理」"
+    },
+    {
+      "id": "e20",
+      "from": "updates-both",
+      "to": "periodic-review",
+      "relation": "prerequisite",
+      "quote": "¶177「完整的更新机制必须同时包含两条路径」；全量整理即¶186「系统还需要定期进行一次全量整理」"
+    },
+    {
+      "id": "e21",
+      "from": "evidence-layer",
+      "to": "incremental-pr",
+      "relation": "prerequisite",
+      "quote": "¶182「这条流水线应当明确分开三层：原始证据层…知识层…服务层」"
+    },
+    {
+      "id": "e22",
+      "from": "double-layer-mem",
+      "to": "proactive",
+      "relation": "prerequisite",
+      "quote": "¶218「主动服务之所以最难，正是因为它要求系统同时握有“全局概览”和“精确细节”两种视角」"
+    },
+    {
+      "id": "e23",
+      "from": "compression-leak",
+      "to": "incremental-pr",
+      "relation": "prerequisite",
+      "quote": "¶78「实践中可以采用多层次的记忆压缩策略」，压缩与淘汰需在持续写入中执行"
+    },
+    {
+      "id": "e24",
+      "from": "agentic-rag",
+      "to": "proactive",
+      "relation": "prerequisite",
+      "quote": "¶203「将 Agent 与用户的完整对话历史本身视为一个知识库」，多轮迭代检索是主动服务的前提"
+    },
+    {
+      "id": "e25",
+      "from": "hybrid-retrieval",
+      "to": "rrf",
+      "relation": "prerequisite",
+      "quote": "¶137「常用的融合方法是倒数排名融合（Reciprocal Rank Fusion, RRF）」，是第二阶段「结果融合」的具体方法"
+    },
+    {
+      "id": "e26",
+      "from": "rrf",
+      "to": "retrieval-metrics",
+      "relation": "prerequisite",
+      "quote": "¶140「调优这样一条多阶段流水线，需要客观的度量指标」，融合参数需用指标验收"
+    },
+    {
+      "id": "e27",
+      "from": "chunking",
+      "to": "context-loss",
+      "relation": "cause",
+      "quote": "¶105「无论采用哪种策略，分块都会切断片段与其原始上下文的联系…这是分块的固有缺陷」"
+    },
+    {
+      "id": "e28",
+      "from": "context-loss",
+      "to": "contextual-retrieval",
+      "relation": "cause",
+      "quote": "¶208「传统文档分块方法本身存在的根本性缺陷，仍然是限制 RAG 系统性能的瓶颈。这正是“文档分块”一节埋下的伏笔」"
+    },
+    {
+      "id": "e29",
+      "from": "raw-needs-structure",
+      "to": "contextual-retrieval",
+      "relation": "cause",
+      "quote": "¶209「核心思想非常直观：在对文本块进行向量化索引之前，先利用 LLM 为其生成一段简短的、包含核心上下文的“前缀摘要”」，同属索引阶段投入计算"
+    },
+    {
+      "id": "e30",
+      "from": "dense-embedding",
+      "to": "sparse-bm25",
+      "relation": "contrast",
+      "quote": "¶133「稠密检索懂语义但可能漏掉关键词…稀疏检索精确匹配但读不懂同义词」"
+    },
+    {
+      "id": "e31",
+      "from": "raptor",
+      "to": "graphrag",
+      "relation": "contrast",
+      "quote": "¶166「RAPTOR 和 GraphRAG 解决不同问题：前者适合“从概念逐步钻进细节”的查询，后者适合“A 和 B 之间是什么关系”的查询」"
+    },
+    {
+      "id": "e32",
+      "from": "contextual-retrieval",
+      "to": "contextual-compress",
+      "relation": "contrast",
+      "quote": "¶210「二者名字相近但作用的时机和对象完全不同：本节的上下文感知检索发生在索引期…第二章的上下文感知压缩发生在运行期」"
+    },
+    {
+      "id": "e33",
+      "from": "incremental-pr",
+      "to": "periodic-review",
+      "relation": "contrast",
+      "quote": "¶186「增量更新的优点是及时，但它每次只看到一个局部」"
+    },
+    {
+      "id": "e34",
+      "from": "write-time-vs-query-time",
+      "to": "updates-both",
+      "relation": "contrast",
+      "quote": "¶65「2025 年论文…和 v2 把冲突处理放在写入阶段，而 2026 年 4 月发布的 v3 新算法把它移到了检索阶段」"
+    },
+    {
+      "id": "e35",
+      "from": "rrf",
+      "to": "dense-embedding",
+      "relation": "contrast",
+      "quote": "¶137「RRF 简单且稳健，但只利用了排名信息，丢失了原始得分中蕴含的丰富相关性信号」"
+    },
+    {
+      "id": "e36",
+      "from": "mem0",
+      "to": "storage-4formats",
+      "relation": "example-of",
+      "quote": "¶64「这里以 Mem0 和 Memobase 为例，看看两种不同的设计理念如何取舍」"
+    },
+    {
+      "id": "e37",
+      "from": "user-as-code",
+      "to": "storage-4formats",
+      "relation": "example-of",
+      "quote": "¶42「前面四种格式本质上都是文本…User as Code 把用户状态改成带类型的可执行对象」"
+    },
+    {
+      "id": "e38",
+      "from": "filesystem-l012",
+      "to": "contextual-compress",
+      "relation": "analogy",
+      "quote": "¶172「这套“摘要常驻、按需取全文”的思路，与第二章介绍的 Skills 渐进式披露（progressive disclosure）如出一辙」"
+    },
+    {
+      "id": "e39",
+      "from": "contextual-retrieval",
+      "to": "double-layer-mem",
+      "relation": "application",
+      "quote": "¶218「用上下文感知检索按需从海量原始对话中取回“细节”」"
+    },
+    {
+      "id": "e40",
+      "from": "retrieval-metrics",
+      "to": "when-structured",
+      "relation": "application",
+      "quote": "¶189「还应回放一组典型检索与问答用例，确认新结构没有让原本可找到的知识变得不可见」"
+    },
+    {
+      "id": "e41",
+      "from": "incremental-pr",
+      "to": "periodic-review",
+      "relation": "sequence",
+      "quote": "¶177「事件触发的增量更新，以及周期触发的全量整理」——先有增量路径，再叠加周期整理"
+    }
+  ],
+  "relationReview": {
+    "prerequisite": {
+      "status": "mapped",
+      "edgeIds": [
+        "e1",
+        "e2",
+        "e3",
+        "e4",
+        "e5",
+        "e6",
+        "e7",
+        "e8",
+        "e9",
+        "e10",
+        "e11",
+        "e12",
+        "e13",
+        "e14",
+        "e15",
+        "e16",
+        "e17",
+        "e18",
+        "e19",
+        "e20",
+        "e21",
+        "e22",
+        "e23",
+        "e24",
+        "e25",
+        "e26"
+      ]
+    },
+    "part-of": {
+      "status": "unsupported",
+      "why": "材料未用“部分—整体”口径论述本章知识；章节标题是目录结构而非可考的知识点。RAPTOR 与 GraphRAG 虽同属结构化索引，但原文是对比二者而非归为某整体的一部分。"
+    },
+    "contrast": {
+      "status": "mapped",
+      "edgeIds": [
+        "e30",
+        "e31",
+        "e32",
+        "e33",
+        "e34",
+        "e35"
+      ]
+    },
+    "cause": {
+      "status": "mapped",
+      "edgeIds": [
+        "e27",
+        "e28",
+        "e29"
+      ]
+    },
+    "example-of": {
+      "status": "mapped",
+      "edgeIds": [
+        "e36",
+        "e37"
+      ]
+    },
+    "application": {
+      "status": "mapped",
+      "edgeIds": [
+        "e39",
+        "e40"
+      ]
+    },
+    "sequence": {
+      "status": "mapped",
+      "edgeIds": [
+        "e41"
+      ]
+    },
+    "analogy": {
+      "status": "mapped",
+      "edgeIds": [
+        "e38"
+      ]
+    }
+  },
+  "direction": "TD",
+  "title": "chapter3 知识图谱",
+  "check": {
+    "ok": true,
+    "issues": [],
+    "stats": {
+      "nodes": 33,
+      "edges": 41,
+      "relationCounts": {
+        "prerequisite": 26,
+        "part-of": 0,
+        "contrast": 6,
+        "cause": 3,
+        "example-of": 2,
+        "application": 2,
+        "sequence": 1,
+        "analogy": 1
+      }
+    }
+  },
+  "savedAt": "2026-10-24T10:09:51.962Z"
+}

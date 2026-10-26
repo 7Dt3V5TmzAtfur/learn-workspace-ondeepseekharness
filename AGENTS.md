@@ -47,7 +47,26 @@
 DSH_WEB_HOST=http://127.0.0.1:<当前端口> node study-system/tests/all.mjs
 ```
 
-一次跑 11 套件（单测 / 挂载时序 / 真实 HTTP / 界面内容 / 技能文档 / 需求逐条 / 文档一致 / 架构不变量 / 组件渲染冒烟 / 样式 / Markdown 渲染），任一红即整体失败。不带 `DSH_WEB_HOST` 时三个 HTTP 套件会连默认端口而崩，不是代码坏了。
+一次跑 15 套件（单测 / 挂载时序 / 全链路用户路径 / 真实 HTTP / 界面内容 / 技能文档 /
+需求逐条 / 文档一致 / 架构不变量 / 组件渲染冒烟 / 悬停 / 样式 / 读中页版面 /
+磁盘数据自洽 / Markdown 渲染），任一红即整体失败。不带 `DSH_WEB_HOST` 时三个 HTTP 套件会连默认端口而崩，不是代码坏了。
+
+**先验源码，再验部署**。`e2e-user-path.mjs` 自带进程内 HTTP 服务（`harness-server.mjs`），
+默认用临时工作区跑源码，不需要桌面端在跑：
+
+```bash
+node study-system/tests/e2e-user-path.mjs          # 源码自挂载（改完就能验）
+node study-system/tests/e2e-user-path.mjs --live   # 打真实部署（验有没有忘记重载）
+node study-system/tests/audit-data-integrity.mjs   # 只读：核对磁盘上真实项目是否自洽
+```
+
+数据类改写走迁移脚本，先预演再落盘（幂等，可重复跑）：
+
+```bash
+node study-system/migrations/normalize-annotation-tier.mjs          # 预演
+node study-system/migrations/normalize-annotation-tier.mjs --apply  # 真写
+```
+
 改完插件必须重载 bundle（先 `enabled=false` 再 `enabled=true`），否则接口跑旧代码。
 
 ## Agent skills

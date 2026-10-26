@@ -1,0 +1,675 @@
+{
+  "items": [
+    {
+      "segmentId": "¶8",
+      "label": "d",
+      "tier": "core",
+      "quote": "用额外的 LLM 调用提取、压缩并审查对未来有用的事实",
+      "title": "用户记忆靠额外 LLM 调用提炼事实",
+      "note": "与“上下文学习”的分界：不在当前窗口生效"
+    },
+    {
+      "segmentId": "¶13",
+      "label": "d",
+      "tier": "core",
+      "quote": "选择性**（丢弃“搜索返回 3 个选项”这类短期细节）",
+      "title": "提取三规则：选择、抽象、结构化",
+      "keyword": "原则"
+    },
+    {
+      "segmentId": "¶15",
+      "label": "q",
+      "tier": "hard",
+      "quote": "什么样的记忆系统算",
+      "title": "先定标准再设计",
+      "note": "LoCoMo：约 300 轮、最多 35 个会话"
+    },
+    {
+      "segmentId": "¶19",
+      "label": "d",
+      "tier": "core",
+      "quote": "这是记忆系统最根本的能力",
+      "title": "第一层：基础回忆",
+      "note": "结构化、无歧义信息的精确存取"
+    },
+    {
+      "segmentId": "¶20",
+      "label": "d",
+      "tier": "core",
+      "quote": "能检索出所有相关信息并推理判断",
+      "title": "第二层：多会话检索",
+      "note": "两辆车那个例子说明要主动问，不能猜"
+    },
+    {
+      "segmentId": "¶21",
+      "label": "d",
+      "tier": "core",
+      "quote": "这是衡量 Agent 是否达到",
+      "title": "第三层：主动服务是最高标准",
+      "note": "无明确指令下的预见性帮助"
+    },
+    {
+      "segmentId": "¶26",
+      "label": "d",
+      "tier": "core",
+      "quote": "按时间顺序排列，只增不改",
+      "title": "轨迹：append-only 的完整历史",
+      "note": "注意：运行时 Context 仍可压缩重组，别混淆"
+    },
+    {
+      "segmentId": "¶27",
+      "label": "c",
+      "tier": "ref",
+      "quote": "前者是流水账，后者是档案",
+      "title": "轨迹 vs 长期记忆",
+      "note": "这句话是全章最好用的记忆钩子",
+      "keyword": "对比"
+    },
+    {
+      "segmentId": "¶28",
+      "label": "d",
+      "tier": "core",
+      "quote": "通常以键值对形式与特定用户 ID 绑定",
+      "title": "长期记忆：按用户 ID 绑定的键值存储"
+    },
+    {
+      "segmentId": "¶34",
+      "label": "e",
+      "tier": "ref",
+      "quote": "同一份工作的内在联系被割裂",
+      "title": "Simple Notes 丢关联",
+      "note": "三个独立事实替代一段完整经历"
+    },
+    {
+      "segmentId": "¶35",
+      "label": "e",
+      "tier": "ref",
+      "quote": "这种表示保留了信息的叙事结构",
+      "title": "Enhanced Notes 保叙事但冗余",
+      "note": "代价是更新复杂：改属性要重写多个段落"
+    },
+    {
+      "segmentId": "¶36",
+      "label": "e",
+      "tier": "ref",
+      "quote": "刚性结构假设信息可清晰分类",
+      "title": "JSON Cards 的刚性",
+      "note": "“周末用 Python 开发项目”归不进单一类别"
+    },
+    {
+      "segmentId": "¶37",
+      "label": "s",
+      "tier": "core",
+      "quote": "代表了记忆系统从信息存储到知识管理的范式转变",
+      "title": "Advanced JSON Cards 的范式转变",
+      "note": "backstory + person + relationship 解决“为谁存”"
+    },
+    {
+      "segmentId": "¶39",
+      "label": "s",
+      "tier": "core",
+      "quote": "关键且少量**的数据（如用户偏好、关键人物关系）用 Advanced JSON Cards",
+      "title": "选型标准：关键少量用高级卡，海量非关键用简笔记",
+      "note": "生产系统多是混合模式",
+      "keyword": "原则"
+    },
+    {
+      "segmentId": "¶42",
+      "label": "d",
+      "tier": "core",
+      "quote": "User as Code",
+      "title": "User as Code：让表示与推理同介质",
+      "note": "把心算交给确定性函数"
+    },
+    {
+      "segmentId": "¶43",
+      "label": "c",
+      "tier": "ref",
+      "quote": "预写日志 + 检查点",
+      "title": "借鉴 WAL 与检查点",
+      "note": "保留原始证据 + 可查询派生状态",
+      "keyword": "机制"
+    },
+    {
+      "segmentId": "¶58",
+      "label": "d",
+      "tier": "core",
+      "quote": "从多次交互中提炼出的稳定特征",
+      "title": "语义记忆：提炼出的稳定特征",
+      "note": "情景=具体事件，语义=一般知识，程序=行为流程"
+    },
+    {
+      "segmentId": "¶61",
+      "label": "s",
+      "tier": "core",
+      "quote": "记忆层次（本章开头）",
+      "title": "表3-1：三套体系各答一问",
+      "note": "存在哪 / 怎么存 / 存什么，正交",
+      "keyword": "归类"
+    },
+    {
+      "segmentId": "¶62",
+      "label": "s",
+      "tier": "core",
+      "quote": "三套体系是正交的维度",
+      "title": "三套体系可自由组合",
+      "note": "最易混处：它们是三个维度不是一条阶梯"
+    },
+    {
+      "segmentId": "¶67",
+      "label": "e",
+      "tier": "ref",
+      "quote": "一次错误的更新或删除会不可逆地丢失历史信息",
+      "title": "Mem0 v2：写入时消歧的代价",
+      "note": "每条候选都要检索 + 二次 LLM 判断"
+    },
+    {
+      "segmentId": "¶68",
+      "label": "s",
+      "tier": "core",
+      "quote": "既避免错误 UPDATE/DELETE 丢失历史",
+      "title": "Mem0 v3：仅追加写入 + 混合检索",
+      "note": "LoCoMo 71.4→92.5；GraphRAG 变体已成历史设计"
+    },
+    {
+      "segmentId": "¶78",
+      "label": "d",
+      "tier": "core",
+      "quote": "重要性评分筛选",
+      "title": "压缩三层：评分、聚类、抽象泛化",
+      "note": "四因素：访问频率、时间衰减、情感强度、独特性"
+    },
+    {
+      "segmentId": "¶81",
+      "label": "v",
+      "tier": "hard",
+      "quote": "发送到云端脱敏就违背了隐私保护初衷",
+      "title": "脱敏必须本地做",
+      "note": "这是带约束的工程决策范例：本地 Qwen3 0.6B"
+    },
+    {
+      "segmentId": "¶95",
+      "label": "d",
+      "tier": "core",
+      "quote": "检索相关片段 → 注入上下文 → LLM 基于上下文生成答案",
+      "title": "RAG 核心三步：检索、注入、生成"
+    },
+    {
+      "segmentId": "¶99",
+      "label": "d",
+      "tier": "core",
+      "quote": "把长文档切成适合独立检索的片段",
+      "title": "分块是离线预处理",
+      "note": "两个理由：嵌入长度限制 + 只注入相关部分"
+    },
+    {
+      "segmentId": "¶104",
+      "label": "d",
+      "tier": "core",
+      "quote": "块太小，单块信息不完整",
+      "title": "块大小两难",
+      "note": "起点 256-1024 token，重叠 10%-20%"
+    },
+    {
+      "segmentId": "¶105",
+      "label": "q",
+      "tier": "hard",
+      "quote": "这是分块的固有缺陷",
+      "title": "分块必然切断上下文",
+      "note": "全章伏笔：上下文感知检索要回补这一刀"
+    },
+    {
+      "segmentId": "¶107",
+      "label": "d",
+      "tier": "core",
+      "quote": "把每个词或句子转化成一串数字",
+      "title": "嵌入：文本到向量的映射",
+      "note": "国王-男性+女性≈女王"
+    },
+    {
+      "segmentId": "¶108",
+      "label": "d",
+      "tier": "core",
+      "quote": "它计算两个向量夹角的余弦值",
+      "title": "余弦相似度",
+      "note": "BGE-M3 实际同时输出稠密、稀疏、多向量"
+    },
+    {
+      "segmentId": "¶109",
+      "label": "c",
+      "tier": "ref",
+      "quote": "我们关心的是两个向量的",
+      "title": "为什么用夹角不用距离",
+      "note": "关心方向（语义）而非长度（文本长短）",
+      "keyword": "辨析"
+    },
+    {
+      "segmentId": "¶115",
+      "label": "s",
+      "tier": "core",
+      "quote": "无法处理一词多义",
+      "title": "静态词向量的根本局限",
+      "note": "bank 河岸/银行同向量；自注意力解决之"
+    },
+    {
+      "segmentId": "¶118",
+      "label": "d",
+      "tier": "core",
+      "quote": "核心是精确的关键词匹配",
+      "title": "稀疏嵌入根植于传统信息检索",
+      "note": "词袋：猫追狗 = 狗追猫"
+    },
+    {
+      "segmentId": "¶120",
+      "label": "e",
+      "tier": "ref",
+      "quote": "一个词在当前文档中出现得越多",
+      "title": "TF-IDF 的核心直觉",
+      "note": "60 篇含“模型”vs 3 篇含“蒸馏”"
+    },
+    {
+      "segmentId": "¶123",
+      "label": "d",
+      "tier": "core",
+      "quote": "词频饱和与长度归一化",
+      "title": "BM25 相对 TF-IDF 的两处修正",
+      "note": "k1 控饱和，b 控长度归一"
+    },
+    {
+      "segmentId": "¶127",
+      "label": "v",
+      "tier": "hard",
+      "quote": "取值会变成负数",
+      "title": "BM25 的 IDF 会变负",
+      "note": "DF>N/2 时为负，实现中通常设下限——易漏且会算错"
+    },
+    {
+      "segmentId": "¶131",
+      "label": "v",
+      "tier": "hard",
+      "quote": "因为 IDF 值更高",
+      "title": "实验：TF 低但 IDF 高反而贡献大",
+      "note": "doc_1“蒸馏”TF=3 贡献 2.15 >“模型”TF=5 的 1.52"
+    },
+    {
+      "segmentId": "¶133",
+      "label": "d",
+      "tier": "core",
+      "quote": "稠密检索懂语义但可能漏掉关键词",
+      "title": "两条路各自的盲区",
+      "note": "HTTP-403 vs kitty/cat"
+    },
+    {
+      "segmentId": "¶137",
+      "label": "d",
+      "tier": "core",
+      "quote": "完全抛开原始得分、只看排名",
+      "title": "RRF：只看排名不看分数",
+      "note": "得分=Σ1/(k+rank)，k 常取 60"
+    },
+    {
+      "segmentId": "¶138",
+      "label": "q",
+      "tier": "hard",
+      "quote": "并不是为了“补救 RRF 丢掉的得分”才存在的",
+      "title": "重排序不是补救 RRF",
+      "note": "原文特意纠正直觉：它换的是匹配范式，与融合方式无关"
+    },
+    {
+      "segmentId": "¶139",
+      "label": "c",
+      "tier": "ref",
+      "quote": "求职者把简历交给猎头快速筛选，是双编码器",
+      "title": "双编码器 vs 跨编码器",
+      "note": "猎头看简历 vs 面试官深谈；重排序用跨编码器",
+      "keyword": "类比"
+    },
+    {
+      "segmentId": "¶142",
+      "label": "d",
+      "tier": "core",
+      "quote": "包含正确答案的文档出现在前 k 个检索结果中的查询比例",
+      "title": "recall@k / MRR / nDCG 三指标"
+    },
+    {
+      "segmentId": "¶143",
+      "label": "c",
+      "tier": "ref",
+      "quote": "本书这里定义的“recall@k”实为**命中率**",
+      "title": "本书 recall@k 实为命中率",
+      "note": "跨来源比较须留意口径差异",
+      "keyword": "辨正"
+    },
+    {
+      "segmentId": "¶147",
+      "label": "q",
+      "tier": "hard",
+      "quote": "这些文本块本身该怎么组织",
+      "title": "更根本的问题：文本块怎么组织",
+      "note": "像靠字典随机词条理解小说"
+    },
+    {
+      "segmentId": "¶150",
+      "label": "e",
+      "tier": "ref",
+      "quote": "大部分案例根本不会被检索到",
+      "title": "黑猫白猫：top-k 截断导致错误结论",
+      "note": "100 个案例，top-20 只看到部分样本"
+    },
+    {
+      "segmentId": "¶152",
+      "label": "e",
+      "tier": "ref",
+      "quote": "“护士”与“医生”语义最近，Sarah 那条排在最前",
+      "title": "Xfinity 案例的三重障碍",
+      "note": "最近邻偏置 / 边界语义缺失 / 完整性信号缺失"
+    },
+    {
+      "segmentId": "¶154",
+      "label": "s",
+      "tier": "core",
+      "quote": "把原始案例或文档不加处理地直接放进知识库是远远不够的",
+      "title": "全章结论：原始知识必须结构化",
+      "note": "最反直觉的一句，也是所有索引方案的起点"
+    },
+    {
+      "segmentId": "¶158",
+      "label": "d",
+      "tier": "core",
+      "quote": "采用自下而上的递归抽象方式",
+      "title": "RAPTOR：自下而上递归抽象",
+      "note": "聚类 → 父节点摘要 → 成树"
+    },
+    {
+      "segmentId": "¶159",
+      "label": "e",
+      "tier": "ref",
+      "quote": "从而在不同粒度上支持检索",
+      "title": "RAPTOR 多粒度检索",
+      "note": "SSE 叶子节点聚成“x86 SIMD 演进”父节点"
+    },
+    {
+      "segmentId": "¶161",
+      "label": "d",
+      "tier": "core",
+      "quote": "实体-关系-实体三元组",
+      "title": "GraphRAG：知识图谱三元组",
+      "note": "（北京, 是首都, 中国）"
+    },
+    {
+      "segmentId": "¶162",
+      "label": "s",
+      "tier": "core",
+      "quote": "这是知识图谱最不可替代的能力",
+      "title": "GraphRAG 两大优势：多跳推理与实体消歧",
+      "note": "注意区分词义消歧与实体消歧"
+    },
+    {
+      "segmentId": "¶164",
+      "label": "q",
+      "tier": "hard",
+      "quote": "将自然语言转为三元组不可避免地导致**语义降级**",
+      "title": "GraphRAG 作通用记忆的局限",
+      "note": "条件与时间逻辑在转三元组时丢失"
+    },
+    {
+      "segmentId": "¶165",
+      "label": "s",
+      "tier": "core",
+      "quote": "实践中的推荐策略是**分层互补**",
+      "title": "推荐策略：分层互补",
+      "note": "自然语言保语义，图谱做专项索引"
+    },
+    {
+      "segmentId": "¶167",
+      "label": "t",
+      "tier": "ref",
+      "quote": "如果你的查询主要是",
+      "title": "何时该上结构化索引",
+      "note": "跨文档综合或多层导航才值得"
+    },
+    {
+      "segmentId": "¶169",
+      "label": "d",
+      "tier": "core",
+      "quote": "将所有上下文——记忆、资源、技能——映射为虚拟文件系统中的目录和文件",
+      "title": "OpenViking：文件系统范式",
+      "note": "viking:// 虚拟 URI"
+    },
+    {
+      "segmentId": "¶172",
+      "label": "d",
+      "tier": "core",
+      "quote": "L0/L1/L2 三层上下文按需加载",
+      "title": "L0 摘要 / L1 概览 / L2 全文",
+      "note": "与 Skills 渐进式披露同源"
+    },
+    {
+      "segmentId": "¶173",
+      "label": "s",
+      "tier": "core",
+      "quote": "纯文本意味着用户可直接阅读、编辑和修正 Agent 的知识",
+      "title": "选纯文本的深意",
+      "note": "可读可改可 Git 回滚"
+    },
+    {
+      "segmentId": "¶174",
+      "label": "q",
+      "tier": "hard",
+      "quote": "文件之间必须建立起链接与索引",
+      "title": "易忽视的前提：横向链接",
+      "note": "只拆成独立文件会让检索无从导航"
+    },
+    {
+      "segmentId": "¶177",
+      "label": "d",
+      "tier": "core",
+      "quote": "事件触发的增量更新",
+      "title": "更新必须两条腿走路",
+      "note": "只更新会乱，只重写会不及时"
+    },
+    {
+      "segmentId": "¶179",
+      "label": "d",
+      "tier": "core",
+      "quote": "把知识库当成代码库",
+      "title": "增量更新：PR 化",
+      "note": "Markdown 记忆同样应进 Git"
+    },
+    {
+      "segmentId": "¶181",
+      "label": "v",
+      "tier": "hard",
+      "quote": "超出上限仍未收敛时转人工审核，不能默认放行",
+      "title": "PR 流程的四个环节",
+      "note": "Proposer→Reviewer→迭代→CI+重建索引"
+    },
+    {
+      "segmentId": "¶184",
+      "label": "s",
+      "tier": "core",
+      "quote": "两个 Agent 应优先使用能力相近但来自不同家族的模型",
+      "title": "异源互审",
+      "note": "异源增加独立性但不能替代原始证据"
+    },
+    {
+      "segmentId": "¶186",
+      "label": "q",
+      "tier": "hard",
+      "quote": "但它每次只看到一个局部",
+      "title": "增量更新的盲区",
+      "note": "多次局部正确会累积出全局问题"
+    },
+    {
+      "segmentId": "¶188",
+      "label": "d",
+      "tier": "core",
+      "quote": "不能只在已有摘要之间相互改写",
+      "title": "定期整理：回到原始数据核查",
+      "note": "否则早期遗漏和误读会一代代传下去；分批须保留覆盖清单"
+    },
+    {
+      "segmentId": "¶190",
+      "label": "c",
+      "tier": "ref",
+      "quote": "在检索阶段就过滤掉已失效的内容",
+      "title": "失效内容下线",
+      "note": "同版本化冲突检测，只是尺度不同",
+      "keyword": "补充"
+    },
+    {
+      "segmentId": "¶194",
+      "label": "d",
+      "tier": "core",
+      "quote": "知识库检索不再是自动化的前置步骤，而是一个可供 Agent 随时调用的",
+      "title": "智能体化 RAG：检索变成工具",
+      "note": "像研究员反复查阅，而非只搜一次"
+    },
+    {
+      "segmentId": "¶198",
+      "label": "q",
+      "tier": "hard",
+      "quote": "检索到的文档正是",
+      "title": "RAG 的安全边界",
+      "note": "间接提示注入与知识库投毒；指令与数据分离"
+    },
+    {
+      "segmentId": "¶201",
+      "label": "s",
+      "tier": "core",
+      "quote": "智能体化 RAG 的价值在于其 “解决问题” 而非 “回答问题” 的能力",
+      "title": "智能体化 RAG 解决的是问题而非回答",
+      "note": "牺牲速度换复杂问题鲁棒性"
+    },
+    {
+      "segmentId": "¶208",
+      "label": "q",
+      "tier": "hard",
+      "quote": "传统文档分块方法本身存在的根本性缺陷",
+      "title": "分块缺陷是 RAG 的瓶颈",
+      "note": "回收 ¶105 的伏笔"
+    },
+    {
+      "segmentId": "¶209",
+      "label": "d",
+      "tier": "core",
+      "quote": "先利用 LLM 为其生成一段简短的、包含核心上下文的",
+      "title": "上下文感知检索：索引前补前缀",
+      "note": "[本段节选自 ACME 2025 Q2 财报]"
+    },
+    {
+      "segmentId": "¶210",
+      "label": "c",
+      "tier": "ref",
+      "quote": "一个在做加法（补上下文），一个在做减法（去冗余）",
+      "title": "检索在索引期做加法，压缩在运行期做减法",
+      "note": "两字之差，时机对象动作全不同",
+      "keyword": "对比"
+    },
+    {
+      "segmentId": "¶212",
+      "label": "s",
+      "tier": "core",
+      "quote": "同时增强了稀疏检索和稠密检索两种模式",
+      "title": "前缀同时增强两路检索",
+      "note": "稀疏得关键词，稠密得语义背景"
+    },
+    {
+      "segmentId": "¶215",
+      "label": "v",
+      "tier": "hard",
+      "quote": "在索引对话历史前增加关键的",
+      "title": "实验3-11：把上下文感知检索用于用户记忆",
+      "note": "三个前缀分别标注妻子设立、丈夫修改、妻子再改"
+    },
+    {
+      "segmentId": "¶218",
+      "label": "s",
+      "tier": "core",
+      "quote": "用 Advanced JSON Cards 把少量关键事实结构化后常驻上下文",
+      "title": "收口：双层记忆架构",
+      "note": "只靠常驻丢细节，只靠检索缺全局"
+    },
+    {
+      "segmentId": "¶220",
+      "label": "q",
+      "tier": "hard",
+      "quote": "知识更多以隐性、分散的形式蕴含在海量结构化案例数据中",
+      "title": "结构化数据里的隐性知识",
+      "note": "司法判例：知识不在法条里，在法官权衡里"
+    },
+    {
+      "segmentId": "¶223",
+      "label": "d",
+      "tier": "core",
+      "quote": "定义一个既全面又一致的数据模式",
+      "title": "第一阶段：知识提取与结构化",
+      "note": "核心挑战是 Schema 设计"
+    },
+    {
+      "segmentId": "¶226",
+      "label": "e",
+      "tier": "ref",
+      "quote": "没有采用预先定义好的僵化数据模式，而是采用 “自下而上” 因子发现策略",
+      "title": "实验3-12：CAIL2018 判例知识提取",
+      "note": "用开关位而非 1/2/3，避免算法误以为量级关系"
+    },
+    {
+      "segmentId": "¶232",
+      "label": "e",
+      "tier": "ref",
+      "quote": "在上下文中只占用 1 个 token 的空间",
+      "title": "多模态记忆思路二：嵌入存上下文",
+      "note": "1000 token 可容 1000 张人脸"
+    },
+    {
+      "segmentId": "¶233",
+      "label": "q",
+      "tier": "hard",
+      "quote": "让模型知道何时该取用它，则是另一回事",
+      "title": "多模态记忆思路三：写进参数",
+      "note": "fact-LoRA 能复述但不能间接推理"
+    },
+    {
+      "segmentId": "¶236",
+      "label": "s",
+      "tier": "core",
+      "quote": "面向个人的用户记忆，以及面向所有用户的共享知识库",
+      "title": "本章小结：两个尺度",
+      "note": "读取→提取→核验→更新的生命周期"
+    },
+    {
+      "segmentId": "¶238",
+      "label": "s",
+      "tier": "core",
+      "quote": "分块 → 稠密/稀疏检索 → 融合 → 重排序 → 生成",
+      "title": "知识库主流水线",
+      "note": "用 recall@k 等指标验收"
+    }
+  ],
+  "stats": {
+    "total": 80,
+    "byTier": {
+      "core": 46,
+      "hard": 16,
+      "ref": 18
+    },
+    "highlightedChars": 1121,
+    "totalChars": 40975,
+    "ratio": 0.0274,
+    "colorChars": 1431,
+    "colorRatio": 0.0349,
+    "tierRatio": {
+      "core": 0.0215,
+      "hard": 0.0059,
+      "ref": 0.0076
+    },
+    "tierChars": {
+      "core": 880,
+      "hard": 241,
+      "ref": 310
+    }
+  },
+  "issues": [],
+  "savedAt": "2026-10-24T11:01:35.048Z"
+}

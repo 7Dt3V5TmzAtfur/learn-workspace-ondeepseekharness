@@ -34,17 +34,20 @@
       "hard": 0,
       "ref": 3
     },
-    "highlightedChars": 10,
+    "highlightedChars": 0,
     "totalChars": 794,
-    "ratio": 0.0126,
-    "labelCounts": {
-      "d": 1,
-      "e": 1,
-      "q": 0,
-      "s": 0,
-      "t": 1,
-      "c": 1,
-      "v": 0
+    "ratio": 0,
+    "colorChars": 0,
+    "colorRatio": 0,
+    "tierRatio": {
+      "core": 0,
+      "hard": 0,
+      "ref": 0
+    },
+    "tierChars": {
+      "core": 0,
+      "hard": 0,
+      "ref": 0
     }
   },
   "issues": [],

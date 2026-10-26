@@ -8,6 +8,7 @@ import { mkdir, readFile, writeFile, readdir, stat, rename, rm } from 'node:fs/p
 import { existsSync, readdirSync } from 'node:fs'
 import { join, resolve, dirname, basename, extname, relative, isAbsolute } from 'node:path'
 import { createHash } from 'node:crypto'
+import { tierOfLabel } from './rules.js'
 
 export const STUDY_DIR_NAME = '.study'
 
@@ -200,11 +201,39 @@ export class StudyStore {
     return meta
   }
 
+  /**
+   * 按正文内容哈希找已有的学习项目。
+   *
+   * 为什么要它：docId 里带时间戳（防同名覆盖），于是**同一份文件导入两次
+   * 就是两个项目**。实测仓库里 already 有两个 chapter1，正文哈希完全相同，
+   * 其中一个一条标注都没有 —— 用户面对两个同名条目，分不清哪个是自己在读的。
+   *
+   * 只按内容判等，不按文件名：用户常把同一份资料换个名字再导一次。
+   * 内容变了就绝不能复用 —— 段号会变，旧标注会整体错位。
+   */
+  async findByContentHash(hash) {
+    if (!hash || !existsSync(this.root)) return null
+    const entries = await readdir(this.root, { withFileTypes: true })
+    for (const entry of entries) {
+      if (!entry.isDirectory()) continue
+      // 正文没了就不算"已有项目"：返回值要能接着读，不能把人指到一个空壳上
+      if (!existsSync(join(this.root, entry.name, 'source.md'))) continue
+      const meta = await readJson(join(this.root, entry.name, 'meta.json'))
+      if (meta?.contentHash === hash) return entry.name
+    }
+    return null
+  }
+
   async saveMeta(docId, patch) {
     const dir = this.dir(docId)
     await mkdir(dir, { recursive: true })
     const prev = (await readJson(join(dir, 'meta.json'))) ?? {}
-    const next = { ...prev, ...patch, id: docId, updatedAt: new Date().toISOString() }
+    // stage 没有读取方（阶段一律由 progressOf 推导），却总有人顺手写一份，
+    // 于是 meta.json 里躺着一个和界面相反的值。写的时候主动剔掉，
+    // 连历史残留一起清 —— 文件里不该有第二个真相。
+    const { stage: _ignored, ...rest } = patch ?? {}
+    const next = { ...prev, ...rest, id: docId, updatedAt: new Date().toISOString() }
+    delete next.stage
     await writeJson(join(dir, 'meta.json'), next)
     return next
   }
@@ -320,8 +349,10 @@ export class StudyStore {
       handledCount: drillRecords.length,
       drilledCount: drillRecords.filter((d) => d?.valid !== false).length,
       annotatedCount: annotation?.items?.length ?? 0,
-      // 只要标过"能复述的要点"，就算拿到了东西 —— 不值得等全标完
-      keyPointCount: (annotation?.items ?? []).filter((a) => a?.tier === 'core').length,
+      // 只要标过"能复述的要点"，就算拿到了东西 —— 不值得等全标完。
+      // 档位必须由标签推：chapter1 有 73 条 #d 在磁盘上被存成 ref，
+      // 信 tier 字段会把 123 处核心要点数成 50 处。
+      keyPointCount: (annotation?.items ?? []).filter((a) => (tierOfLabel(a?.label) ?? a?.tier) === 'core').length,
       // 这批标注是不是脚本回填的。
       // 放在 progress 里是因为列表页与停靠条都要用到它，而它们已经调了 progressOf，
       // 不该为同一个判断再读一遍 annotations.json。

@@ -6,6 +6,7 @@ import { strict as assert } from 'node:assert'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { mkdtemp, rm, readFile, mkdir, writeFile } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
@@ -591,6 +592,39 @@ await test('分档占比按标签现算（老项目没有 tierRatio 也能显示
   assert.equal(stat.ratio, 0.01, '只有核心/攻坚计入注意力预算')
 })
 
+await test('总高亮预算按三档合计判（参考档不能无限标）', async () => {
+  /**
+   * 早期只把核心+攻坚计入总预算，参考档"不限"于是真的可以标到满页。
+   * 实测同一份资料的两种口径差近一倍（chapter4：核心+攻坚 6.3%，三档合计 11.1%）——
+   * 需求里"高亮 10%-20%"说的显然是后者。
+   */
+  // 20 段 × 100 字：每段标 15 字参考档 = 300 字 = 15%，再加核心/攻坚仍在 20% 内
+  const refsOnly = SEGS.map((s, i) => ({
+    segmentId: s.id,
+    label: 'e',
+    title: `例子${i}`,
+    quote: '填充内容'.repeat(3) + '填',
+  }))
+  const view = rules.summarizeAnnotations(refsOnly, CTX.totalChars)
+  assert.equal(view.ratio, 0, '参考档不进分档预算')
+  assert.ok(view.colorRatio > 0.1, `三档合计应计入参考档，实际 ${view.colorRatio}`)
+
+  // 把参考档标到 30%：分档预算完全没超，但读者看到的是一页颜色，必须拒
+  const heavy = SEGS.map((s, i) => ({
+    segmentId: s.id,
+    label: 'e',
+    title: `例子${i}`,
+    quote: ('填充内容'.repeat(6) + s.text.slice(0, 30)).slice(0, 30),
+  }))
+  const r = rules.validateAnnotation(heavy, CTX)
+  assert.equal(r.ok, false, '参考档把 30% 的正文染满竟然通过了')
+  assert.ok(
+    r.check === undefined && r.issues.some((i) => i.code === 'budget-total'),
+    '没有报 budget-total，模型不知道是总量超了',
+  )
+  assert.ok(r.stats.colorRatio > 0.2)
+})
+
 await test('渲染时颜色跟着标签走，不跟 tier', async () => {
   const html = rules.renderAnnotatedHtml(
     [{ id: '¶2', text: '关键短语2 是定义', html: '' }],
@@ -1034,7 +1068,18 @@ section('9. 读前建构的 HTML 结构（排版不能乱）')
 // 先单独导一份，避免和前面"超预算被拒"的文档状态纠缠
 {
   const svc = new StudyService(workspace)
-  const r = await svc.ingest(join(FIXTURES, 'sample.md'), { title: '排版测试' })
+  // 必须是另一份**内容不同**的资料：同一份正文再导入会复用已有项目（去重），
+  // 那样这里就不是"单独导一份"，而是把前面那份的状态搅进来。
+  const copy = join(workspace, 'typeset.md')
+  await writeFile(
+    copy,
+    `${await readFile(join(FIXTURES, 'sample.md'), 'utf8')}
+
+排版专用段落：这一份只用来验读前页的 HTML 结构。
+`,
+    'utf8',
+  )
+  const r = await svc.ingest(copy, { title: '排版测试' })
   const id = r.docId ?? r.id
   await svc.savePreflight(id, goodPlan())
 }
@@ -2105,6 +2150,149 @@ await test('分组不超过节点上限，也不丢节点', async () => {
   assert.equal(total, 40, '拆完不能丢节点')
 })
 
+
+
+/* ------------------------------ 21. 被拒的产物 / 重复导入 / 档位只有一个算法 */
+
+section('21. 被拒的不推进阶段 · 同一份资料不重复建项目 · 档位只有一个算法')
+
+/**
+ * 三条都是端到端验收里真实抓到的：
+ *
+ * 1. 读前六段式只写了①摘要、其余五段全缺，校验 6 条 error，
+ *    产物却照写 preflight.json，阶段照样推进到 planned ——
+ *    而标注和图谱被拒时只留 .rejected，三个阶段的语义不一致。
+ * 2. 同一份正文导入两次就是两个项目（docId 带时间戳）。实测仓库里
+ *    已经有两个 chapter1，正文哈希完全相同，用户分不清哪个是自己在读的。
+ * 3. 磁盘上的 tier 可能与 label 矛盾（chapter1 93/217），
+ *    信的代码会把 123 处核心要点数成 50 处。
+ */
+const ws21 = await mkdtemp(join(tmpdir(), 'study-gate-'))
+const svc21 = new StudyService(ws21)
+const fixture21 = join(ws21, 'sample.md')
+await writeFile(
+  fixture21,
+  [
+    '# 验收样本',
+    '',
+    '第一段：这里讲的是为什么要按用户路径验收，而不是只跑单元测试。接口通了不代表页面有东西。',
+    '',
+    '## 小节一',
+    '',
+    '第二段：这里讲的是检查点要落在用户能看到的东西上，比如高亮包住了哪几个字。',
+    '',
+    '第三段：这里讲的是失败要分类说清，无后缀、空文件、路径不存在、路径是文件夹。',
+    '',
+  ].join('\n'),
+  'utf8',
+)
+const ing21 = await svc21.ingest(fixture21, { title: '验收样本' })
+const DOC21 = ing21.docId
+
+await test('读前计划缺五段：只留 rejected 草稿，阶段不许推进', async () => {
+  const res = await svc21.savePreflight(DOC21, { summary: '只写了摘要，其余五段全缺。' })
+  assert.equal(res.check.ok, false, '六段缺五段竟然通过了校验')
+  assert.equal(res.accepted, false, '没有告诉调用方这次没被接受')
+  const proj = await svc21.project(DOC21)
+  assert.equal(proj.stage, 'ingested', '被拒的读前计划把阶段推进了')
+  const dir = join(ws21, '.study', DOC21)
+  assert.equal(existsSync(join(dir, 'preflight.json')), false, '被拒的计划写了正式文件名')
+  assert.equal(existsSync(join(dir, 'preflight.rejected.json')), true, '被拒后没留草稿，用户丢了刚写的内容')
+  assert.equal(existsSync(join(dir, 'quiz.md')), false, '被拒的计划还生成了残缺题库')
+  assert.equal(existsSync(join(dir, 'refs.md')), false, '被拒的计划还生成了残缺参考资料')
+})
+
+await test('完整的读前计划：接受并推进到 planned', async () => {
+  const res = await svc21.savePreflight(DOC21, goodPlan())
+  assert.ok(res.check.ok, JSON.stringify(res.check.issues))
+  assert.equal(res.accepted, true)
+  const proj = await svc21.project(DOC21)
+  assert.equal(proj.stage, 'planned')
+  assert.ok(proj.quizHtml, '题库没生成')
+})
+
+await test('同一份正文再导入：复用同一个项目', async () => {
+  const again = await svc21.ingest(fixture21, { title: '换个标题也一样' })
+  assert.equal(again.docId, DOC21, '同一份正文又建了一个项目')
+  assert.equal(again.reused, true, '没有告诉调用方这是复用')
+  assert.equal((await svc21.list()).length, 1, '资料库里出现了两条')
+  // 复用不许顺手改名：导入是"放进来"，不是"改已有项目的名字"
+  const list = await svc21.list()
+  assert.equal(list[0].title, '验收样本', '复用路径把已有项目改名了')
+})
+
+await test('同名但内容变了：必须新建（段号会位移，复用会把旧标注挂错段）', async () => {
+  await writeFile(fixture21, '# 验收样本\n\n改过之后的正文：这一版的段落数不一样了。\n', 'utf8')
+  const changed = await svc21.ingest(fixture21)
+  assert.notEqual(changed.docId, DOC21, '内容变了还复用旧项目，旧标注会挂到别的段落上')
+  assert.equal((await svc21.list()).length, 2)
+})
+
+await test('核心要点数按标签算，不信磁盘上的 tier', async () => {
+  // 模拟 chapter1 的历史数据：73 条 #d 被存成 ref
+  const segs = await svc21.store.segments(DOC21)
+  const texts = await svc21.store.segmentTexts(DOC21)
+  const q = (id) => (texts.get(id) ?? '').slice(0, 12)
+  await svc21.store.writeArtifact(DOC21, 'annotations.json', {
+    items: [
+      { segmentId: segs[0].id, label: 'd', tier: 'ref', quote: q(segs[0].id) },
+      { segmentId: segs[1].id, label: 's', tier: 'ref', quote: q(segs[1].id) },
+      { segmentId: segs[2].id, label: 'e', tier: 'core', quote: q(segs[2].id) },
+    ],
+  })
+  const p = await svc21.store.progressOf(DOC21)
+  assert.equal(p.keyPointCount, 2, '#d 与 #s 应算核心要点，与 tier 字段写什么无关')
+  const h = await svc21.harvested(DOC21)
+  assert.equal(h.keyPoints, 2, '收获视图的核心要点数用了磁盘上的 tier')
+})
+
+await test('读出来的标注 tier 已归位（界面按 tier 判断才不会漏）', async () => {
+  const proj = await svc21.project(DOC21)
+  const tiers = Object.fromEntries(proj.annotations.items.map((i) => [i.label, i.tier]))
+  assert.equal(tiers.d, 'core', 'project() 没把 tier 归位，读中页的「核心档盖住待回想」会漏')
+  assert.equal(tiers.s, 'core')
+  assert.equal(tiers.e, 'ref')
+  assert.equal(proj.annotations.stats.byTier.core, 2)
+})
+
+await test('老 stats 缺 tierRatio 时，status 仍给出分档占比', async () => {
+  const st = await svc21.status(DOC21)
+  assert.ok(st.highlight, 'highlight 为空，模型失去预算判断依据')
+  assert.equal(typeof st.highlight.coreRatio, 'number', 'coreRatio 应为数字')
+  assert.equal(typeof st.highlight.hardRatio, 'number')
+})
+
+await test('meta.stage 写不进去（阶段只有产物这一个真相）', async () => {
+  await svc21.store.saveMeta(DOC21, { stage: 'drilled' })
+  const meta = JSON.parse(await readFile(join(ws21, '.study', DOC21, 'meta.json'), 'utf8'))
+  assert.equal('stage' in meta, false, 'meta.json 里又出现了和界面打架的阶段值')
+  const proj = await svc21.project(DOC21)
+  assert.notEqual(proj.stage, 'done', '写 meta.stage 竟然影响了真实阶段')
+})
+
+await test('关系边的原文出处不许用省略号拼（无法核对等于没有出处）', async () => {
+  // 实测 chapter3 有 8/41 条边写成「前半句…后半句」，与原文字符串永远对不上。
+  const res = await svc21.saveRelations(DOC21, {
+    nodes: [{ id: 'a', label: '甲' }, { id: 'b', label: '乙' }],
+    edges: [{ id: 'e1', from: 'a', to: 'b', relation: 'prerequisite', quote: '前半句…后半句' }],
+    relationReview: Object.fromEntries(
+      ['prerequisite', 'part-of', 'contrast', 'cause', 'example-of', 'application', 'sequence', 'analogy'].map((k) => [
+        k,
+        k === 'prerequisite'
+          ? { status: 'mapped', edgeIds: ['e1'] }
+          : { status: 'unsupported', why: '这份样本没有这一类关系' },
+      ]),
+    ),
+  })
+  assert.equal(res.check.ok, false, '带省略号的出处被当成合格证据了')
+  assert.ok(
+    res.check.issues.some((i) => i.code === 'edge-quote-ellipsis'),
+    '没有指出省略号问题，模型不知道该改成逐字原文',
+  )
+  assert.equal(await svc21.store.artifact(DOC21, 'relations.json').catch(() => null), null, '被拒的图写了正式产物')
+})
+
+await rm(ws21, { recursive: true, force: true })
 
 console.log(`\n${'─'.repeat(52)}`)
 console.log(`通过 ${passed}　失败 ${failed}`)

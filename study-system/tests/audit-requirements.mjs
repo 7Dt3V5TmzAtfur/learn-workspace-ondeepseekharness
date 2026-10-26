@@ -243,10 +243,13 @@ add(
   'D5',
   '高亮占比落在原则要求的 10%-20%',
   (() => {
-    const r = ann?.stats?.ratio
+    // 用 colorRatio（三档合计）而不是 ratio（只算核心+攻坚）：
+    // 需求说的是"高亮占全文多少"，读者看到的是所有带颜色的字。
+    // ratio 只回答预算问题（核心≤10%、攻坚≤8%），两者不能混用。
+    const r = ann?.stats?.colorRatio ?? ann?.stats?.ratio
     return typeof r === 'number' && r >= 0.1 && r <= 0.2
   })(),
-  `实际 ${ann?.stats?.ratio}：低于 10% 三色注意力失效，高于 20% 违反二八法则`,
+  `实际 ${ann?.stats?.colorRatio ?? ann?.stats?.ratio}：低于 10% 三色注意力失效，高于 20% 违反二八法则`,
 )
 
 add(

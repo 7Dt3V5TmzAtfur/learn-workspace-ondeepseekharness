@@ -1466,21 +1466,24 @@
   "stats": {
     "total": 182,
     "byTier": {
-      "ref": 90,
       "core": 64,
-      "hard": 28
+      "hard": 28,
+      "ref": 90
     },
-    "highlightedChars": 3446,
+    "highlightedChars": 1868,
     "totalChars": 29831,
-    "ratio": 0.1106,
-    "labelCounts": {
-      "c": 41,
-      "e": 30,
-      "t": 19,
-      "d": 49,
-      "q": 12,
-      "s": 15,
-      "v": 16
+    "ratio": 0.0626,
+    "colorChars": 3446,
+    "colorRatio": 0.1155,
+    "tierRatio": {
+      "core": 0.0426,
+      "hard": 0.02,
+      "ref": 0.0529
+    },
+    "tierChars": {
+      "core": 1272,
+      "hard": 596,
+      "ref": 1578
     }
   },
   "issues": [],

@@ -15,7 +15,10 @@ const NODE = process.execPath
 const SUITES = [
   ['run-tests.mjs', '单元 / 端到端 / 规则'],
   ['case-api-mount.mjs', '宿主挂载 / 路由时序'],
-  ['e2e-check.mjs', '真实 HTTP 接口'],
+  // e2e-user-path 自带一个进程内 HTTP 服务（harness-server），验的是源码，
+  // 不依赖运行中的桌面端 —— 改了代码还没重载时也能先跑通这条路。
+  ['e2e-user-path.mjs', '全链路用户路径'],
+  ['e2e-check.mjs', '真实部署的 HTTP 接口'],
   ['audit-ui.mjs', '界面渲染内容'],
   ['audit-skills.mjs', '技能文档约束'],
   ['audit-requirements.mjs', '用户需求逐条'],
@@ -24,6 +27,8 @@ const SUITES = [
   ['audit-client-render.mjs', '组件渲染冒烟'],
   ['audit-hover.mjs', '悬停提示（真实浏览器）'],
   ['audit-styles.mjs', '样式与变量'],
+  ['audit-reading-layout.mjs', '读中页版面（真实浏览器）'],
+  ['audit-data-integrity.mjs', '磁盘数据自洽'],
   ['check-render.mjs', 'Markdown 渲染'],
 ]
 
