@@ -16,7 +16,7 @@ import { readFile, readdir, stat } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { join, resolve, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { tierOfLabel } from '../plugin/lib/rules.js'
+import { tierOfAnnotation } from '../plugin/lib/rules.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const WS = resolve(process.argv[2] ?? join(HERE, '..', '..'))
@@ -112,7 +112,8 @@ for (const id of ids) {
     let dupSeg = 0
     const seen = new Set()
     for (const it of items) {
-      if (it.tier !== tierOfLabel(it.label)) tierMismatch += 1
+      // 这里必须比**磁盘上的字段**与规则值，不能调 tierOfAnnotation（它已经把 tier 盖掉了）
+      if (it.tier !== tierOfAnnotation({ label: it.label }) ) tierMismatch += 1
       if (!segIds.has(it.segmentId)) unknownSeg += 1
       else if (!(textOf.get(it.segmentId) ?? '').includes(String(it.quote ?? ''))) quoteMissing += 1
       if (seen.has(it.segmentId)) dupSeg += 1
@@ -130,17 +131,22 @@ for (const id of ids) {
     const totalChars = segs.reduce((a, s) => a + (s.chars ?? 0), 0) || 1
     let core = 0
     let hardChars = 0
+    let all = 0
     for (const it of items) {
       const n = [...String(it.quote ?? '')].length
-      const t = it.tier ?? tierOfLabel(it.label)
+      const t = tierOfAnnotation(it)
       if (t === 'core') core += n
       if (t === 'hard') hardChars += n
+      all += n
     }
     const coreRatio = core / totalChars
     const hardRatio = hardChars / totalChars
     if (coreRatio > 0.1001) bad(id, 'budget-core', `核心档 ${(coreRatio * 100).toFixed(1)}% > 10%`)
     if (hardRatio > 0.0801) bad(id, 'budget-hard', `攻坚档 ${(hardRatio * 100).toFixed(1)}% > 8%`)
-    if (coreRatio + hardRatio > 0.2001) bad(id, 'budget-total', `合计 ${((coreRatio + hardRatio) * 100).toFixed(1)}% > 20%`)
+    // 总预算按三档合计判，与 rules.validateAnnotation 同一口径；
+    // 只算核心+攻坚的话，参考档把整页染满也查不出来。
+    const colorRatio = all / totalChars
+    if (colorRatio > 0.2001) bad(id, 'budget-total', `三档合计 ${(colorRatio * 100).toFixed(1)}% > 20%`)
   }
 
   /* ---- 关系图 ---- */

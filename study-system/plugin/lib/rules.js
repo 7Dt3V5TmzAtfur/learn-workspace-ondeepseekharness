@@ -177,6 +177,18 @@ export function tierOfLabel(label) {
 }
 
 /**
+ * 一条标注的档位 —— 全项目只从这里取。
+ *
+ * 写成函数而不是让各处自己拼 `tierOfLabel(x.label) ?? x.tier`：
+ * 这个 `??` 兜底一散开就是五份拷贝，其中一份把顺序写反了（先信 tier、后信 label），
+ * 于是同一份数据在不同地方算出两种档位。规则只有一句：**标签优先**；
+ * `tier` 只在标签不合法时兜底（历史数据里可能有脏标签）。
+ */
+export function tierOfAnnotation(item) {
+  return tierOfLabel(item?.label) ?? item?.tier ?? null
+}
+
+/**
  * 由标注项直接算出分档占比（口径与 validateAnnotation 一致：按 quote 字数）。
  *
  * 为什么需要单独一份：老项目的 annotations.stats 里没有 tierRatio，
@@ -366,13 +378,22 @@ export function validateAnnotation(items, context) {
 
   // 总预算按三档合计判：参考档不分档封顶，但一样会把页面染满。
   // 只约束核心/攻坚的话，把 40% 的正文都标成例子也能过关 —— 读者看到的还是一页颜色。
+  //
+  // 文案要说清该减哪一档：核心/攻坚本身超了却让人"减少参考档"，
+  // 模型会照着改错地方，来回几轮都过不了。
   if (colorRatio > TOTAL_HIGHLIGHT_BUDGET) {
+    const over = []
+    for (const [key, def] of Object.entries(ATTENTION_TIERS)) {
+      if (def.budget !== null && tierCharsMap[key] / totalChars > def.budget) over.push(def.zh)
+    }
+    // 分档都没超，超的是合计 —— 那只可能是参考档把总量顶上去了
+    const which = over.length ? over.join('、') : '参考'
     issues.push(
       issue(
         'error',
         'budget-total',
         `高亮覆盖 ${(colorRatio * 100).toFixed(1)}%（三档合计，其中核心+攻坚 ${(ratio * 100).toFixed(1)}%），` +
-          `超过二八法则上限 ${TOTAL_HIGHLIGHT_BUDGET * 100}%。请缩短 quote，或减少参考档的条数。`,
+          `超过二八法则上限 ${TOTAL_HIGHLIGHT_BUDGET * 100}%。请缩短 quote，或减少${which}档的条数。`,
       ),
     )
   }
@@ -381,12 +402,12 @@ export function validateAnnotation(items, context) {
    * 原则原文《深度阅读的二八法则》说的是「不超过 10%-20%」，
    * 理想值就在这个区间里，不是"越少越好"。实测某份 29831 字的资料
    * 只标了 0.85%（253 字），翻一页只看到 7 个字有颜色，注意力机制等于没有。 */
-  if (ratio < 0.02) {
+  if (colorRatio < 0.02) {
     issues.push(
       issue(
         'warn',
         'budget-too-sparse',
-        `高亮只占 ${(ratio * 100).toFixed(2)}%（${highlightedChars}/${totalChars} 字）。` +
+        `高亮只占 ${(colorRatio * 100).toFixed(2)}%（${colorChars}/${totalChars} 字）。` +
           '原则建议 10%-20%，低于 2% 时三色注意力基本失效——' +
           '请回头给关键段落补标，而不是只标几处。',
       ),

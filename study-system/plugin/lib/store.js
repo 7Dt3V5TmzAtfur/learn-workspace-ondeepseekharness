@@ -8,7 +8,7 @@ import { mkdir, readFile, writeFile, readdir, stat, rename, rm } from 'node:fs/p
 import { existsSync, readdirSync } from 'node:fs'
 import { join, resolve, dirname, basename, extname, relative, isAbsolute } from 'node:path'
 import { createHash } from 'node:crypto'
-import { tierOfLabel } from './rules.js'
+import { tierOfAnnotation } from './rules.js'
 
 export const STUDY_DIR_NAME = '.study'
 
@@ -352,7 +352,7 @@ export class StudyStore {
       // 只要标过"能复述的要点"，就算拿到了东西 —— 不值得等全标完。
       // 档位必须由标签推：chapter1 有 73 条 #d 在磁盘上被存成 ref，
       // 信 tier 字段会把 123 处核心要点数成 50 处。
-      keyPointCount: (annotation?.items ?? []).filter((a) => (tierOfLabel(a?.label) ?? a?.tier) === 'core').length,
+      keyPointCount: (annotation?.items ?? []).filter((a) => tierOfAnnotation(a) === 'core').length,
       // 这批标注是不是脚本回填的。
       // 放在 progress 里是因为列表页与停靠条都要用到它，而它们已经调了 progressOf，
       // 不该为同一个判断再读一遍 annotations.json。

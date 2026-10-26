@@ -20,7 +20,7 @@ import {
   renderAnnotatedHtml,
   ATTENTION_TIERS,
   summarizeAnnotations,
-  tierOfLabel,
+  tierOfAnnotation,
   ROLE_LABELS,
   RELATION_TYPES,
   STAGES,
@@ -155,9 +155,9 @@ export class StudyService {
     if (!ext) throw new Error(`认不出文件类型：${safeName}。文件名需要带后缀，例如 .pdf / .md`)
 
     // 同一份内容已经在库里：一个字节都不用落盘，直接把那个项目还回去。
-    // 放在写 _inbox 之前，否则每次重复上传都会在 _inbox 留一份孤儿副本。
+    // 放在写 _inbox 之前，否则每次重复导入都会在 _inbox 留一份孤儿副本。
     if (!options.docId) {
-      const reuse = await this.reuseOf(buffer, options)
+      const reuse = await this.reuseOf(buffer)
       if (reuse) return reuse
     }
 
@@ -179,7 +179,7 @@ export class StudyService {
    * 内容变了就绝不复用：段号会整体位移，旧标注会挂到别的段落上，
    * 那比多出一个项目危险得多。
    */
-  async reuseOf(buffer, options = {}) {
+  async reuseOf(buffer) {
     if (!Buffer.isBuffer(buffer) || !buffer.length) return null
     const hash = createHash('sha1').update(buffer).digest('hex')
     const docId = await this.store.findByContentHash(hash)
@@ -219,7 +219,7 @@ export class StudyService {
     // 曾经 chapter1 在库里出现两次（正文哈希完全相同，其中一份一条标注都没有），
     // 用户面对两个同名条目，根本分不清哪个是自己在读的。
     if (!options.docId) {
-      const reuse = await this.reuseOf(buf, options)
+      const reuse = await this.reuseOf(buf)
       if (reuse) return reuse
     }
     const { text, format, warning } = await extractDocument(abs, buf)
@@ -580,7 +580,7 @@ export class StudyService {
    */
   annotationView(annotations, totalChars) {
     if (!annotations?.items?.length) return annotations ?? null
-    const items = annotations.items.map((it) => ({ ...it, tier: tierOfLabel(it?.label) ?? it?.tier }))
+    const items = annotations.items.map((it) => ({ ...it, tier: tierOfAnnotation(it) }))
     return { ...annotations, items, stats: summarizeAnnotations(items, totalChars) }
   }
 
@@ -1056,7 +1056,7 @@ export class StudyService {
     // 只要"能复述"的核心档，参考档和攻坚档不算"拿到的点"。
     // 档位按标签推，不信磁盘上的 tier：chapter1 有 73 条 #d 存成了 ref，
     // 信 tier 会把 123 处数成 50 处 —— 这正是"拿到的东西"被少报的来源。
-    const core = ann.filter((a) => (tierOfLabel(a?.label) ?? a?.tier) === 'core')
+    const core = ann.filter((a) => tierOfAnnotation(a) === 'core')
     // 有效考核：合书、够时长、没抄原文
     const validDrills = drills.filter((d) => d.valid !== false)
     const actions = validDrills.map((d) => String(d.minimalAction ?? '').trim()).filter(Boolean)
@@ -1311,9 +1311,12 @@ export class StudyService {
     const annotationsRaw = await this.store.artifact(docId, 'annotations.json').catch(() => null)
     // 预算占比必须现算：chapter1 的 stats 是旧格式（没有 tierRatio），
     // 直接读 stats 会让模型看到 coreRatio:null，等于失去了判断依据。
+    // 分母与 project() 用同一个口径（段落字数求和）。信 stats.totalChars 会分叉：
+    // 同一份资料在 /project 与 study_status 里算出两个占比，而 stats 可能是几版前的。
     const totalChars =
+      (await this.store.segments(docId)).reduce((a, s) => a + (s.chars || 0), 0) ||
       annotationsRaw?.stats?.totalChars ||
-      (await this.store.segments(docId)).reduce((a, s) => a + (s.chars || 0), 0)
+      0
     const annotations = this.annotationView(annotationsRaw, totalChars)
     const relations = await this.store.artifact(docId, 'relations.json').catch(() => null)
     const qa = await this.store.artifact(docId, 'qa.json').catch(() => null)
@@ -1537,7 +1540,7 @@ export class StudyService {
       // 导出 Markdown 时用加粗表达三色高亮，保证纯文本也能看出档位。
       // 档位仍按标签推：磁盘上的 tier 可能是历史错误值。
       if (a?.quote) {
-        const tier = tierOfLabel(a.label) ?? a.tier
+        const tier = tierOfAnnotation(a)
         const mark = tier === 'ref' ? '*' : '**'
         body = body.replace(String(a.quote), `${mark}${a.quote}${mark}`)
       }

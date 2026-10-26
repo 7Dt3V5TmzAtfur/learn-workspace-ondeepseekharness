@@ -14,9 +14,11 @@
  *    第二个真相。saveMeta 现在会主动剔掉它，这里把历史文件一起清干净。
  *
  * 3. 老项目没有 `contentHash`，重复导入认不出"这份已经在库里了"。
- *    优先按 `original/<源文件>` 的字节算（和 ingest 时同一份输入），
- *    没有原件才退回 source.md —— 后者只对 md/txt 类成立，其他格式宁可不补，
- *    也不能给一个错的指纹（错指纹会让"改过的文件"被误判成同一份）。
+ *    口径必须与 ingest 完全一致：**文件原始字节**的 sha1。
+ *    所以只从 `original/<源文件>` 取；没有原件的项目宁可不补。
+ *    绝不能拿 source.md 顶替 —— 抽取会做空白归一（extract.js），
+ *    算出来的指纹和原文件的字节不等，那个指纹永远不会命中，
+ *    而一旦命中就是把两份不同的文件当成同一份。
  *
  * 为什么不用 writeArtifact：它会顺带 saveMeta({}) 刷新 updatedAt，
  * 而列表按 updatedAt 排序 —— 一次迁移把整个资料库的顺序打乱，是不可接受的副作用。
@@ -55,9 +57,6 @@ async function writeJsonAtomic(file, value) {
   await rename(tmp, file)
 }
 
-/** 只对这些格式，source.md 与源文件字节等价（纯文本抽取不改变内容）。 */
-const TEXT_FORMATS = new Set(['md', 'markdown', 'txt', 'text', 'html', 'htm'])
-
 if (!existsSync(ROOT)) {
   console.log(`没有 .study 目录：${ROOT}`)
   process.exit(0)
@@ -70,6 +69,8 @@ console.log('='.repeat(68))
 
 const docs = (await readdir(ROOT, { withFileTypes: true })).filter((e) => e.isDirectory()).map((e) => e.name)
 let touched = 0
+/** 只在需要重新导出 annotated.md 时才加载 service（它会把 archify 那套也带进来） */
+let svc = null
 
 for (const id of docs) {
   const dir = join(ROOT, id)
@@ -79,6 +80,7 @@ for (const id of docs) {
 
   /* ---- 1. 标注归位 ---- */
   const ann = await readJson(join(dir, 'annotations.json'))
+  let writeMd = null
   if (ann?.items?.length) {
     const segs = (await readJson(join(dir, 'segments.json'), { items: [] }))?.items ?? []
     const totalChars = ann.stats?.totalChars || segs.reduce((a, s) => a + (s.chars || 0), 0)
@@ -111,6 +113,13 @@ for (const id of docs) {
         const coreBefore = ann.items.filter((i) => i.tier === 'core').length
         const coreAfter = items.filter((i) => i.tier === 'core').length
         changes.push(`核心要点数 ${coreBefore} → ${coreAfter}`)
+        // annotated.md 是派生导出：档位归位后，里面的加粗标记也得跟着改，
+        // 否则导出的 Markdown 还按旧 tier 决定粗体/斜体（参考档用 *，其余用 **）。
+        if (existsSync(join(dir, 'annotated.md'))) {
+          svc ??= new (await import(`file://${join(HERE, '..', 'plugin', 'lib', 'service.js')}`)).StudyService(WS)
+          writeMd = await svc.renderAnnotatedMarkdown(id, segs, items)
+          changes.push('annotated.md 按新档位重新导出')
+        }
       }
     }
   }
@@ -129,15 +138,10 @@ for (const id of docs) {
     }
     if (!next.contentHash) {
       const original = next.sourceName ? join(dir, 'original', next.sourceName) : null
-      let from = null
-      if (original && existsSync(original)) from = original
-      else if (TEXT_FORMATS.has(String(next.format ?? '').toLowerCase()) && existsSync(join(dir, 'source.md'))) {
-        from = join(dir, 'source.md')
-      }
-      if (from) {
-        next.contentHash = createHash('sha1').update(await readFile(from)).digest('hex')
+      if (original && existsSync(original)) {
+        next.contentHash = createHash('sha1').update(await readFile(original)).digest('hex')
         dirty = true
-        changes.push(`补 contentHash（取自 ${from === original ? 'original/' + next.sourceName : 'source.md'}）`)
+        changes.push(`补 contentHash（取自 original/${next.sourceName}）`)
       }
     }
     if (dirty) writeMeta = next
@@ -150,6 +154,7 @@ for (const id of docs) {
     if (APPLY) {
       if (writeAnn) await writeJsonAtomic(join(dir, 'annotations.json'), writeAnn)
       if (writeMeta) await writeJsonAtomic(metaPath, writeMeta)
+      if (writeMd) await writeFile(join(dir, 'annotated.md'), writeMd, 'utf8')
     }
   }
 }

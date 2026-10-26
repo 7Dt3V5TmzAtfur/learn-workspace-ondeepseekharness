@@ -15,7 +15,7 @@
  *   STUDY_E2E_WS=D:\learn            可选，默认取当前仓库根
  *   STUDY_E2E_KEEP=1                 跑完不删项目，方便人工看界面
  */
-import { mkdir, writeFile, rm, stat, mkdtemp } from 'node:fs/promises'
+import { mkdir, writeFile, rm, mkdtemp } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
 import { resolve, dirname, join } from 'node:path'
 import { tmpdir } from 'node:os'
@@ -60,7 +60,6 @@ function startModule(name) {
 }
 
 async function check(name, fn) {
-  const t0 = Date.now()
   try {
     const note = await fn()
     pass += 1
@@ -72,7 +71,6 @@ async function check(name, fn) {
     console.log(`  ✗ ${name}\n      ${e?.message ?? e}`)
     failures.push({ module: bucket?.name, name, error: e })
   }
-  void t0
 }
 
 /** 断言工具：不引第三方库，报错信息直接说人话 */
@@ -192,9 +190,9 @@ try {
   })
 
   /* ========================================================== 1 导入 */
-  startModule('1 导入（上传 / 路径 / 失败分类）')
+  startModule('1 导入（拖入文件 / 给路径 / 失败分类）')
 
-  await check('浏览器上传：落的文件名带时间戳，标题保持干净', async () => {
+  await check('浏览器导入：落的文件名带时间戳，标题保持干净', async () => {
     const res = await fetch(`${BASE}/ingest-upload?name=${encodeURIComponent(FIXTURE_NAME)}&${Q}`, {
       method: 'POST',
       headers: { 'content-type': 'application/octet-stream' },
@@ -228,7 +226,7 @@ try {
     return `docId=${res.body.docId}`
   })
 
-  await check('上传同一份内容也不新建（_inbox 不留孤儿副本）', async () => {
+  await check('再导入同一份内容也不新建（_inbox 不留孤儿副本）', async () => {
     const before = (await get('/projects')).items.length
     const res = await fetch(`${BASE}/ingest-upload?name=${encodeURIComponent('换个名字也一样.md')}&${Q}`, {
       method: 'POST',
@@ -399,7 +397,6 @@ try {
     // 六段式必须真的渲染成六段，而不是一段
     const secs = (after.preflightHtml.match(/class="sc-pf-sec"/g) ?? []).length
     assertEq(secs, 6, '六段式渲染出的段数')
-    assert(after.preflightHtml.includes('<table') === false || true, '')
     assert(/看原文/.test(after.preflightHtml) || /原文位置待定位/.test(after.preflightHtml), '知识点既没有回指也没说明缺失')
     // 题库在读前就生成，但它不等于考过
     assert(after.quizHtml, 'quizHtml 为空')
@@ -765,9 +762,6 @@ try {
   }
   if (harness) await harness.close().catch(() => {})
   if (tempRoot && !keep) await rm(tempRoot, { recursive: true, force: true }).catch(() => {})
-  void stat
-  void mkdir
-  void writeFile
 }
 
 console.log('\n' + '='.repeat(64))

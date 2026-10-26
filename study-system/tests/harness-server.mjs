@@ -7,7 +7,7 @@
  * 实际变成了「先重载再祈祷」。
  *
  * 这里用最小假宿主（只实现插件真正碰到的几个面）把路由挂到
- * 进程内的 http.createServer 上：真实 req/res、真实端口、真实流式上传，
+ * 进程内的 http.createServer 上：真实 req/res、真实端口、真实流式请求体，
  * 但代码来自源码，与部署无关。
  *
  * 注意 DSH_HOME：插件会往 <DSH_HOME>/study-copilot.state.json 记

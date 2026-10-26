@@ -170,6 +170,9 @@ for (const docId of docs) {
       }
     })
 
+    // 先证明样本非空：没有高亮时，下面几条都会"自动通过"，
+    // 那是空集合自证，不是版面没问题。
+    check(`${tag}：样本里确实有高亮（否则后面的断言没有意义）`, m.hl > 0, '这一份没有任何高亮')
     check(`${tag}：${m.hl} 处高亮都真的画出了底色`, m.invisible === 0, `${m.invisible} 处背景与正文同色`)
     check(`${tag}：三档颜色互不相同`, m.distinctBg >= Math.min(3, m.tiers.length), `只出现 ${m.distinctBg} 种底色（档位 ${m.tiers.join('/')}）`)
     check(`${tag}：段落只用左边线标档位（无整段底色）`, m.borderWidths.every((w) => w === '2px'), `左边线宽度 ${m.borderWidths.join(',')}`)
